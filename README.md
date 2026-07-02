@@ -19,7 +19,8 @@ No install. No local clone. No API keys to hand over.
 [![Registry](https://img.shields.io/badge/MCP_Registry-io.github.doc2mcp-2563eb)](https://registry.modelcontextprotocol.io/?search=doc2mcp)
 [![npm](https://img.shields.io/npm/v/doc2mcp?color=8b5cf6&label=doc2mcp&logo=npm)](https://www.npmjs.com/package/doc2mcp)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-22c55e)](https://github.com/gautammanak1/doc2mcp/pulls)
-[![License](https://img.shields.io/badge/License-Apache_2.0-green)](#license)
+[![License](https://img.shields.io/badge/License-Proprietary-red)](#license)
+[![PR AI review](https://img.shields.io/badge/PR-AI_review-blue)](#license)
 
 **If doc2mcp is useful to you, please [⭐ star the repo](https://github.com/gautammanak1/doc2mcp) — it helps other developers find it.**
 
@@ -233,7 +234,13 @@ instead of a public issue.
 
 ## License
 
-[Apache 2.0](./LICENSE)
+Proprietary — all rights reserved. See [LICENSE](./LICENSE). Source may be
+visible on GitHub for transparency; copying, forking, or redistributing without
+written permission is not allowed.
+
+Pull requests to `staging`/`main` receive an automated **AI code review**
+comment when `GEMINI_API_KEY` is configured in GitHub Actions secrets. See
+[CONTRIBUTING.md](./CONTRIBUTING.md#automated-ai-code-review).
 
 ---
 

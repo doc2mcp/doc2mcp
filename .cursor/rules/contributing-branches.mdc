@@ -1,0 +1,33 @@
+---
+description: doc2mcp branch protection, proprietary license, and PR-only workflow
+alwaysApply: true
+---
+
+# Contributing and branch rules
+
+## Protected branches
+
+Never push directly to `main` or `staging`. Always:
+
+1. Branch from `staging`: `git switch -c feature/my-change`
+2. Open PR → `staging` (QA), then `staging` → `main` for release
+3. Wait for CI: TypeScript, Biome + Ultracite, Next build
+
+## License
+
+Code is **proprietary** (`LICENSE`). Do not relicense to Apache/MIT without approval.
+
+## Secrets
+
+Never commit `.env.local` or real API keys. Production secrets live in Vercel only.
+
+## API routes
+
+Before adding routes, confirm callers exist. Remove unused routes and stale
+`vercel.json` `functions` entries together.
+
+## PRs
+
+- Title: Conventional Commits (`feat:`, `fix:`, …)
+- Automated AI review runs on PR open/update (needs `GEMINI_API_KEY` secret)
+- For deep review in Cursor, use skill `doc2mcp-pr-review`

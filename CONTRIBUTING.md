@@ -7,7 +7,7 @@ deployment workflow, and our PR conventions.
 ## Getting started
 
 ```bash
-git clone https://github.com/doc2mcp/doc2mcp.git
+git clone https://github.com/gautammanak1/doc2mcp.git
 cd doc2mcp
 pnpm install
 cp .env.example .env.local   # then fill in values (see below)
@@ -84,6 +84,54 @@ the stable `staging` URL after merge. Production ships from `main` only when a
 `vX.Y.Z` tag is pushed. The full model and one-time setup live in
 [RELEASING.md](./RELEASING.md).
 
+### Protected branches
+
+**`main` and `staging` do not accept direct pushes** (including from admins).
+Changes must land via a merged pull request after CI passes:
+
+- TypeScript
+- Biome + Ultracite
+- Next build (no migrate)
+
+Workflow:
+
+```bash
+git switch staging
+git pull
+git switch -c feature/my-change
+# ... commit on feature branch ...
+git push -u origin feature/my-change
+# open PR → staging (not direct push to staging/main)
+```
+
+Bypassing branch protection requires changing GitHub settings — do not do
+this for routine work.
+
+## License and source use
+
+The repository is **public for transparency**, but the code is **proprietary**
+(see [LICENSE](./LICENSE)). Do not copy, fork for redistribution, or reuse
+substantial portions without written permission. Hosted functionality depends on
+server-side secrets (Vercel env) that are not in the repo.
+
+## Automated AI code review
+
+Every non-draft PR targeting `staging` or `main` triggers
+[`.github/workflows/pr-ai-review.yml`](./.github/workflows/pr-ai-review.yml):
+
+1. CI runs semantic title + `pnpm check` (existing [PR workflow](./.github/workflows/pr.yml))
+2. **Gemini 2.5 Flash** reviews the PR with:
+   - Local secret-pattern pre-scan on the diff
+   - Priority-ordered diff (`app/api`, `lib/`, `services/` first)
+   - Structured verdict (`approve` / `request_changes` / `comment`)
+   - Findings table with file:line, merge recommendation, and PR review event
+
+**One-time setup** (repo maintainer): add GitHub Actions secret `GEMINI_API_KEY`
+(same key as production Gemini). Without it, the workflow skips quietly.
+
+For a deeper local review in Cursor, use the project skill
+`.cursor/skills/doc2mcp-pr-review` (Bugbot + Security subagents).
+
 ## Pull request conventions
 
 - **Title** must follow [Conventional Commits](https://www.conventionalcommits.org/):
@@ -92,6 +140,7 @@ the stable `staging` URL after merge. Production ships from `main` only when a
 - Fill out the PR template checklist.
 - Keep PRs focused and reasonably small.
 - Never commit secrets or `.env*` files with real values.
+- Wait for **CI** and the **AI review comment** before merging when possible.
 
 ## Code style
 

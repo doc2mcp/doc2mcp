@@ -13,7 +13,7 @@ export function LoginForm({
   return (
     <GoogleAuthButton
       className={cn(className)}
-      label="Sign up with Google"
+      label="Continue with Google"
       redirectUrl={redirectUrl}
     />
   );

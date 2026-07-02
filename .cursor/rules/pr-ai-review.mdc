@@ -1,0 +1,17 @@
+---
+description: AI PR review checklist for doc2mcp changed files
+globs: app/**/*.{ts,tsx},lib/**/*.ts,services/**/*.ts,cli/**/*.ts,.github/workflows/*.yml
+alwaysApply: false
+---
+
+# PR AI review checklist
+
+When reviewing or authoring PR changes in matched files:
+
+- **Auth**: session checks on mutating API routes; MCP tokens verified via `resolveMcpProject`
+- **Secrets**: no env values in code, logs, or tests
+- **Breaking**: MCP JSON-RPC contract, CLI `/api/cli/*` routes, Razorpay webhooks
+- **Performance**: avoid loading full `crawlData` when `withPages: false` suffices
+- **Cleanup**: delete orphaned handlers when removing API routes; update `vercel.json`
+
+Report findings as Critical / Suggestion / OK. Do not merge critical auth or secret issues.

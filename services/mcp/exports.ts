@@ -173,7 +173,7 @@ export function generateMcpExportBundle(options: {
     toolsListMethod: "tools/list",
     toolsCallMethod: "tools/call",
     authorization: authHeader ? "Bearer token included in config" : "required",
-    health: `${entry.url.replace(/\/mcp$/, "")}/overview`,
+    health: entry.url,
   };
 
   const artifacts: McpExportArtifact[] = [

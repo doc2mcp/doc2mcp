@@ -3,6 +3,7 @@ import { AuthAwareLandingNavigation } from "@/components/landing/auth-aware-navi
 import { MarketMatrixSection } from "@/components/landing/comparison-section";
 import { CtaSection } from "@/components/landing/cta-section";
 import { FooterSection } from "@/components/landing/footer-section";
+import { SocialProofSection } from "@/components/landing/social-proof-section";
 import CompareUILib from "@/components/shadcn-studio/blocks/compare-07/compare-07";
 
 export const metadata: Metadata = {
@@ -101,6 +102,7 @@ export default function ComparisonPage() {
       <div className="h-20" />
       <CompareUILib data={comparisonData} />
       <MarketMatrixSection />
+      <SocialProofSection />
       <CtaSection />
       <FooterSection />
     </main>
