@@ -7,8 +7,6 @@ import {
   streamText,
 } from "ai";
 import { checkBotId } from "botid/server";
-import { after } from "next/server";
-import { createResumableStreamContext } from "resumable-stream";
 import { auth, type UserType } from "@/app/(auth)/auth";
 import { isAdminEmail } from "@/lib/admin/admin-access";
 import { entitlementsByUserType } from "@/lib/ai/entitlements";
@@ -49,16 +47,6 @@ import { generateTitleFromUserMessage } from "../../actions";
 import { type PostRequestBody, postRequestBodySchema } from "./schema";
 
 export const maxDuration = 60;
-
-function getStreamContext() {
-  try {
-    return createResumableStreamContext({ waitUntil: after });
-  } catch (_) {
-    return null;
-  }
-}
-
-export { getStreamContext };
 
 export async function POST(request: Request) {
   let requestBody: PostRequestBody;
@@ -385,12 +373,7 @@ export async function POST(request: Request) {
       },
     });
 
-    return createUIMessageStreamResponse({
-      stream,
-      async consumeSseStream() {
-        // Resumable streams disabled (was Redis); rate limits use Supabase Postgres
-      },
-    });
+    return createUIMessageStreamResponse({ stream });
   } catch (error) {
     const vercelId = request.headers.get("x-vercel-id");
 

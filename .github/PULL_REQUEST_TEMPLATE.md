@@ -22,11 +22,13 @@ PR titles must follow Conventional Commits, e.g.:
 
 ## Checklist
 
-- [ ] `pnpm check` passes (Biome + Ultracite, formatting + lint)
+- [ ] PR title follows Conventional Commits (`feat:`, `fix:`, …)
+- [ ] `pnpm check` passes (Biome + Ultracite)
 - [ ] `pnpm exec tsc --noEmit --skipLibCheck` passes
 - [ ] `pnpm exec next build` succeeds (or change is docs-only)
-- [ ] I tested this on a Vercel **preview** deployment, including auth/login
-- [ ] No secrets, tokens, or `.env*` values are committed
+- [ ] Tested on a Vercel **preview** deployment when UI/auth changed
+- [ ] No secrets, tokens, or real `.env*` values committed
+- [ ] AI review comment on this PR reviewed (posted automatically on open/update)
 
 ## Screenshots / recordings
 

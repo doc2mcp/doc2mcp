@@ -9,15 +9,7 @@
   "functions": {
     "app/api/convert/route.ts": { "maxDuration": 60 },
     "app/api/internal/pipeline-worker/route.ts": { "maxDuration": 60 },
-    "app/api/projects/[id]/sync/route.ts": { "maxDuration": 60 },
     "app/api/mcp/[projectId]/mcp/route.ts": { "maxDuration": 30 },
-    "app/api/mcp/[projectId]/ask/route.ts": { "maxDuration": 30 },
-    "app/api/mcp/[projectId]/search/route.ts": { "maxDuration": 15 },
-    "app/api/mcp/[projectId]/pages/route.ts": { "maxDuration": 15 },
-    "app/api/mcp/[projectId]/full/route.ts": { "maxDuration": 15 },
-    "app/api/mcp/[projectId]/overview/route.ts": { "maxDuration": 15 },
-    "app/api/pdf/generate/route.ts": { "maxDuration": 60 },
-    "app/api/image/generate/route.ts": { "maxDuration": 60 },
     "app/(chat)/api/chat/route.ts": { "maxDuration": 60 },
     "app/(chat)/api/files/upload/route.ts": { "maxDuration": 30 }
   },

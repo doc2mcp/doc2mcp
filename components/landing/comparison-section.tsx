@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { SocialProofSection } from "@/components/landing/social-proof-section";
 import { cn } from "@/lib/utils";
 
 type Cell = "yes" | "no" | "partial";
@@ -367,54 +368,56 @@ export function ComparisonSection() {
   }, []);
 
   return (
-    <section
-      className="relative py-16 sm:py-24 lg:py-32"
-      id="comparison"
-      ref={sectionRef}
-    >
-      <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-12">
-        <div className="mb-12 text-center sm:mb-16">
-          <span className="inline-flex items-center gap-3 font-mono text-muted-foreground text-sm">
-            <span className="h-px w-8 bg-foreground/30" />
-            Comparison
-            <span className="h-px w-8 bg-foreground/30" />
-          </span>
-          <h2
-            className={cn(
-              "mt-6 font-display text-3xl tracking-tight transition-all duration-700 sm:text-5xl lg:text-6xl",
-              isVisible
-                ? "translate-y-0 opacity-100"
-                : "translate-y-4 opacity-0"
-            )}
-          >
-            Manual MCP development{" "}
-            <span className="text-muted-foreground">vs</span>{" "}
-            <span className="text-[#4285f4] dark:text-[#8ab4f8] font-semibold">
-              Doc2MCP
+    <>
+      <section
+        className="relative py-16 sm:py-24 lg:py-32"
+        id="comparison"
+        ref={sectionRef}
+      >
+        <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-12">
+          <div className="mb-12 text-center sm:mb-16">
+            <span className="inline-flex items-center gap-3 font-mono text-muted-foreground text-sm">
+              <span className="h-px w-8 bg-foreground/30" />
+              Comparison
+              <span className="h-px w-8 bg-foreground/30" />
             </span>
-          </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">
-            Build it by hand and you ship a one-off, brittle integration. Use
-            Doc2MCP and you ship{" "}
-            <span className="text-foreground">infrastructure</span> —
-            structured, current, and ready for every agent in your stack.
-          </p>
-        </div>
+            <h2
+              className={cn(
+                "mt-6 font-display text-3xl tracking-tight transition-all duration-700 sm:text-5xl lg:text-6xl",
+                isVisible
+                  ? "translate-y-0 opacity-100"
+                  : "translate-y-4 opacity-0"
+              )}
+            >
+              Manual MCP development{" "}
+              <span className="text-muted-foreground">vs</span>{" "}
+              <span className="text-[#4285f4] dark:text-[#8ab4f8] font-semibold">
+                Doc2MCP
+              </span>
+            </h2>
+            <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">
+              Build it by hand and you ship a one-off, brittle integration. Use
+              Doc2MCP and you ship{" "}
+              <span className="text-foreground">infrastructure</span> —
+              structured, current, and ready for every agent in your stack.
+            </p>
+          </div>
 
-        <ManualVsDoc2McpTable />
+          <ManualVsDoc2McpTable />
 
-        <div className="mt-10 flex flex-col items-center gap-4">
-          <TrustStrip />
-          <Link
-            className="inline-flex items-center gap-1.5 rounded-full border border-violet-500/30 bg-violet-500/10 px-4 py-2 font-medium text-sm text-violet-700 transition-colors hover:bg-violet-500/20 dark:text-violet-200"
-            href="/comparison"
-          >
-            <Network className="size-4" />
-            See the full market comparison
-          </Link>
+          <div className="mt-10 flex flex-col items-center gap-4">
+            <Link
+              className="inline-flex items-center gap-1.5 rounded-full border border-violet-500/30 bg-violet-500/10 px-4 py-2 font-medium text-sm text-violet-700 transition-colors hover:bg-violet-500/20 dark:text-violet-200"
+              href="/comparison"
+            >
+              <Network className="size-4" />
+              See the full market comparison
+            </Link>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+      <SocialProofSection />
+    </>
   );
 }
 

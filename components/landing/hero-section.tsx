@@ -45,7 +45,7 @@ export function HeroSection() {
   };
 
   return (
-    <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden py-24 sm:py-32">
+    <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden pb-24 pt-28 sm:pb-32 sm:pt-32">
       <div
         className="pointer-events-none absolute top-1/2 left-1/2 h-[700px] w-[700px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-45 blur-[120px] dark:opacity-20"
         style={{
