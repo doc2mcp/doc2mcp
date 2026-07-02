@@ -28,6 +28,7 @@ import {
   Workflow,
 } from "lucide-react";
 import { useCallback, useEffect, useRef } from "react";
+import { ToolOrbitShowcase } from "@/components/ui/tool-orbit-card";
 import { cn } from "@/lib/utils";
 
 const HEADING_WORDS = ["One", "platform.", "Every", "layer."];
@@ -255,40 +256,7 @@ function SyncCard() {
 
 /* -------------------------- 5. Multi-agent ----------------------------- */
 
-function MultiAgentCard() {
-  const clients = [
-    { name: "Cursor", status: "Installed", path: ".cursor/mcp.json" },
-    {
-      name: "Claude Desktop",
-      status: "Configured",
-      path: "claude_desktop_config.json",
-    },
-    { name: "VS Code", status: "Active", path: "settings.json" },
-  ];
-
-  return (
-    <div className="flex flex-col gap-2 w-full">
-      {clients.map((client) => (
-        <div
-          className="flex items-center justify-between p-2.5 rounded-lg border border-border/40 bg-card/30"
-          key={client.name}
-        >
-          <div className="flex flex-col min-w-0">
-            <span className="font-mono text-[10.5px] text-foreground font-semibold">
-              {client.name}
-            </span>
-            <span className="text-[9px] text-muted-foreground font-mono truncate">
-              {client.path}
-            </span>
-          </div>
-          <span className="px-2 py-0.5 rounded-full font-mono text-[9px] font-semibold text-[#4285f4] dark:text-[#8ab4f8] bg-[#4285f4]/10 border border-[#4285f4]/20 shrink-0">
-            {client.status}
-          </span>
-        </div>
-      ))}
-    </div>
-  );
-}
+const multiAgentShowcase = () => <ToolOrbitShowcase />;
 
 /* ----------------------------- 6. Export ------------------------------- */
 
@@ -385,7 +353,7 @@ const FEATURES: Feature[] = [
     icon: Bot,
     span: "lg:col-span-2",
     accent: "from-[#4285f4]/15 via-[#8ab4f8]/5 to-transparent",
-    render: () => <MultiAgentCard />,
+    render: multiAgentShowcase,
   },
   {
     id: "export",
@@ -407,7 +375,8 @@ function FeatureCard({ feature }: { feature: Feature }) {
   return (
     <motion.div
       className={cn(
-        "group relative col-span-1 overflow-hidden rounded-3xl border p-6 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-[#4285f4]/8 hover:shadow-xl sm:p-7",
+        "group relative col-span-1 rounded-3xl border p-6 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-[#4285f4]/8 hover:shadow-xl sm:p-7",
+        feature.id === "agents" ? "overflow-visible" : "overflow-hidden",
         feature.span,
         feature.highlight
           ? "border-[#4285f4]/45 bg-gradient-to-br from-[#4285f4]/12 via-card/50 to-[#8ab4f8]/12"
