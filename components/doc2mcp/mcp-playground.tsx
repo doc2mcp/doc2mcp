@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import type { CompressedTool } from "@/types/platform";
+import type { CompressedTool, JsonSchemaProperty } from "@/types/platform";
 
 type ToolDef = {
   key: string;
@@ -53,6 +53,33 @@ const DEFAULT_DOCS_TOOLS: ToolDef[] = [
   },
 ];
 
+function schemaType(schema: JsonSchemaProperty): string | undefined {
+  if (Array.isArray(schema.type)) {
+    return schema.type.find((type) => type !== "null") ?? schema.type[0];
+  }
+  return schema.type;
+}
+
+function defaultArgForSchema(schema: JsonSchemaProperty): unknown {
+  if (schema.default !== undefined) {
+    return schema.default;
+  }
+
+  switch (schemaType(schema)) {
+    case "string":
+      return schema.description ? `<${schema.description}>` : "";
+    case "number":
+    case "integer":
+      return 1;
+    case "boolean":
+      return false;
+    case "array":
+      return [];
+    default:
+      return {};
+  }
+}
+
 async function callMcp(
   projectId: string,
   tool: string,
@@ -91,22 +118,9 @@ export function McpPlayground({ projectId, tools }: McpPlaygroundProps) {
     }
     return tools.map((t) => {
       const defaultArgs: Record<string, unknown> = {};
-      const properties = (t.parameters as any)?.properties ?? {};
+      const properties = t.parameters.properties ?? {};
       for (const [k, v] of Object.entries(properties)) {
-        const val = v as { type?: string; description?: string; default?: any };
-        if (val.default !== undefined) {
-          defaultArgs[k] = val.default;
-        } else if (val.type === "string") {
-          defaultArgs[k] = val.description ? `<${val.description}>` : "";
-        } else if (val.type === "number" || val.type === "integer") {
-          defaultArgs[k] = 1;
-        } else if (val.type === "boolean") {
-          defaultArgs[k] = false;
-        } else if (val.type === "array") {
-          defaultArgs[k] = [];
-        } else {
-          defaultArgs[k] = {};
-        }
+        defaultArgs[k] = defaultArgForSchema(v);
       }
       return {
         key: t.name,
