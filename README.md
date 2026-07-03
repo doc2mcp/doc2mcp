@@ -219,9 +219,10 @@ and support full login.
 Contributions are welcome! Whether it's a bug fix, a new source-format adapter,
 or docs improvements:
 
-1. Fork the repo and create a branch off `staging`.
-2. Run `pnpm check` and `pnpm exec tsc --noEmit` before opening a PR.
-3. Open a PR against `staging` with a clear description.
+1. Follow the [first-contribution walkthrough](./CONTRIBUTING.md#your-first-contribution).
+2. Fork the repo and create a branch off `staging`.
+3. Run `pnpm check` and `pnpm exec tsc --noEmit` before opening a PR.
+4. Open a PR against `staging` with a clear description.
 
 Found a bug or have an idea? [Open an issue](https://github.com/gautammanak1/doc2mcp/issues).
 

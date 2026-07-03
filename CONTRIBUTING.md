@@ -16,6 +16,62 @@ pnpm dev
 
 Requirements: Node 20, pnpm 10, and a Supabase project + Postgres database.
 
+## Your first contribution
+
+Use this checklist for your first PR:
+
+1. Fork the repo on GitHub.
+2. Create your branch from `staging`, not `main`:
+
+   ```bash
+   git switch staging
+   git pull
+   git switch -c docs/my-first-change
+   ```
+
+3. Install dependencies and copy the local env template:
+
+   ```bash
+   pnpm install
+   cp .env.example .env.local
+   ```
+
+4. Fill only local placeholder values in `.env.local`. Do not commit this file.
+   Minimum local development keys are:
+
+   - `AUTH_SECRET`
+   - `POSTGRES_URL`
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `SUPABASE_SERVICE_ROLE_KEY`
+   - `GEMINI_API_KEY`
+
+   Optional services such as Upstash, QStash, Resend, search providers, and the
+   MCP registry token can stay empty unless your issue specifically needs them.
+
+5. Start the app and verify the local page:
+
+   ```bash
+   pnpm dev
+   ```
+
+   Open <http://localhost:3000>. If your change touches auth, conversion, or
+   dashboard flows, test the affected path with your local Supabase project.
+
+6. Run the checks relevant to your change:
+
+   ```bash
+   pnpm check
+   pnpm exec tsc --noEmit --skipLibCheck
+   ```
+
+   For end-to-end or UI behavior changes, also run the targeted Playwright test
+   or `pnpm test` when your local environment is configured for it. For docs-only
+   changes, note that you reviewed the rendered Markdown.
+
+7. Open a PR into `staging`. Fill out the PR template, include screenshots for
+   UI changes, and paste the preview URL after Vercel creates it.
+
 ## Project checks
 
 Run these before opening a PR — CI runs the same commands:
