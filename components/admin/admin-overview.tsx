@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import { getAdminStats, getAllProjects } from "@/lib/db/queries";
 import { AdminCharts, type DailyPoint, type StatusSlice } from "./admin-charts";
 
@@ -63,6 +64,7 @@ function buildStatusSlices(projects: Array<{ status: string }>): StatusSlice[] {
 }
 
 export async function AdminOverview() {
+  await connection();
   const [statsResult, projectsResult] = await Promise.allSettled([
     getAdminStats(),
     getAllProjects(200),
