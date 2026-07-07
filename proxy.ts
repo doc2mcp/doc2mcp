@@ -142,6 +142,16 @@ function applySecurityHeaders(response: NextResponse) {
   headers.delete("Server");
 }
 
+function safePostLoginPath(raw: string | null): string {
+  if (!raw?.startsWith("/")) {
+    return "/post-login";
+  }
+  if (raw.startsWith("//") || raw.startsWith("/auth/")) {
+    return "/post-login";
+  }
+  return raw;
+}
+
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -166,8 +176,8 @@ export async function proxy(request: NextRequest) {
   ) {
     const oauthUrl = new URL(`${base}/auth/oauth`, request.url);
     oauthUrl.searchParams.set("code", oauthCode);
-    const next = request.nextUrl.searchParams.get("next");
-    oauthUrl.searchParams.set("next", next ?? "/post-login");
+    const next = safePostLoginPath(request.nextUrl.searchParams.get("next"));
+    oauthUrl.searchParams.set("next", next);
     const redirect = NextResponse.redirect(oauthUrl);
     applySecurityHeaders(redirect);
     return redirect;
