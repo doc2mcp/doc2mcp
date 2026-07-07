@@ -1,0 +1,63 @@
+name: Sync Vercel env
+
+# One-off / manual sync of required env vars from GitHub secrets → Vercel project.
+# Add secrets in repo Settings → Secrets → Actions, then run workflow_dispatch.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+jobs:
+  sync:
+    name: Push env vars to Vercel (production + preview)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Vercel CLI
+        run: npm i -g vercel@latest
+
+      - name: Link Vercel project
+        run: |
+          mkdir -p .vercel
+          echo '{"orgId":"'"${VERCEL_ORG_ID}"'","projectId":"'"${VERCEL_PROJECT_ID}"'"}' > .vercel/project.json
+
+      - name: Sync environment variables
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          # Required
+          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+          POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
+          NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          # Recommended
+          ADMIN_EMAILS: ${{ secrets.ADMIN_EMAILS }}
+          GEMINI_MODEL: ${{ secrets.GEMINI_MODEL }}
+          KV_REST_API_URL: ${{ secrets.KV_REST_API_URL }}
+          KV_REST_API_TOKEN: ${{ secrets.KV_REST_API_TOKEN }}
+          QSTASH_TOKEN: ${{ secrets.QSTASH_TOKEN }}
+          QSTASH_CURRENT_SIGNING_KEY: ${{ secrets.QSTASH_CURRENT_SIGNING_KEY }}
+          QSTASH_NEXT_SIGNING_KEY: ${{ secrets.QSTASH_NEXT_SIGNING_KEY }}
+          QSTASH_URL: ${{ secrets.QSTASH_URL }}
+        run: node scripts/sync-vercel-env.mjs
+
+      - name: Redeploy production
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+          vercel build --prod --token="$VERCEL_TOKEN"
+          vercel deploy --prebuilt --prod --archive=tgz --token="$VERCEL_TOKEN"
