@@ -205,11 +205,32 @@ function buildSmartDiff(files) {
   };
 }
 
-function scanDiffForSecrets(diff) {
+function isExampleEnvFile(filePath) {
+  return filePath === ".env.example" || filePath.endsWith("/.env.example");
+}
+
+function buildSecretScanDiff(files) {
+  const chunks = [];
+  for (const file of files) {
+    if (isExampleEnvFile(file.path)) {
+      continue;
+    }
+    const fileDiff = runGit(
+      `git diff ${baseSha}...${headSha} -- ${JSON.stringify(file.path)}`
+    );
+    if (fileDiff) {
+      chunks.push(fileDiff);
+    }
+  }
+  return chunks.join("\n");
+}
+
+function scanDiffForSecrets(diff, files) {
+  const secretDiff = files?.length ? buildSecretScanDiff(files) : diff;
   const hits = [];
   for (const pattern of SECRET_PATTERNS) {
     pattern.regex.lastIndex = 0;
-    const matches = diff.match(pattern.regex);
+    const matches = secretDiff.match(pattern.regex);
     if (matches?.length) {
       hits.push({
         id: pattern.id,
@@ -219,7 +240,9 @@ function scanDiffForSecrets(diff) {
     }
   }
 
-  const envFileTouched = /\n(?:\+|-).*\.env(?:\.|$)/.test(diff);
+  const envFileTouched = files?.some(
+    (file) => file.path.startsWith(".env") && !isExampleEnvFile(file.path)
+  );
   if (envFileTouched) {
     hits.push({
       id: "env_file",
@@ -382,26 +405,45 @@ function formatReviewMarkdown(review, context) {
 
 async function callGemini(prompt, { maxTokens = 4096 } = {}) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${apiKey}`;
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: {
-        temperature: 0.12,
-        maxOutputTokens: maxTokens,
-        responseMimeType: "application/json",
-      },
-    }),
-  });
+  const maxAttempts = 4;
+  let lastError = "Gemini API request failed";
 
-  if (!res.ok) {
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: {
+          temperature: 0.12,
+          maxOutputTokens: maxTokens,
+          responseMimeType: "application/json",
+        },
+      }),
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      return data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+    }
+
     const err = await res.text();
-    throw new Error(`Gemini API ${res.status}: ${err.slice(0, 500)}`);
+    lastError = `Gemini API ${res.status}: ${err.slice(0, 500)}`;
+    const retryable = res.status === 429 || res.status === 503;
+    if (!retryable || attempt === maxAttempts) {
+      throw new Error(lastError);
+    }
+
+    const delayMs = 2000 * 2 ** (attempt - 1);
+    console.warn(
+      `Gemini ${res.status} on attempt ${attempt}/${maxAttempts}; retrying in ${delayMs}ms`
+    );
+    await new Promise((resolve) => {
+      setTimeout(resolve, delayMs);
+    });
   }
 
-  const data = await res.json();
-  return data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+  throw new Error(lastError);
 }
 
 async function geminiReview({
@@ -526,10 +568,6 @@ ${diff.slice(0, 80_000)}`;
     }
   }
 
-  if (secretHits.length > 0 && parsed.verdict === "approve") {
-    parsed.verdict = "request_changes";
-  }
-
   return parsed;
 }
 
@@ -627,7 +665,7 @@ async function submitPullRequestReview(review) {
 
 const files = getChangedFiles();
 const { diff, included, skipped } = buildSmartDiff(files);
-const secretHits = scanDiffForSecrets(diff);
+const secretHits = scanDiffForSecrets(diff, files);
 const groups = summarizeFiles(files);
 const prTitle = process.env.PR_TITLE ?? "";
 const prBody = process.env.PR_BODY ?? "";

@@ -39,7 +39,7 @@ export function DocFeedback({ pageHref }: { pageHref: string }) {
         Spotted an issue?{" "}
         <Link
           className="text-primary underline-offset-2 hover:underline"
-          href={`https://github.com/gautammanak1/doc2mcp/issues/new?title=Docs%20feedback&body=Page%3A%20${encodeURIComponent(pageHref)}`}
+          href={`https://github.com/doc2mcp/doc2mcp/issues/new?title=Docs%20feedback&body=Page%3A%20${encodeURIComponent(pageHref)}`}
           rel="noopener noreferrer"
           target="_blank"
         >
