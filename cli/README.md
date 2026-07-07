@@ -11,7 +11,7 @@ Point it at a docs URL, and doc2mcp crawls, analyzes, and serves it as a token-s
 [![npm version](https://img.shields.io/npm/v/doc2mcp?color=8b5cf6&label=npm&logo=npm)](https://www.npmjs.com/package/doc2mcp)
 [![npm downloads](https://img.shields.io/npm/dm/doc2mcp?color=8b5cf6&logo=npm)](https://www.npmjs.com/package/doc2mcp)
 [![node](https://img.shields.io/node/v/doc2mcp?color=8b5cf6&logo=node.js)](https://nodejs.org)
-[![license](https://img.shields.io/npm/l/doc2mcp?color=8b5cf6)](https://github.com/gautammanak1/doc2mcp/blob/main/LICENSE)
+[![license](https://img.shields.io/npm/l/doc2mcp?color=8b5cf6)](https://github.com/doc2mcp/doc2mcp/blob/main/LICENSE)
 
 [Website](https://doc2mcp.site) · [CLI](https://doc2mcp.site/cli) · [Docs](https://doc2mcp.site/docs) · [CLI guide](https://doc2mcp.site/docs/cli)
 
@@ -262,4 +262,4 @@ already exists).
 
 ## License
 
-[MIT](https://github.com/gautammanak1/doc2mcp/blob/main/LICENSE)
+[MIT](https://github.com/doc2mcp/doc2mcp/blob/main/LICENSE)
