@@ -9,7 +9,7 @@
   "homepage": "https://doc2mcp.site",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gautammanak1/doc2mcp.git",
+    "url": "git+https://github.com/doc2mcp/doc2mcp.git",
     "directory": "cli"
   },
   "bugs": {

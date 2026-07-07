@@ -98,7 +98,7 @@ export default function RootLayout({
         >
           <TooltipProvider>
             {children}
-            <Analytics />
+            {process.env.NODE_ENV === "production" ? <Analytics /> : null}
             <Toaster position="bottom-center" theme="system" />
           </TooltipProvider>
         </ThemeProvider>

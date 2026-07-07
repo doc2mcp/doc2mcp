@@ -142,6 +142,16 @@ function applySecurityHeaders(response: NextResponse) {
   headers.delete("Server");
 }
 
+function safePostLoginPath(raw: string | null): string {
+  if (!raw?.startsWith("/")) {
+    return "/post-login";
+  }
+  if (raw.startsWith("//") || raw.startsWith("/auth/")) {
+    return "/post-login";
+  }
+  return raw;
+}
+
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -154,6 +164,24 @@ export async function proxy(request: NextRequest) {
   }
 
   const base = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
+  // Supabase PKCE sometimes redirects to Site URL (/) with ?code= when the
+  // exact redirectTo path is not allow-listed. Forward to /auth/oauth so the
+  // server can exchange the code and mint the app session.
+  const oauthCode = request.nextUrl.searchParams.get("code");
+  if (
+    oauthCode &&
+    !pathname.startsWith("/auth/oauth") &&
+    !pathname.startsWith("/auth/confirm")
+  ) {
+    const oauthUrl = new URL(`${base}/auth/oauth`, request.url);
+    oauthUrl.searchParams.set("code", oauthCode);
+    const next = safePostLoginPath(request.nextUrl.searchParams.get("next"));
+    oauthUrl.searchParams.set("next", next);
+    const redirect = NextResponse.redirect(oauthUrl);
+    applySecurityHeaders(redirect);
+    return redirect;
+  }
 
   if (pathname === "/register") {
     const loginUrl = new URL(`${base}/login`, request.url);
