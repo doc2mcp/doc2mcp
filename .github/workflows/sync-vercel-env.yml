@@ -54,6 +54,10 @@ jobs:
           QSTASH_URL: ${{ secrets.QSTASH_URL }}
         run: node scripts/sync-vercel-env.mjs
 
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.32.1
+
       - name: Redeploy production
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}

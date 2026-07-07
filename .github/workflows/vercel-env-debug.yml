@@ -1,0 +1,28 @@
+name: Debug Vercel env
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+jobs:
+  list:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Vercel CLI
+        run: npm i -g vercel@latest
+
+      - name: Link project
+        run: |
+          mkdir -p .vercel
+          echo '{"orgId":"'"${VERCEL_ORG_ID}"'","projectId":"'"${VERCEL_PROJECT_ID}"'"}' > .vercel/project.json
+
+      - name: List production env names
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: vercel env ls production --token="$VERCEL_TOKEN"
