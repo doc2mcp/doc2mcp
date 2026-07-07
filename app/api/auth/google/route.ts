@@ -33,7 +33,9 @@ export async function GET(request: NextRequest) {
   });
 
   if (error || !data.url) {
-    const message = encodeURIComponent(error?.message ?? "Google sign-in failed");
+    const message = encodeURIComponent(
+      error?.message ?? "Google sign-in failed"
+    );
     return NextResponse.redirect(`${origin}/login?error=${message}`);
   }
 
