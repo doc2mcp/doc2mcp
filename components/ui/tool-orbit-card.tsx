@@ -39,21 +39,6 @@ const ORBIT_TOOLS = [
   },
 ] as const;
 
-const SPARKLE_POSITIONS = [
-  { id: "s-1", top: 12, left: 18, duration: 4.2, x: -0.5, y: 0.8 },
-  { id: "s-2", top: 28, left: 72, duration: 5.1, x: 0.3, y: -0.4 },
-  { id: "s-3", top: 44, left: 35, duration: 4.8, x: -0.8, y: 0.2 },
-  { id: "s-4", top: 58, left: 88, duration: 5.6, x: 0.6, y: -0.7 },
-  { id: "s-5", top: 71, left: 12, duration: 4.5, x: 0.1, y: 0.5 },
-  { id: "s-6", top: 83, left: 54, duration: 5.3, x: -0.3, y: -0.2 },
-  { id: "s-7", top: 22, left: 91, duration: 4.9, x: 0.7, y: 0.4 },
-  { id: "s-8", top: 36, left: 48, duration: 5.8, x: -0.6, y: -0.5 },
-  { id: "s-9", top: 52, left: 8, duration: 4.1, x: 0.4, y: 0.3 },
-  { id: "s-10", top: 66, left: 76, duration: 5.4, x: -0.2, y: 0.6 },
-  { id: "s-11", top: 79, left: 29, duration: 4.7, x: 0.5, y: -0.3 },
-  { id: "s-12", top: 91, left: 63, duration: 5.2, x: -0.4, y: 0.1 },
-] as const;
-
 function subscribeToMounted() {
   return () => {};
 }
@@ -102,12 +87,12 @@ function OrbitContainer({
         reduceMotion
           ? undefined
           : {
-              scale: [1, 1.1, 1],
+              scale: [1, 1.08, 1],
               y: [0, -4, 0],
             }
       }
       className={cn(
-        "flex items-center justify-center rounded-full bg-[rgba(248,248,248,0.01)] shadow-[0px_0px_8px_0px_rgba(248,248,248,0.25)_inset,0px_32px_24px_-16px_rgba(0,0,0,0.40)]",
+        "flex items-center justify-center rounded-full border border-white/10 bg-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]",
         className
       )}
       transition={
@@ -127,40 +112,6 @@ function OrbitContainer({
   );
 }
 
-function ToolOrbitSparkles({ reduceMotion }: { reduceMotion: boolean | null }) {
-  if (reduceMotion) {
-    return null;
-  }
-
-  return (
-    <div className="absolute inset-0">
-      {SPARKLE_POSITIONS.map((sparkle) => (
-        <motion.span
-          animate={{
-            top: `calc(${sparkle.top}% + ${sparkle.y}px)`,
-            left: `calc(${sparkle.left}% + ${sparkle.x}px)`,
-            opacity: [0.15, 1, 0],
-            scale: [1, 1.2, 0],
-          }}
-          className="inline-block size-0.5 rounded-full bg-cyan-500 dark:bg-cyan-400"
-          initial={{
-            top: `${sparkle.top}%`,
-            left: `${sparkle.left}%`,
-            opacity: 0.35,
-          }}
-          key={sparkle.id}
-          style={{ position: "absolute" }}
-          transition={{
-            duration: sparkle.duration,
-            repeat: Number.POSITIVE_INFINITY,
-            ease: "linear",
-          }}
-        />
-      ))}
-    </div>
-  );
-}
-
 function ToolOrbitSkeleton() {
   const reduceMotion = useReducedMotion();
   const mounted = useSyncExternalStore(
@@ -176,7 +127,7 @@ function ToolOrbitSkeleton() {
           {ORBIT_TOOLS.map((tool) => (
             <div
               className={cn(
-                "flex items-center justify-center rounded-full bg-neutral-300/40 dark:bg-neutral-800/60",
+                "flex items-center justify-center rounded-full bg-neutral-800/60",
                 tool.containerClass
               )}
               key={tool.name}
@@ -203,12 +154,6 @@ function ToolOrbitSkeleton() {
           </OrbitContainer>
         ))}
       </div>
-
-      <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-        <div className="relative h-32 w-10">
-          <ToolOrbitSparkles reduceMotion={reduceMotion} />
-        </div>
-      </div>
     </div>
   );
 }
@@ -217,7 +162,7 @@ export function ToolOrbitShowcase({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        "relative h-[15rem] overflow-hidden rounded-xl bg-neutral-300/70 dark:bg-[rgba(40,40,40,0.70)] [mask-image:radial-gradient(50%_50%_at_50%_50%,white_0%,transparent_100%)] md:h-[20rem]",
+        "relative h-[15rem] overflow-hidden rounded-xl bg-neutral-900/40 [mask-image:radial-gradient(50%_50%_at_50%_50%,white_0%,transparent_100%)] md:h-[20rem]",
         className
       )}
     >

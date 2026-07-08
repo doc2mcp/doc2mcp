@@ -37,6 +37,7 @@ import {
   ModelSelectorName,
   ModelSelectorTrigger,
 } from "@/components/ai-elements/model-selector";
+import { useChatDocPreview } from "@/components/chat/chat-doc-preview-context";
 import { Doc2McpModeToggle } from "@/components/doc2mcp/mode-toggle";
 import { UrlDetectBanner } from "@/components/doc2mcp/url-detect-banner";
 import {
@@ -344,6 +345,23 @@ function PureMultimodalInput({
     detectedUrl !== null &&
     detectedUrl !== dismissedUrl &&
     !doc2mcpLoading;
+
+  const { setPreview } = useChatDocPreview();
+  useEffect(() => {
+    setPreview({
+      url: detectedUrl,
+      doc2mcpMode: hasMounted && doc2mcpMode,
+      isLoading: doc2mcpLoading,
+      isDismissed: detectedUrl !== null && detectedUrl === dismissedUrl,
+    });
+  }, [
+    detectedUrl,
+    doc2mcpMode,
+    doc2mcpLoading,
+    dismissedUrl,
+    hasMounted,
+    setPreview,
+  ]);
 
   const handleBannerGenerate = useCallback(() => {
     if (!detectedUrl) {

@@ -19,6 +19,7 @@ import { toast } from "sonner";
 import { updateProjectOwnership } from "@/app/(dashboard)/dashboard/projects/[id]/ownership-actions";
 import { McpPlayground } from "@/components/doc2mcp/mcp-playground";
 import { RegistryStatusCard } from "@/components/doc2mcp/registry-status-card";
+import { RetryConversionButton } from "@/components/doc2mcp/retry-conversion-button";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -143,6 +144,21 @@ export function ProjectDetail({
               Live
             </Badge>
           ) : null}
+          {project.status === "error" ? (
+            <>
+              <RetryConversionButton
+                projectId={project.id}
+                size="sm"
+                variant="default"
+              />
+              <Button asChild size="sm" type="button" variant="outline">
+                <Link href={`/convert/${project.id}`}>
+                  <ExternalLink className="mr-1 size-3.5" />
+                  Pipeline view
+                </Link>
+              </Button>
+            </>
+          ) : null}
           {artifacts?.mcpConfig ? (
             <Button asChild size="sm" type="button" variant="outline">
               <Link href={`/convert/${project.id}`}>
@@ -160,6 +176,24 @@ export function ProjectDetail({
         report={report}
         tools={tools}
       />
+
+      {project.status === "error" ? (
+        <Card className="border-red-500/30 bg-red-500/5">
+          <CardHeader>
+            <CardTitle className="text-base">Conversion failed</CardTitle>
+            <CardDescription>
+              Retry with the same documentation URL. Failed attempts are not
+              counted in your monthly conversion limit.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-wrap gap-3">
+            <RetryConversionButton projectId={project.id} redirectToConvert />
+            <Button asChild type="button" variant="outline">
+              <Link href={`/convert/${project.id}`}>View pipeline</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      ) : null}
 
       {artifacts?.mcpAccessToken ? (
         <RegistryStatusCard registry={artifacts.registry} />

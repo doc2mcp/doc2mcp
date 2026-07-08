@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
 import { Toaster } from "sonner";
 import { ThemeProvider } from "@/components/theme-provider";
+import { CustomCursor } from "@/components/ui/custom-cursor";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
 
@@ -92,11 +93,12 @@ export default function RootLayout({
       >
         <ThemeProvider
           attribute="class"
-          defaultTheme="light"
+          defaultTheme="dark"
           disableTransitionOnChange
           enableSystem={false}
         >
           <TooltipProvider>
+            <CustomCursor />
             {children}
             {process.env.NODE_ENV === "production" ? <Analytics /> : null}
             <Toaster position="bottom-center" theme="system" />

@@ -13,6 +13,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
+import { RetryConversionButton } from "@/components/doc2mcp/retry-conversion-button";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -209,12 +210,22 @@ export function ProjectsExplorer({
                       {new Date(project.updatedAt).toLocaleString()}
                     </td>
                     <td className="px-5 py-3 text-right">
-                      <Button asChild size="sm" type="button" variant="ghost">
-                        <Link href={`/dashboard/projects/${project.id}`}>
-                          Open
-                          <ExternalLink className="ml-1 size-3" />
-                        </Link>
-                      </Button>
+                      <div className="flex items-center justify-end gap-2">
+                        {project.status === "error" ? (
+                          <RetryConversionButton
+                            label="Retry"
+                            projectId={project.id}
+                            size="sm"
+                            variant="outline"
+                          />
+                        ) : null}
+                        <Button asChild size="sm" type="button" variant="ghost">
+                          <Link href={`/dashboard/projects/${project.id}`}>
+                            Open
+                            <ExternalLink className="ml-1 size-3" />
+                          </Link>
+                        </Button>
+                      </div>
                     </td>
                   </tr>
                 );

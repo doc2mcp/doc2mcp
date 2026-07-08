@@ -17,15 +17,7 @@ const nextConfig: NextConfig = {
           },
         ],
       }
-    : {
-        redirects: async () => [
-          {
-            source: "/playground",
-            destination: "/cli",
-            permanent: true,
-          },
-        ],
-      }),
+    : {}),
   env: {
     NEXT_PUBLIC_BASE_PATH: basePath,
   },
@@ -52,6 +44,15 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "*.supabase.co",
         pathname: "/storage/v1/object/public/**",
+      },
+      {
+        protocol: "https",
+        hostname: "ui-avatars.com",
+      },
+      {
+        protocol: "https",
+        hostname: "www.google.com",
+        pathname: "/s2/favicons/**",
       },
     ],
   },

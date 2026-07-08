@@ -46,32 +46,30 @@ export function HeroSection() {
 
   return (
     <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden pb-24 pt-28 sm:pb-32 sm:pt-32">
+      <div className="noise-texture pointer-events-none absolute inset-0" />
       <div
-        className="pointer-events-none absolute top-1/2 left-1/2 h-[700px] w-[700px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-45 blur-[120px] dark:opacity-20"
-        style={{
-          background:
-            "radial-gradient(circle, rgba(66, 133, 244, 0.12) 0%, rgba(66, 133, 244, 0.04) 60%, transparent 100%)",
-        }}
+        aria-hidden="true"
+        className="auth-orb-glow pointer-events-none top-1/3 left-1/2 -translate-x-1/2"
       />
 
-      <div className="relative z-10 mx-auto flex w-full max-w-[950px] flex-col items-center justify-center px-6 text-center">
+      <div className="relative z-10 mx-auto flex w-[90vw] max-w-4xl flex-col items-center justify-center px-4 text-center sm:w-5/6 2xl:w-4/6">
         <motion.div
           animate={mounted ? { opacity: 1, scale: 1 } : false}
-          className="mb-8 inline-flex items-center gap-2 rounded-full border border-border/80 bg-card/40 px-3.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-muted-foreground/80 backdrop-blur-md"
+          className="mb-8 inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-3.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground backdrop-blur-md"
           initial={false}
           transition={{ duration: 0.5 }}
         >
           Any URL to Model Context Protocol
         </motion.div>
 
-        <h1 className="font-display text-[clamp(2rem,6vw,4.25rem)] font-semibold leading-[1.05] tracking-tight">
+        <h1 className="font-display text-[clamp(2.25rem,6.5vw,4.5rem)] font-thin leading-[1.02] tracking-tight">
           <span className="block text-foreground">Turn Any Documentation</span>
           <div className="relative mt-3 flex flex-col items-center justify-center gap-2 sm:flex-row">
             <LayoutTextFlip duration={3000} text="Into " words={words} />
           </div>
         </h1>
 
-        <p className="mt-8 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+        <p className="mt-8 max-w-2xl text-base leading-relaxed text-muted-foreground font-light sm:text-lg">
           Paste a docs URL—Mintlify, Docusaurus, GitHub, OpenAPI—and get a
           hosted, Cursor-ready MCP server in seconds. No setup, no local
           scripts.

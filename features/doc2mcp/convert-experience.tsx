@@ -21,6 +21,7 @@ import {
   ResultDashboard,
   StatusBadge,
 } from "@/components/doc2mcp/result-dashboard";
+import { RetryConversionButton } from "@/components/doc2mcp/retry-conversion-button";
 import { TerminalLog } from "@/components/doc2mcp/terminal-log";
 import { Button } from "@/components/ui/button";
 import type { PlatformProject } from "@/lib/db/schema";
@@ -292,12 +293,31 @@ export function ConvertExperience({
                   className="rounded-2xl border border-red-500/30 bg-red-500/10 p-6 text-center"
                   initial={{ opacity: 0 }}
                 >
-                  <p className="text-red-500 dark:text-red-300">
-                    Conversion failed. Try another URL.
+                  <p className="font-medium text-red-500 dark:text-red-300">
+                    Conversion failed
                   </p>
-                  <Button asChild className="mt-4" variant="outline">
-                    <Link href="/">Start over</Link>
-                  </Button>
+                  <p className="mt-2 text-muted-foreground text-sm">
+                    Retry the same URL from here or your dashboard. Retries do
+                    not count toward your monthly limit.
+                  </p>
+                  <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+                    <RetryConversionButton
+                      onSuccess={async () => {
+                        const res = await fetch(`/api/projects/${project.id}`);
+                        if (res.ok) {
+                          const data = (await res.json()) as {
+                            project: PlatformProject;
+                          };
+                          setProject(data.project);
+                        }
+                      }}
+                      projectId={project.id}
+                      redirectToConvert={false}
+                    />
+                    <Button asChild type="button" variant="outline">
+                      <Link href="/dashboard/projects">Open dashboard</Link>
+                    </Button>
+                  </div>
                 </motion.div>
               ) : null}
             </AnimatePresence>
