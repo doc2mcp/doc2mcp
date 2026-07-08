@@ -40,6 +40,7 @@ const VARS = [
   { name: "BRAVE_SEARCH_API_KEY" },
   { name: "EXA_API_KEY" },
   { name: "JINA_API_KEY" },
+  { name: "MCP_REGISTRY_GITHUB_TOKEN" },
 ];
 
 const API = "https://api.vercel.com";

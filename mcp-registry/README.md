@@ -42,7 +42,7 @@ Set these on the deployed app (Vercel → Environment Variables):
 | `MCP_REGISTRY_AUTOPUBLISH`   |    no    | Set to `false` to disable auto-publishing.                                                    |
 | `MCP_REGISTRY_BASE_URL`      |    no    | Override the registry base URL (defaults to the official registry).                           |
 | `MCP_REGISTRY_NAMESPACE`     |    no    | Override the namespace (defaults to `io.github.doc2mcp`).                                      |
-| `MCP_REGISTRY_SOURCE_REPO`   |    no    | Repo URL recorded in each manifest (defaults to `https://github.com/doc2mcp/doc2mcp`).        |
+| `MCP_REGISTRY_SOURCE_REPO`   |    no    | Repo URL recorded in each manifest (defaults to `https://github.com/doc2mcp/doc2mcp-registry`). |
 
 > The namespace `io.github.doc2mcp/*` requires the GitHub token to belong to
 > a member of the `doc2mcp` GitHub organization. A token from any other
@@ -77,8 +77,8 @@ this repo, `server.json`, `.env` files committed to git, or any README.
 
 ## Gateway entry (this folder)
 
-The files here mirror the separate
-[`doc2mcp/doc2mcp`](https://github.com/doc2mcp/doc2mcp) GitHub-org repo,
+The files here mirror the public
+[`doc2mcp/doc2mcp-registry`](https://github.com/doc2mcp/doc2mcp-registry) repo,
 which owns the namespace via GitHub OIDC and publishes the canonical
 `io.github.doc2mcp/doc2mcp` gateway record. To cut a new gateway version,
 push a `v*` tag in that repo — the workflow syncs `server.json`'s version
