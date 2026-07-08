@@ -129,7 +129,7 @@ export async function POST(request: Request) {
       return Response.json(
         {
           error:
-            "Payment gateway rejected the request (invalid Razorpay keys). Please check RAZORPAY_KEY_ID / RAZORPAY_KEY_SECRET.",
+            "Payment gateway rejected the request (invalid Razorpay keys). On production use live keys (rzp_live_*) from the Razorpay dashboard — test keys often fail here. Update RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET in Vercel, then redeploy.",
         },
         { status: 502 }
       );

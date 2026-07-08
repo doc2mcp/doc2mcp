@@ -1,10 +1,8 @@
 #!/usr/bin/env node
 /**
  * Upsert GitHub Actions secrets (passed as env) into Vercel project env.
- * Used by .github/workflows/sync-vercel-env.yml
+ * Uses Vercel REST API to remove branch-scoped duplicates before re-adding.
  */
-
-import { execSync, spawnSync } from "node:child_process";
 
 const token = process.env.VERCEL_TOKEN;
 const orgId = process.env.VERCEL_ORG_ID;
@@ -42,28 +40,64 @@ const VARS = [
   { name: "BRAVE_SEARCH_API_KEY" },
   { name: "EXA_API_KEY" },
   { name: "JINA_API_KEY" },
+  { name: "MCP_REGISTRY_GITHUB_TOKEN" },
 ];
 
-function run(command) {
-  execSync(command, { stdio: "inherit", env: process.env });
+const API = "https://api.vercel.com";
+
+async function vercelApi(path, { method = "GET", body } = {}) {
+  const url = new URL(`${API}${path}`);
+  url.searchParams.set("teamId", orgId);
+  const res = await fetch(url, {
+    method,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Vercel API ${method} ${path}: ${res.status} ${text}`);
+  }
+  if (res.status === 204) {
+    return null;
+  }
+  return res.json();
 }
 
-function upsertEnv(name, value, target) {
-  try {
-    run(
-      `vercel env rm ${name} ${target} --yes --token="${token}" 2>/dev/null || true`
-    );
-  } catch {
-    // ignore missing
+async function listProjectEnv() {
+  const data = await vercelApi(`/v9/projects/${projectId}/env`);
+  return Array.isArray(data?.envs) ? data.envs : [];
+}
+
+async function deleteEnvEntry(id) {
+  await vercelApi(`/v9/projects/${projectId}/env/${id}`, { method: "DELETE" });
+}
+
+async function createEnvEntry(key, value) {
+  await vercelApi(`/v10/projects/${projectId}/env`, {
+    method: "POST",
+    body: {
+      key,
+      value,
+      type: "encrypted",
+      target: ["production", "preview"],
+    },
+  });
+}
+
+const existing = await listProjectEnv();
+const keysToSync = new Set(VARS.map((v) => v.name));
+
+for (const entry of existing) {
+  if (!keysToSync.has(entry.key)) {
+    continue;
   }
-  const result = spawnSync(
-    "vercel",
-    ["env", "add", name, target, "--token", token],
-    { input: value, stdio: ["pipe", "inherit", "inherit"], env: process.env }
+  console.log(
+    `delete ${entry.key} (id=${entry.id}, targets=${entry.target?.join(",")}, branch=${entry.gitBranch ?? "all"})`
   );
-  if (result.status !== 0) {
-    throw new Error(`vercel env add ${name} ${target} failed`);
-  }
+  await deleteEnvEntry(entry.id);
 }
 
 let synced = 0;
@@ -81,10 +115,8 @@ for (const { name, required } of VARS) {
     continue;
   }
 
-  for (const target of ["production", "preview"]) {
-    console.log(`set ${name} → ${target}`);
-    upsertEnv(name, value, target);
-  }
+  console.log(`create ${name} → production + preview`);
+  await createEnvEntry(name, value);
   synced += 1;
 }
 
