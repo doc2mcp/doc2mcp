@@ -29,7 +29,8 @@ const SERVER_SCHEMA =
 const DEFAULT_REGISTRY_BASE = "https://registry.modelcontextprotocol.io";
 const NAMESPACE = process.env.MCP_REGISTRY_NAMESPACE ?? "io.github.doc2mcp";
 const SOURCE_REPO =
-  process.env.MCP_REGISTRY_SOURCE_REPO ?? "https://github.com/doc2mcp/doc2mcp";
+  process.env.MCP_REGISTRY_SOURCE_REPO ??
+  "https://github.com/doc2mcp/doc2mcp-registry";
 
 const MAX_DESCRIPTION = 100;
 const TOKEN_TIMEOUT_MS = 8000;

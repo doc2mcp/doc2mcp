@@ -11,6 +11,7 @@ import {
   ilike,
   inArray,
   lt,
+  ne,
   or,
   type SQL,
   sql,
@@ -1336,7 +1337,8 @@ export async function countUserConversionsThisMonth(userId: string) {
     .where(
       and(
         eq(platformProject.userId, userId),
-        gte(platformProject.createdAt, startOfMonth)
+        gte(platformProject.createdAt, startOfMonth),
+        ne(platformProject.status, "error")
       )
     );
 

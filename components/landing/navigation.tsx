@@ -6,6 +6,7 @@ import {
   BookOpen,
   CreditCard,
   FileText,
+  FlaskConical,
   Home,
   LogIn,
   MessageSquare,
@@ -44,7 +45,12 @@ const NAV_LINKS = [
   { name: "Docs", href: "/docs", icon: FileText },
 ] as const;
 
+const AUTH_NAV_LINKS = [
+  { name: "Playground", href: "/dashboard/playground", icon: FlaskConical },
+] as const;
+
 const TOUR_ANCHORS: Record<string, string> = {
+  "/dashboard/playground": "nav-playground",
   "/cli": "nav-cli",
   "/pricing": "nav-pricing",
 };
@@ -123,7 +129,14 @@ export function LandingNavigation({
   const appHref = activeSession?.isAdmin ? "/admin" : "/chat";
   const appLabel = activeSession?.isAdmin ? "Admin" : "Open app";
 
-  const navItems = NAV_LINKS.map((link) => ({
+  const visibleNavLinks = useMemo(() => {
+    if (!activeSession) {
+      return NAV_LINKS;
+    }
+    return [...NAV_LINKS.slice(0, 2), ...AUTH_NAV_LINKS, ...NAV_LINKS.slice(2)];
+  }, [activeSession]);
+
+  const navItems = visibleNavLinks.map((link) => ({
     name: link.name,
     link: link.href,
   }));
@@ -176,7 +189,7 @@ export function LandingNavigation({
         </MobileNavHeader>
 
         <MobileNavMenu isOpen={isMobileMenuOpen}>
-          {NAV_LINKS.map((item) => {
+          {visibleNavLinks.map((item) => {
             const Icon = item.icon;
             return (
               <Link

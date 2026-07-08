@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useChatDocPreviewVisible } from "@/components/chat/chat-doc-preview-context";
+import { DocPreviewPanel } from "@/components/chat/doc-preview-panel";
 import { ChatTour } from "@/components/onboarding/chat-tour";
 import {
   AlertDialog,
@@ -54,6 +56,7 @@ export function ChatShell() {
   );
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const isArtifactVisible = useArtifactSelector((state) => state.isVisible);
+  const showDocPreview = useChatDocPreviewVisible() && !isArtifactVisible;
   const { setArtifact } = useArtifact();
 
   const stopRef = useRef(stop);
@@ -72,11 +75,15 @@ export function ChatShell() {
 
   return (
     <>
-      <div className="flex h-dvh w-full flex-row overflow-hidden">
+      <div className="flex h-dvh w-full flex-col overflow-hidden md:flex-row">
         <div
           className={cn(
-            "flex min-w-0 flex-col bg-sidebar transition-[width] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
-            isArtifactVisible ? "w-[40%]" : "w-full"
+            "flex min-h-0 min-w-0 flex-col bg-sidebar transition-[width] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
+            isArtifactVisible
+              ? "w-full md:w-[40%]"
+              : showDocPreview
+                ? "w-full md:w-[45%]"
+                : "w-full"
           )}
         >
           <ChatHeader
@@ -152,6 +159,10 @@ export function ChatShell() {
             </div>
           </div>
         </div>
+
+        {showDocPreview ? (
+          <DocPreviewPanel className="order-last h-[38vh] w-full shrink-0 md:order-none md:h-auto md:w-[35%] md:min-w-[280px]" />
+        ) : null}
 
         <Artifact
           addToolApprovalResponse={addToolApprovalResponse}
