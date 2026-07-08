@@ -1,7 +1,10 @@
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
+import { Suspense } from "react";
 import { auth } from "@/app/(auth)/auth";
 
-export default async function PlaygroundRedirectPage() {
+async function PlaygroundRedirectContent(): Promise<null> {
+  await connection();
   const session = await auth();
 
   if (!session?.user?.id || session.user.type === "guest") {
@@ -9,4 +12,13 @@ export default async function PlaygroundRedirectPage() {
   }
 
   redirect("/dashboard/playground");
+  return null;
+}
+
+export default function PlaygroundRedirectPage() {
+  return (
+    <Suspense fallback={null}>
+      <PlaygroundRedirectContent />
+    </Suspense>
+  );
 }
