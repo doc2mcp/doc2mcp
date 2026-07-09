@@ -1891,6 +1891,22 @@ export async function getOrCreateOwnedTeam({
   return created;
 }
 
+/** Returns the team only when `userId` is the owner. */
+export async function getOwnedTeamById({
+  teamId,
+  userId,
+}: {
+  teamId: string;
+  userId: string;
+}) {
+  const [owned] = await db
+    .select()
+    .from(team)
+    .where(and(eq(team.id, teamId), eq(team.ownerId, userId)))
+    .limit(1);
+  return owned ?? null;
+}
+
 export async function listTeamInvitesForOwner({ userId }: { userId: string }) {
   const owned = await db
     .select({ id: team.id })
@@ -1918,6 +1934,11 @@ export async function createTeamInvite({
   invitedBy: string;
   role?: "admin" | "member";
 }) {
+  const owned = await getOwnedTeamById({ teamId, userId: invitedBy });
+  if (!owned) {
+    throw new Error("forbidden: only the team owner can create invites");
+  }
+
   const rawToken = generateUUID();
   const tokenHash = createHash("sha256").update(rawToken).digest("hex");
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
@@ -1925,7 +1946,7 @@ export async function createTeamInvite({
   const [invite] = await db
     .insert(teamInvite)
     .values({
-      teamId,
+      teamId: owned.id,
       email: email.trim().toLowerCase(),
       role,
       invitedBy,
