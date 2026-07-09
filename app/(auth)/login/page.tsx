@@ -20,7 +20,7 @@ function LoginHeading() {
       <LoginHeroStrip />
 
       <div className="space-y-3">
-        <p className="inline-flex items-center rounded-full border border-primary/25 bg-primary/8 px-3 py-1 font-medium text-primary text-xs dark:border-primary/30 dark:bg-primary/10 dark:text-primary">
+        <p className="inline-flex items-center rounded-full border border-[#4285f4]/25 bg-[#4285f4]/8 px-3 py-1 font-medium text-[#4285f4] text-xs dark:border-[#8ab4f8]/30 dark:bg-[#8ab4f8]/10 dark:text-[#8ab4f8]">
           Free to get started
         </p>
         <h1 className="font-display font-semibold text-2xl tracking-tight sm:text-3xl">
@@ -39,7 +39,7 @@ function LoginHeading() {
             className="flex items-start gap-2.5 rounded-xl border border-border/50 bg-muted/30 px-3 py-2.5 text-sm"
             key={text}
           >
-            <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-[#4285f4]/10 text-[#4285f4] dark:bg-[#8ab4f8]/15 dark:text-[#8ab4f8]">
               <Icon className="size-3" strokeWidth={2.25} />
             </span>
             <span className="text-foreground/90">{text}</span>

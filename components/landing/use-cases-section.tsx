@@ -117,7 +117,9 @@ export function UseCasesSection() {
             </span>
             <h2 className="font-display text-3xl tracking-tight sm:text-4xl lg:text-5xl leading-tight text-foreground">
               Infrastructure for every{" "}
-              <span className="text-primary font-semibold">AI-native</span>{" "}
+              <span className="text-[#4285f4] dark:text-[#8ab4f8] font-semibold">
+                AI-native
+              </span>{" "}
               team.
             </h2>
           </div>
@@ -142,7 +144,7 @@ export function UseCasesSection() {
                   className={cn(
                     "flex flex-col text-left p-5 rounded-2xl border transition-all duration-300 backdrop-blur-md",
                     active
-                      ? "border-primary bg-primary/5 shadow-sm"
+                      ? "border-[#4285f4] bg-[#4285f4]/5 dark:border-[#8ab4f8] dark:bg-[#8ab4f8]/5 shadow-sm"
                       : "border-border/40 bg-card/20 hover:bg-card/45 hover:border-border/80"
                   )}
                   key={uc.id}
@@ -154,7 +156,7 @@ export function UseCasesSection() {
                       className={cn(
                         "flex size-8 items-center justify-center rounded-lg border transition-colors",
                         active
-                          ? "border-primary/40 bg-primary/10 text-primary"
+                          ? "border-[#4285f4]/40 bg-[#4285f4]/10 text-[#4285f4] dark:border-[#8ab4f8]/40 dark:bg-[#8ab4f8]/10 dark:text-[#8ab4f8]"
                           : "border-border/40 bg-background/50 text-muted-foreground"
                       )}
                     >
@@ -215,7 +217,9 @@ export function UseCasesSection() {
                     <span className="text-zinc-500 font-bold uppercase">
                       claude_desktop_config.json
                     </span>
-                    <span className="text-primary font-bold">● Connected</span>
+                    <span className="text-[#4285f4] dark:text-[#8ab4f8] font-bold">
+                      ● Connected
+                    </span>
                   </div>
                   <div className="space-y-1 text-zinc-300">
                     <p className="text-zinc-500">
@@ -288,7 +292,7 @@ export function UseCasesSection() {
                   >
                     <span
                       aria-hidden="true"
-                      className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary"
+                      className="mt-1.5 size-1.5 shrink-0 rounded-full bg-[#4285f4] dark:bg-[#8ab4f8]"
                     />
                     <span>{b}</span>
                   </li>

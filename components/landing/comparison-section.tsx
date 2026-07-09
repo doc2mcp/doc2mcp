@@ -391,7 +391,9 @@ export function ComparisonSection() {
             >
               Manual MCP development{" "}
               <span className="text-muted-foreground">vs</span>{" "}
-              <span className="text-primary font-semibold">Doc2MCP</span>
+              <span className="text-[#4285f4] dark:text-[#8ab4f8] font-semibold">
+                Doc2MCP
+              </span>
             </h2>
             <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">
               Build it by hand and you ship a one-off, brittle integration. Use

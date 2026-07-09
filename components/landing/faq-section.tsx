@@ -152,7 +152,7 @@ export function FaqSection() {
         <p className="mt-10 text-center text-muted-foreground text-xs">
           Still curious?{" "}
           <a
-            className="font-medium text-foreground underline underline-offset-4 hover:text-primary transition-colors"
+            className="font-medium text-foreground underline underline-offset-4 hover:text-[#4285f4] transition-colors"
             href="https://calendly.com/doc2mcp/30min"
             rel="noopener noreferrer"
             target="_blank"

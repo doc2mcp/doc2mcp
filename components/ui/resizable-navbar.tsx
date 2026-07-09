@@ -225,12 +225,12 @@ export function NavbarButton({
   React.ComponentPropsWithoutRef<"button">) {
   const variantStyles = {
     primary:
-      "bg-primary text-primary-foreground shadow-sm hover:opacity-95",
+      "bg-[#4285f4] text-white shadow-sm hover:opacity-95 dark:bg-[#8ab4f8] dark:text-[#131314]",
     secondary:
       "border border-border/60 bg-transparent text-foreground shadow-none hover:bg-muted/50",
     dark: "bg-foreground text-background shadow-sm",
     gradient:
-      "btn-cta-gradient shadow-sm",
+      "bg-gradient-to-b from-[#4285f4] to-[#1a56db] text-white shadow-sm dark:from-[#8ab4f8] dark:to-[#4285f4] dark:text-[#131314]",
   };
 
   const classes = cn(
