@@ -7,7 +7,7 @@ import type { ProjectArtifacts } from "@/types/platform";
 export const metadata: Metadata = {
   title: "MCP Playground",
   description:
-    "Run semantic MCP tool calls against your converted documentation projects in a live sandbox.",
+    "Connect your hosted documentation MCP and chat with it — ask questions, search pages, and get cited answers.",
 };
 
 export default async function DashboardPlaygroundPage({
@@ -26,14 +26,13 @@ export default async function DashboardPlaygroundPage({
 
   const mapped = projects.map((p) => {
     const artifacts = p.artifacts as ProjectArtifacts | null;
-    const tools = artifacts?.compressedTools ?? [];
     return {
       id: p.id,
       name: p.name ?? "",
       sourceUrl: p.sourceUrl,
       status: p.status,
-      tools,
       hasToken: Boolean(artifacts?.mcpAccessToken),
+      pageCount: artifacts?.docsPageCount,
     };
   });
 
@@ -47,8 +46,8 @@ export default async function DashboardPlaygroundPage({
           MCP Playground
         </h1>
         <p className="mt-2 max-w-2xl text-muted-foreground text-sm leading-relaxed">
-          Pick a ready project and fire real JSON-RPC tool calls against your
-          hosted MCP — inspect payloads before wiring into Cursor or Claude.
+          Add your hosted MCP, then chat with your documentation — the agent
+          calls real tools and streams cited answers, just like Cursor.
         </p>
       </header>
 

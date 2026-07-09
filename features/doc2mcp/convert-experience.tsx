@@ -10,7 +10,6 @@ import {
   MessageSquare,
   Server,
   Share2,
-  TerminalSquare,
   Wrench,
 } from "lucide-react";
 import Link from "next/link";
@@ -42,7 +41,6 @@ const SECTIONS = [
   { id: "connect", label: "Connect", icon: Server },
   { id: "chat", label: "Chat", icon: MessageSquare },
   { id: "tools", label: "Tools", icon: Wrench },
-  { id: "test", label: "Test", icon: TerminalSquare },
   { id: "insights", label: "Insights", icon: Activity },
 ] as const;
 

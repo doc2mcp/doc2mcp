@@ -15,7 +15,6 @@ import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { InstallButtons } from "@/components/doc2mcp/install-buttons";
 import { McpChat } from "@/components/doc2mcp/mcp-chat";
-import { McpPlayground } from "@/components/doc2mcp/mcp-playground";
 import { RegistryStatusCard } from "@/components/doc2mcp/registry-status-card";
 import { Button } from "@/components/ui/button";
 import type { PlatformProject } from "@/lib/db/schema";
@@ -73,18 +72,6 @@ function getServerUrl(config: McpServerConfig | null): string | null {
     return null;
   }
   return Object.values(servers).at(0)?.url ?? null;
-}
-
-function dedupeTools(tools: CompressedTool[]): CompressedTool[] {
-  const seen = new Set<string>();
-  const out: CompressedTool[] = [];
-  for (const tool of tools) {
-    if (!seen.has(tool.name)) {
-      seen.add(tool.name);
-      out.push(tool);
-    }
-  }
-  return out;
 }
 
 type DisplayTool = { name: string; description: string; endpoints: string[] };
@@ -406,10 +393,6 @@ export function ResultDashboard({
   const origin = useLiveOrigin();
   const logs = (project.logs as ProcessingLog[]) ?? [];
 
-  const compressedTools = useMemo(
-    () => dedupeTools(artifacts.compressedTools ?? []),
-    [artifacts.compressedTools]
-  );
   const displayTools = useMemo(
     () => buildDisplayTools(artifacts.compressedTools ?? []),
     [artifacts.compressedTools]
@@ -630,19 +613,6 @@ export function ResultDashboard({
         />
         <ToolsGrid tools={displayTools} />
       </section>
-
-      {/* Test */}
-      {token ? (
-        <section className="scroll-mt-8" id="test">
-          <SectionIntro
-            description="Invoke any tool with raw JSON-RPC — exactly what Cursor and Claude send."
-            eyebrow="Sandbox"
-            highlight="the MCP"
-            title="Test"
-          />
-          <McpPlayground projectId={project.id} tools={compressedTools} />
-        </section>
-      ) : null}
 
       {/* Advanced configs */}
       {exportBundle ? (
