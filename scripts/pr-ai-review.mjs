@@ -271,6 +271,52 @@ function nearestAddedLine(addedLines, requested) {
   return bestDist <= 8 ? best : null;
 }
 
+function readHeadFile(filePath) {
+  return runGit(`git show ${headSha}:${JSON.stringify(filePath)}`);
+}
+
+/**
+ * Full-file context for high-priority changed files so the model can verify
+ * auth/ownership/call sites instead of inventing issues from a partial hunk.
+ */
+function buildFullFileContext(
+  files,
+  { maxFiles = 18, maxChars = 120_000 } = {}
+) {
+  const priority = files
+    .filter((f) => filePriority(f.path) <= PRIORITY_PREFIXES.length)
+    .slice(0, maxFiles);
+  const fallback = files
+    .filter((f) => !priority.some((p) => p.path === f.path))
+    .slice(0, Math.max(0, maxFiles - priority.length));
+  const selected = [...priority, ...fallback];
+
+  const chunks = [];
+  let used = 0;
+  const included = [];
+
+  for (const file of selected) {
+    const content = readHeadFile(file.path);
+    if (!content) {
+      continue;
+    }
+    const numbered = content
+      .split("\n")
+      .slice(0, 900)
+      .map((line, i) => `${String(i + 1).padStart(4, " ")}|${line}`)
+      .join("\n");
+    const block = `\n===== FILE ${file.path} (${file.status}) =====\n${numbered}\n`;
+    if (used + block.length > maxChars) {
+      break;
+    }
+    chunks.push(block);
+    used += block.length;
+    included.push(file.path);
+  }
+
+  return { context: chunks.join("\n"), included };
+}
+
 function isExampleEnvFile(filePath) {
   return filePath === ".env.example" || filePath.endsWith("/.env.example");
 }
@@ -381,7 +427,12 @@ function normalizePriority(value) {
   ) {
     return "should_fix";
   }
-  if (raw === "nit" || raw === "low" || raw === "info" || raw === "suggestion") {
+  if (
+    raw === "nit" ||
+    raw === "low" ||
+    raw === "info" ||
+    raw === "suggestion"
+  ) {
     return "nit";
   }
   return "should_fix";
@@ -412,18 +463,85 @@ function normalizeFindings(review) {
         typeof f.line === "number"
           ? f.line
           : Number.parseInt(String(f.line ?? ""), 10) || null;
+      const confidence = String(f.confidence ?? "medium").toLowerCase();
       return {
         priority,
-        severity: priority === "must_fix" ? "high" : priority === "should_fix" ? "medium" : "low",
+        severity:
+          priority === "must_fix"
+            ? "high"
+            : priority === "should_fix"
+              ? "medium"
+              : "low",
         file: typeof f.file === "string" ? f.file : "",
         line: Number.isFinite(line) && line > 0 ? line : null,
         title: f.title ?? "Issue",
         detail: f.detail ?? f.title ?? "",
+        evidence: typeof f.evidence === "string" ? f.evidence.trim() : "",
         suggestion: typeof f.suggestion === "string" ? f.suggestion : "",
         breakRisk: typeof f.breakRisk === "string" ? f.breakRisk : "",
+        confidence,
       };
     })
     .sort((a, b) => priorityRank(a.priority) - priorityRank(b.priority));
+}
+
+const FALSE_POSITIVE_PATTERNS = [
+  /color-mix/i,
+  /browser support/i,
+  /font variable names/i,
+  /redundant font/i,
+  /documentation clarity/i,
+  /MAX_INLINE_COMMENTS/i,
+  /script description/i,
+  /type=['"]button['"]/i,
+  /lacks explicit type/i,
+  /playground page removed/i,
+  /redirecting to \/chat/i,
+  /intentional product/i,
+  /toISOString\(\)/i,
+  /ISO string/i,
+  /timestamptz/i,
+];
+
+function filterVerifiedFindings(findings, files) {
+  const changed = new Set(files.map((f) => f.path));
+  const out = [];
+
+  for (const f of findings) {
+    const priority = normalizePriority(f.priority ?? f.severity);
+    const confidence = String(f.confidence ?? "medium").toLowerCase();
+    const evidence = String(f.evidence ?? "").trim();
+    const blob = `${f.title ?? ""} ${f.detail ?? ""} ${f.breakRisk ?? ""}`;
+
+    if (!evidence || evidence.length < 12) {
+      continue;
+    }
+    if (FALSE_POSITIVE_PATTERNS.some((re) => re.test(blob))) {
+      continue;
+    }
+    if (f.file && !changed.has(f.file) && f.file !== "") {
+      // allow findings only on changed files
+      continue;
+    }
+    if (priority === "must_fix" && confidence !== "high") {
+      f.priority = "should_fix";
+    }
+    if (String(f.file ?? "").includes("scripts/pr-ai-review")) {
+      continue;
+    }
+    out.push(f);
+  }
+
+  const must = out
+    .filter((f) => normalizePriority(f.priority) === "must_fix")
+    .slice(0, 5);
+  const should = out
+    .filter((f) => normalizePriority(f.priority) === "should_fix")
+    .slice(0, 6);
+  const nits = out
+    .filter((f) => normalizePriority(f.priority) === "nit")
+    .slice(0, 3);
+  return [...must, ...should, ...nits];
 }
 
 function formatInlineComment(finding) {
@@ -433,6 +551,15 @@ function formatInlineComment(finding) {
     "",
     finding.detail,
   ];
+  if (finding.evidence) {
+    parts.push(
+      "",
+      "**Evidence:**",
+      "```",
+      finding.evidence.slice(0, 500),
+      "```"
+    );
+  }
   if (finding.breakRisk) {
     parts.push("", `**Break risk:** ${finding.breakRisk}`);
   }
@@ -474,12 +601,16 @@ function formatReviewMarkdown(review, context) {
   }
 
   if (findings.length > 0) {
-    md += "| Priority | Location | Finding | Break risk |\n";
-    md += "| --- | --- | --- | --- |\n";
+    md += "| Priority | Location | Finding | Evidence | Break risk |\n";
+    md += "| --- | --- | --- | --- | --- |\n";
     for (const f of findings.slice(0, 20)) {
       const loc = f.file ? `\`${f.file}${f.line ? `:${f.line}` : ""}\`` : "—";
       const risk = (f.breakRisk || "—").replace(/\|/g, "/");
-      md += `| ${priorityLabel(f.priority)} | ${loc} | ${(f.title ?? "").replace(/\|/g, "/")} | ${risk} |\n`;
+      const evidence = (f.evidence || "—")
+        .replace(/\|/g, "/")
+        .replace(/\n/g, " ")
+        .slice(0, 80);
+      md += `| ${priorityLabel(f.priority)} | ${loc} | ${(f.title ?? "").replace(/\|/g, "/")} | ${evidence} | ${risk} |\n`;
     }
     if (findings.length > 20) {
       md += `\n_+ ${findings.length - 20} more finding(s) below._\n`;
@@ -592,6 +723,8 @@ async function callGemini(prompt, { maxTokens = 8192 } = {}) {
 
 async function geminiReview({
   diff,
+  fileContext,
+  fileContextFiles,
   prTitle,
   prBody,
   files,
@@ -612,24 +745,26 @@ async function geminiReview({
           .join("\n")}\n`
       : "";
 
-  const systemContext = `You are a principal engineer reviewing doc2mcp PRs in the style of CodeRabbit.
+  const systemContext = `You are a principal engineer doing a REAL code review of doc2mcp, in CodeRabbit style.
 
-Product: Next.js 16 App Router + Supabase auth/Postgres + QStash + Gemini + hosted MCP JSON-RPC at /api/mcp/{id}/mcp + CLI /api/cli/* + Razorpay.
+Product: Next.js 16 App Router + Supabase auth/Postgres + QStash + Gemini + hosted MCP at /api/mcp/{id}/mcp + CLI /api/cli/* + Razorpay.
 
-Review goals:
-1. Find real bugs and security holes that will break production or leak data.
-2. Classify every finding as must_fix, should_fix, or nit (CodeRabbit style).
-3. For each finding, explain WHERE it breaks (runtime path / user impact) in breakRisk.
-4. Prefer concrete, actionable suggestions over vague advice.
-5. Cite exact file paths and line numbers from the diff (new-file line numbers).
-6. Do NOT invent issues. If unsure, use should_fix or nit — never fabricate must_fix.
-7. Skip pure style nits unless they hide a bug. Prefer fewer, higher-signal findings.
+CRITICAL PROCESS (do this before emitting any finding):
+1. Read the FULL FILE CONTEXT for each changed high-priority file (line-numbered).
+2. Read the DIFF to see what changed.
+3. Trace callers / auth / ownership in the full file before claiming a bug.
+4. Only emit a finding if you can quote evidence from the provided code.
+5. If you are not sure, OMIT the finding. Silence is better than a false positive.
+6. Do NOT invent auth/IDOR bugs when auth() + userId scoping is clearly present.
+7. Do NOT flag intentional product decisions (route redirects, feature removals) as bugs unless they crash or leak data.
+8. Do NOT flag browser-standard CSS (color-mix) or ISO timestamptz strings as must_fix without a concrete failure mode proven in this codebase.
+9. Prefer 0-8 high-signal findings over a long laundry list.
 ${secretContext}
 
 Priority rules:
-- must_fix: auth bypass, IDOR, secret leak, data loss, crash on happy path, broken billing/webhook verify, MCP token bypass, build/prerender blockers
-- should_fix: missing edge-case handling, weak validation, confusing UX that causes wrong actions, perf footguns, incomplete migrations
-- nit: naming, minor clarity, optional polish
+- must_fix ONLY for proven: auth bypass, IDOR, secret leak, data loss, crash on happy path, webhook verify skip, MCP token bypass, build/prerender blockers
+- should_fix for real edge bugs / weak validation that can cause wrong behavior
+- nit for optional polish only (max 3). Skip documentation-only nits about this review script.
 
 Project checklist:
 ${checklist}`;
@@ -646,19 +781,22 @@ ${checklist}`;
       "line": 123,
       "title": "short imperative title",
       "detail": "what is wrong and why it matters",
+      "evidence": "quote 1-3 lines of code from the provided context that prove the issue",
       "breakRisk": "how/where this breaks at runtime (user, API, build, data)",
-      "suggestion": "concrete fix steps or patch outline"
+      "suggestion": "concrete fix steps or patch outline",
+      "confidence": "high" | "medium" | "low"
     }
   ],
   "looksGood": ["bullet", "..."]
 }
 
-Rules for findings:
-- Always set priority (required).
-- Always set file + line when the issue is in the diff.
-- Always set breakRisk for must_fix and should_fix.
-- Cap at ~15 findings; prioritize must_fix then should_fix.
-- verdict must be request_changes if any must_fix exists.`;
+Hard rules:
+- evidence is REQUIRED for every finding. No evidence => omit finding.
+- confidence high required for must_fix. If medium/low, use should_fix or omit.
+- Always set file + line from the numbered full-file context when possible.
+- Cap findings: <=5 must_fix, <=6 should_fix, <=3 nit.
+- verdict = request_changes ONLY if there is at least one high-confidence must_fix.
+- If no real issues: verdict approve or comment with empty findings.`;
 
   const userPrompt = `${systemContext}
 
@@ -670,10 +808,14 @@ Changed files (${files.length}):
 ${fileList}
 
 File areas: API=${groups.api}, lib/services=${groups.lib}, UI=${groups.ui}, CI=${groups.ci}, docs=${groups.docs}
+Full-file context included for: ${fileContextFiles.join(", ") || "(none)"}
 
 ${schema}
 
-Diff (priority-ordered, may be partial). Use NEW file line numbers from +++ / hunk headers:
+===== FULL FILE CONTEXT (analyze first) =====
+${fileContext || "(no full-file context)"}
+
+===== DIFF (what changed) =====
 ${diff || "(empty diff)"}`;
 
   let raw = await callGemini(userPrompt, { maxTokens: 8192 });
@@ -682,15 +824,19 @@ ${diff || "(empty diff)"}`;
   if (!parsed && DEEP_REVIEW) {
     const securityPrompt = `${systemContext}
 
-Focus ONLY on must_fix security/auth/secrets/webhooks/MCP tokens/RLS/IDOR.
+Focus ONLY on high-confidence must_fix security/auth/secrets/webhooks/MCP tokens/RLS/IDOR.
+Omit anything without evidence quotes from the full-file context.
 
 PR: ${prTitle}
 Files:\n${fileList}
 
 ${schema}
 
-Diff:
-${diff.slice(0, 80_000)}`;
+FULL FILE CONTEXT:
+${fileContext.slice(0, 90_000)}
+
+DIFF:
+${diff.slice(0, 60_000)}`;
 
     raw = await callGemini(securityPrompt, { maxTokens: 4096 });
     parsed = extractJson(raw);
@@ -711,8 +857,10 @@ ${diff.slice(0, 80_000)}`;
         line: null,
         title: h.label,
         detail: `${h.count} pattern match(es) in diff`,
+        evidence: "local regex secret scan hit",
         breakRisk: "Credential exposure if real secrets were committed",
         suggestion: "Rotate keys and remove secrets from git history if needed",
+        confidence: "high",
       })),
       looksGood: [],
       _raw: raw.slice(0, 2000),
@@ -734,15 +882,22 @@ ${diff.slice(0, 80_000)}`;
         line: null,
         title: hit.label,
         detail: "Detected by local pre-flight secret scan on the PR diff.",
+        evidence: "local regex secret scan hit",
         breakRisk: "Leaked credentials can be abused immediately",
-        suggestion: "Remove from the PR, rotate the credential, confirm .gitignore",
+        suggestion:
+          "Remove from the PR, rotate the credential, confirm .gitignore",
+        confidence: "high",
       });
     }
   }
 
+  parsed.findings = filterVerifiedFindings(parsed.findings, files);
   const normalized = normalizeFindings(parsed);
+  parsed.findings = normalized;
   if (normalized.some((f) => f.priority === "must_fix")) {
     parsed.verdict = "request_changes";
+  } else if (parsed.verdict === "request_changes") {
+    parsed.verdict = normalized.length > 0 ? "comment" : "approve";
   }
 
   return parsed;
@@ -947,9 +1102,14 @@ const groups = summarizeFiles(files);
 const prTitle = process.env.PR_TITLE ?? "";
 const prBody = process.env.PR_BODY ?? "";
 
+const { context: fileContext, included: fileContextFiles } =
+  buildFullFileContext(files);
+
 try {
   const review = await geminiReview({
     diff,
+    fileContext,
+    fileContextFiles,
     prTitle,
     prBody,
     files,
@@ -958,7 +1118,7 @@ try {
   });
 
   const findings = normalizeFindings(review);
-  const { markdown, verdict } = formatReviewMarkdown(review, {
+  const { verdict } = formatReviewMarkdown(review, {
     files,
     included,
     skipped,

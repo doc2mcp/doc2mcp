@@ -35,7 +35,8 @@ jobs:
       - name: Run AI review
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GEMINI_MODEL: gemini-2.5-flash-lite
+          # Full model (not lite): fewer false positives after full-file analysis
+          GEMINI_MODEL: gemini-2.5-flash
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
@@ -46,4 +47,6 @@ jobs:
           BASE_REF: ${{ github.event.pull_request.base.ref }}
           HEAD_REF: ${{ github.event.pull_request.head.ref }}
           REVIEW_MAX_DIFF_CHARS: "180000"
+          REVIEW_DEEP: "1"
+          REVIEW_MAX_INLINE: "15"
         run: node scripts/pr-ai-review.mjs
