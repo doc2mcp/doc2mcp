@@ -35,16 +35,16 @@ export function UrlDetectBanner({
   onDismiss,
 }: UrlDetectBannerProps) {
   return (
-    <div className="mb-2 w-full overflow-hidden rounded-2xl border border-[#4285f4]/30 bg-[#4285f4]/[0.06] backdrop-blur-sm dark:border-[#8ab4f8]/30 dark:bg-[#8ab4f8]/[0.06]">
+    <div className="mb-2 w-full overflow-hidden rounded-2xl border border-primary/30 bg-primary/[0.06] backdrop-blur-sm">
       <div className="flex items-start gap-3 px-3.5 py-3">
-        <div className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full bg-[#4285f4]/15 text-[#4285f4] dark:bg-[#8ab4f8]/15 dark:text-[#8ab4f8]">
+        <div className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary">
           <Sparkles className="size-3.5" />
         </div>
 
         <div className="min-w-0 flex-1">
           <p className="font-medium text-foreground text-xs">
             Documentation detected
-            <span className="ml-1.5 font-mono text-[#4285f4] text-[11px] dark:text-[#8ab4f8]">
+            <span className="ml-1.5 font-mono text-primary text-[11px]">
               {prettyUrl(url)}
             </span>
           </p>
@@ -56,7 +56,7 @@ export function UrlDetectBanner({
 
           <div className="mt-2.5 flex items-center gap-2">
             <button
-              className="inline-flex items-center gap-1.5 rounded-full bg-[#4285f4] px-3 py-1.5 font-medium text-[11px] text-white transition-opacity hover:opacity-90 disabled:opacity-60 dark:bg-[#8ab4f8] dark:text-[#131314]"
+              className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 font-medium text-[11px] text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
               disabled={loading}
               onClick={onGenerate}
               type="button"

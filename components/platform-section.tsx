@@ -96,9 +96,7 @@ function CrawlingCard() {
       <div className="flex flex-col justify-between gap-3 p-3.5 rounded-xl border border-border/40 bg-card/30">
         <span className="text-[9px] text-muted-foreground uppercase tracking-wider font-semibold border-b border-border/20 pb-1.5 flex items-center justify-between">
           <span>Metadata &amp; Stats</span>
-          <span className="text-[#4285f4] dark:text-[#8ab4f8] font-bold">
-            doc2mcp-crawler/1.0
-          </span>
+          <span className="text-primary font-bold">doc2mcp-crawler/1.0</span>
         </span>
         <div className="grid grid-cols-2 gap-2.5 my-auto">
           {stats.map((stat) => (
@@ -182,9 +180,7 @@ function RetrievalCard() {
   return (
     <div className="flex flex-col gap-2.5 w-full">
       <div className="rounded-lg border border-border/40 bg-card/25 px-3 py-2 flex items-center gap-2 font-mono text-[10.5px]">
-        <span className="text-[#4285f4] dark:text-[#8ab4f8] font-bold">
-          Query:
-        </span>
+        <span className="text-primary font-bold">Query:</span>
         <span className="text-foreground font-medium truncate">
           stripe session return URL parameters
         </span>
@@ -311,7 +307,7 @@ const FEATURES: Feature[] = [
       "Automatically understands documentation hierarchy and structure — Mintlify, Docusaurus, Swagger, GitBook, raw markdown.",
     icon: Network,
     span: "lg:col-span-3 lg:row-span-2",
-    accent: "from-[#4285f4]/15 via-[#8ab4f8]/5 to-transparent",
+    accent: "from-primary/15 via-primary/5 to-transparent",
     render: () => <CrawlingCard />,
   },
   {
@@ -321,7 +317,7 @@ const FEATURES: Feature[] = [
       "Generate MCP servers without writing MCP code. Tools, workflows, auth, hosting — done.",
     icon: Workflow,
     span: "lg:col-span-3",
-    accent: "from-[#4285f4]/15 via-[#8ab4f8]/5 to-transparent",
+    accent: "from-primary/15 via-primary/5 to-transparent",
     render: () => <MCPGenCard />,
   },
   {
@@ -331,7 +327,7 @@ const FEATURES: Feature[] = [
       "Improve AI coding accuracy and reduce hallucinations with semantic, schema-aware retrieval.",
     icon: Target,
     span: "lg:col-span-3",
-    accent: "from-[#4285f4]/20 via-[#8ab4f8]/10 to-transparent",
+    accent: "from-primary/20 via-primary/10 to-transparent",
     highlight: true,
     render: () => <RetrievalCard />,
   },
@@ -342,7 +338,7 @@ const FEATURES: Feature[] = [
       "Keep documentation synchronized automatically — your MCP server tracks the source.",
     icon: RefreshCw,
     span: "lg:col-span-2",
-    accent: "from-[#4285f4]/15 via-[#8ab4f8]/5 to-transparent",
+    accent: "from-primary/15 via-primary/5 to-transparent",
     render: () => <SyncCard />,
   },
   {
@@ -352,7 +348,7 @@ const FEATURES: Feature[] = [
       "Works across the modern MCP ecosystem — Cursor, Claude, VS Code, Windsurf, OpenAI Agents.",
     icon: Bot,
     span: "lg:col-span-2",
-    accent: "from-[#4285f4]/15 via-[#8ab4f8]/5 to-transparent",
+    accent: "from-primary/15 via-primary/5 to-transparent",
     render: multiAgentShowcase,
   },
   {
@@ -362,7 +358,7 @@ const FEATURES: Feature[] = [
       "Instant MCP configuration generation. Copy a JSON snippet, paste into your editor, done.",
     icon: Download,
     span: "lg:col-span-2",
-    accent: "from-[#4285f4]/15 via-[#8ab4f8]/5 to-transparent",
+    accent: "from-primary/15 via-primary/5 to-transparent",
     render: () => <ExportCard />,
   },
 ];
@@ -375,12 +371,12 @@ function FeatureCard({ feature }: { feature: Feature }) {
   return (
     <motion.div
       className={cn(
-        "group relative col-span-1 rounded-3xl border p-6 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-[#4285f4]/8 hover:shadow-xl sm:p-7",
+        "group relative col-span-1 rounded-3xl border p-6 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-primary/8 hover:shadow-xl sm:p-7",
         feature.id === "agents" ? "overflow-visible" : "overflow-hidden",
         feature.span,
         feature.highlight
-          ? "border-[#4285f4]/45 bg-gradient-to-br from-[#4285f4]/12 via-card/50 to-[#8ab4f8]/12"
-          : "border-border/60 bg-card/40 hover:border-[#4285f4]/50 dark:hover:border-[#8ab4f8]/50"
+          ? "border-primary/45 bg-gradient-to-br from-primary/12 via-card/50 to-primary/12"
+          : "border-border/60 bg-card/40 hover:border-primary/50"
       )}
       ref={ref}
       variants={cardVariants}
@@ -394,7 +390,7 @@ function FeatureCard({ feature }: { feature: Feature }) {
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#4285f4]/45 to-transparent opacity-0 transition-opacity group-hover:opacity-100"
+        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/45 to-transparent opacity-0 transition-opacity group-hover:opacity-100"
       />
 
       <div className="flex h-full flex-col gap-5">
@@ -508,7 +504,7 @@ export function PlatformSection() {
                     className={cn(
                       "mr-[0.25em] inline-block",
                       isAccent
-                        ? "text-[#4285f4] dark:text-[#8ab4f8] font-semibold"
+                        ? "text-primary font-semibold"
                         : "text-foreground"
                     )}
                     initial={{ opacity: 0, y: 14 }}
@@ -526,13 +522,13 @@ export function PlatformSection() {
               From crawl to retrieval to deployment — the full stack between
               your docs and an AI agent.
             </p>
-            <div className="mt-4 flex flex-wrap gap-4 text-xs font-mono text-[#4285f4] dark:text-[#8ab4f8]">
-              <span className="flex items-center gap-1.5 border border-[#4285f4]/30 bg-[#4285f4]/5 px-2.5 py-1 rounded-full">
-                <span className="size-1.5 rounded-full bg-[#4285f4] animate-pulse" />
+            <div className="mt-4 flex flex-wrap gap-4 text-xs font-mono text-primary">
+              <span className="flex items-center gap-1.5 border border-primary/30 bg-primary/5 px-2.5 py-1 rounded-full">
+                <span className="size-1.5 rounded-full bg-primary animate-pulse" />
                 6 Capabilities
               </span>
-              <span className="flex items-center gap-1.5 border border-[#8ab4f8]/30 bg-[#8ab4f8]/5 px-2.5 py-1 rounded-full">
-                <span className="size-1.5 rounded-full bg-[#8ab4f8] animate-pulse" />
+              <span className="flex items-center gap-1.5 border border-primary/30 bg-primary/5 px-2.5 py-1 rounded-full">
+                <span className="size-1.5 rounded-full bg-primary/70 animate-pulse" />
                 1 Secure Endpoint
               </span>
             </div>

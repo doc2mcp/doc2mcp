@@ -107,10 +107,7 @@ export function RealExampleSection() {
             <span className="h-px w-8 bg-foreground/30" />
           </span>
           <h2 className="mt-6 font-display text-3xl tracking-tight sm:text-5xl lg:text-6xl">
-            See it{" "}
-            <span className="text-[#4285f4] dark:text-[#8ab4f8] font-semibold">
-              in action
-            </span>
+            See it <span className="text-primary font-semibold">in action</span>
           </h2>
           <p className="mt-5 text-base text-muted-foreground leading-relaxed sm:text-lg">
             Watch how doc2mcp turns the entire Stripe documentation into an
