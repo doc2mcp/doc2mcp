@@ -70,7 +70,7 @@ export function GoogleAuthButton({
   return (
     <div className={cn("flex flex-col gap-3", className)}>
       <Button
-        className="relative h-11 w-full gap-2.5 rounded-xl border-0 bg-[#4285f4] font-medium text-sm text-white shadow-[0_4px_14px_rgba(66,133,244,0.35)] transition-all hover:opacity-95 active:scale-[0.99] dark:bg-[#8ab4f8] dark:text-[#131314] dark:shadow-[0_4px_14px_rgba(138,180,248,0.25)]"
+        className="relative h-11 w-full gap-2.5 rounded-xl border-0 bg-primary font-medium text-sm text-primary-foreground shadow-[var(--shadow-composer-focus)] transition-all hover:opacity-95 active:scale-[0.99]"
         disabled={loading}
         onClick={handleGoogleSignIn}
         type="button"

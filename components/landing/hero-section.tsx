@@ -77,7 +77,7 @@ export function HeroSection() {
 
         <motion.form
           animate={mounted ? { y: 0, opacity: 1 } : false}
-          className="mt-10 flex w-full max-w-[620px] animate-fade-in items-center rounded-full border border-border/80 bg-card/50 p-1.5 transition-all duration-300 focus-within:border-[#4285f4] focus-within:shadow-[0_0_24px_rgba(66,133,244,0.15)] focus-within:ring-2 focus-within:ring-[#4285f4]/20 hover:border-[#4285f4] hover:bg-card/75 dark:focus-within:border-[#8ab4f8] dark:focus-within:shadow-[0_0_24px_rgba(138,180,248,0.12)] dark:hover:border-[#8ab4f8]"
+          className="mt-10 flex w-full max-w-[620px] animate-fade-in items-center rounded-full border border-border/80 bg-surface-container-lowest/80 p-1.5 transition-all duration-300 focus-within:border-primary focus-within:shadow-[var(--shadow-composer-focus)] focus-within:ring-2 focus-within:ring-primary/20 hover:border-primary hover:bg-surface-container-lowest"
           data-tour="hero-url"
           initial={false}
           onSubmit={handleSubmit}
@@ -91,7 +91,7 @@ export function HeroSection() {
             value={urlInput}
           />
           <button
-            className="flex shrink-0 items-center gap-1.5 rounded-full bg-[#4285f4] px-6 py-2.5 text-sm font-medium text-white shadow-sm transition-all hover:opacity-90 active:scale-[0.98] dark:bg-[#8ab4f8] dark:text-[#131314]"
+            className="flex shrink-0 items-center gap-1.5 rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground shadow-sm transition-all hover:opacity-90 active:scale-[0.98]"
             type="submit"
           >
             Generate
@@ -126,10 +126,10 @@ export function HeroSection() {
         >
           {STATS.map((stat) => (
             <div
-              className="group relative overflow-hidden rounded-xl border border-border/50 bg-card/30 px-4 py-4 text-left backdrop-blur-md transition-colors hover:border-[#4285f4]/50 dark:hover:border-[#8ab4f8]/50"
+              className="group relative overflow-hidden rounded-xl border border-border/50 bg-card/30 px-4 py-4 text-left backdrop-blur-md transition-colors hover:border-primary/50"
               key={stat.tag}
             >
-              <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#4285f4]/50 to-transparent opacity-0 transition-opacity group-hover:opacity-100 dark:via-[#8ab4f8]/50" />
+              <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
               <p className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">
                 {stat.value}
               </p>

@@ -100,7 +100,7 @@ export function SocialProofSection() {
                   >
                     <Icon
                       aria-hidden="true"
-                      className="size-3.5 text-[#4285f4] dark:text-[#8ab4f8]"
+                      className="size-3.5 text-primary"
                     />
                     <span className="font-display font-medium text-foreground/80 text-xs sm:text-sm">
                       {p.label}
@@ -113,10 +113,7 @@ export function SocialProofSection() {
 
           {/* Customer Quote Box on the right */}
           <figure className="rounded-2xl border border-border/40 bg-card/25 p-6 sm:p-8 backdrop-blur-md relative overflow-hidden h-full">
-            <Quote
-              aria-hidden="true"
-              className="size-5 text-[#4285f4] dark:text-[#8ab4f8] mb-3"
-            />
+            <Quote aria-hidden="true" className="size-5 text-primary mb-3" />
             <blockquote className="font-display text-foreground text-base sm:text-lg leading-relaxed font-medium italic">
               “We stopped pasting docs into prompts. Our agents finally know
               what our APIs actually do — across every editor in our stack.”
@@ -136,7 +133,7 @@ export function SocialProofSection() {
                 className="group flex items-center gap-4 rounded-2xl border border-border/40 bg-card/20 px-5 py-4.5 backdrop-blur-md transition-all duration-300 hover:bg-card/45 hover:border-border/80"
                 key={t.id}
               >
-                <span className="flex size-9 items-center justify-center rounded-xl border border-border/40 bg-background/50 text-[#4285f4] dark:text-[#8ab4f8] group-hover:scale-[1.02] transition-transform duration-300">
+                <span className="flex size-9 items-center justify-center rounded-xl border border-border/40 bg-background/50 text-primary group-hover:scale-[1.02] transition-transform duration-300">
                   <Icon aria-hidden="true" className="size-4" />
                 </span>
                 <div className="min-w-0">

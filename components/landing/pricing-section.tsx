@@ -345,7 +345,7 @@ export function PricingSection({
             <ul className="flex flex-1 flex-col gap-2.5 text-xs">
               {FREE_PLAN.features.map((feature) => (
                 <li className="flex items-start gap-2.5" key={feature}>
-                  <Check className="mt-0.5 size-3.5 shrink-0 text-[#4285f4]" />
+                  <Check className="mt-0.5 size-3.5 shrink-0 text-primary" />
                   <span className="text-muted-foreground leading-relaxed">
                     {feature}
                   </span>
@@ -367,7 +367,7 @@ export function PricingSection({
               className={cn(
                 "relative flex flex-col gap-6 rounded-2xl border bg-card/45 p-6 backdrop-blur-xl transition-all duration-500 shadow-[0_4px_24px_rgba(0,0,0,0.02)]",
                 plan.highlight
-                  ? "border-[#4285f4]/35 dark:border-[#8ab4f8]/35 shadow-[0_0_24px_rgba(66,133,244,0.06)]"
+                  ? "border-primary/35 shadow-[0_0_24px_color-mix(in_srgb,var(--primary)_8%,transparent)]"
                   : "border-border/50 hover:border-border/80",
                 isVisible
                   ? "translate-y-0 opacity-100"
@@ -377,7 +377,7 @@ export function PricingSection({
               style={{ transitionDelay: `${(index + 1) * 80}ms` }}
             >
               {plan.badge ? (
-                <span className="absolute -top-3 left-6 inline-flex items-center gap-1 rounded-full bg-[#4285f4] dark:bg-[#8ab4f8] px-3 py-1 font-semibold text-white dark:text-[#131314] text-[9px] uppercase tracking-wider shadow-sm">
+                <span className="absolute -top-3 left-6 inline-flex items-center gap-1 rounded-full bg-primary px-3 py-1 font-semibold text-primary-foreground text-[9px] uppercase tracking-wider shadow-sm">
                   {plan.badge}
                 </span>
               ) : null}
@@ -411,9 +411,7 @@ export function PricingSection({
                     <Check
                       className={cn(
                         "mt-0.5 size-3.5 shrink-0",
-                        plan.highlight
-                          ? "text-[#4285f4] dark:text-[#8ab4f8]"
-                          : "text-[#4285f4] dark:text-[#8ab4f8]"
+                        plan.highlight ? "text-primary" : "text-primary"
                       )}
                     />
                     <span className="text-muted-foreground leading-relaxed">
@@ -474,7 +472,7 @@ function ComparisonTable() {
                   Starter
                 </span>
               </th>
-              <th className="px-5 py-4 font-medium text-[#4285f4] dark:text-[#8ab4f8]">
+              <th className="px-5 py-4 font-medium text-primary">
                 Hosted
                 <span className="ml-1.5 font-mono text-[10px] text-muted-foreground/60">
                   Pro
