@@ -14,7 +14,6 @@ import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { InstallButtons } from "@/components/doc2mcp/install-buttons";
-import { McpChat } from "@/components/doc2mcp/mcp-chat";
 import { RegistryStatusCard } from "@/components/doc2mcp/registry-status-card";
 import { Button } from "@/components/ui/button";
 import type { PlatformProject } from "@/lib/db/schema";
@@ -589,19 +588,6 @@ export function ResultDashboard({
           </pre>
         </details>
       </section>
-
-      {/* Chat */}
-      {token ? (
-        <section className="scroll-mt-8" id="chat">
-          <SectionIntro
-            description="Ask anything — the MCP runs real tool calls over your crawled pages and streams a cited answer, just like Cursor."
-            eyebrow="Try it live"
-            highlight="your docs"
-            title="Chat with"
-          />
-          <McpChat pageCount={pageCount} projectId={project.id} />
-        </section>
-      ) : null}
 
       {/* Tools */}
       <section className="scroll-mt-8" id="tools">

@@ -1,8 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useChatCabinets } from "@/components/chat/chat-cabinets-context";
 import { useChatDocPreviewVisible } from "@/components/chat/chat-doc-preview-context";
+import { useChatMcp } from "@/components/chat/chat-mcp-context";
 import { DocPreviewPanel } from "@/components/chat/doc-preview-panel";
+import { SourcesCabinet } from "@/components/chat/sources-cabinet";
+import { McpChat } from "@/components/doc2mcp/mcp-chat";
 import { ChatTour } from "@/components/onboarding/chat-tour";
 import {
   AlertDialog,
@@ -58,6 +62,15 @@ export function ChatShell() {
   const isArtifactVisible = useArtifactSelector((state) => state.isVisible);
   const showDocPreview = useChatDocPreviewVisible() && !isArtifactVisible;
   const { setArtifact } = useArtifact();
+  const { open: cabinetsOpen, setWebSources } = useChatCabinets();
+  const {
+    enabled: mcpEnabled,
+    projectId: mcpProjectId,
+    projects,
+  } = useChatMcp();
+  const selectedMcp = projects.find((p) => p.id === mcpProjectId);
+  const showMcpPanel =
+    mcpEnabled && Boolean(mcpProjectId) && !isArtifactVisible;
 
   const stopRef = useRef(stop);
   stopRef.current = stop;
@@ -73,6 +86,44 @@ export function ChatShell() {
     }
   }, [chatId, setArtifact]);
 
+  useEffect(() => {
+    const sources: { title: string; url: string; snippet?: string }[] = [];
+    const seen = new Set<string>();
+    for (const message of messages) {
+      for (const part of message.parts ?? []) {
+        if (part.type !== "tool-webSearch") {
+          continue;
+        }
+        const output = "output" in part ? part.output : undefined;
+        if (!(output && typeof output === "object" && "results" in output)) {
+          continue;
+        }
+        const results = (output as { results?: unknown }).results;
+        if (!Array.isArray(results)) {
+          continue;
+        }
+        for (const row of results) {
+          if (!(row && typeof row === "object")) {
+            continue;
+          }
+          const r = row as { title?: string; url?: string; snippet?: string };
+          if (typeof r.url !== "string" || seen.has(r.url)) {
+            continue;
+          }
+          seen.add(r.url);
+          sources.push({
+            title: typeof r.title === "string" ? r.title : r.url,
+            url: r.url,
+            snippet: typeof r.snippet === "string" ? r.snippet : undefined,
+          });
+        }
+      }
+    }
+    setWebSources(sources);
+  }, [messages, setWebSources]);
+
+  const sideOpen = showDocPreview || cabinetsOpen || showMcpPanel;
+
   return (
     <>
       <div className="flex h-dvh w-full flex-col overflow-hidden md:flex-row">
@@ -81,8 +132,8 @@ export function ChatShell() {
             "flex min-h-0 min-w-0 flex-col bg-sidebar transition-[width] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
             isArtifactVisible
               ? "w-full md:w-[40%]"
-              : showDocPreview
-                ? "w-full md:w-[45%]"
+              : sideOpen
+                ? "w-full md:w-[55%]"
                 : "w-full"
           )}
         >
@@ -160,9 +211,21 @@ export function ChatShell() {
           </div>
         </div>
 
-        {showDocPreview ? (
+        {showMcpPanel && mcpProjectId ? (
+          <div className="order-last h-[42vh] w-full shrink-0 border-border/40 border-l p-3 md:order-none md:h-auto md:w-[40%] md:min-w-[300px]">
+            <McpChat
+              key={mcpProjectId}
+              pageCount={selectedMcp?.pageCount}
+              projectId={mcpProjectId}
+            />
+          </div>
+        ) : null}
+
+        {showDocPreview && !showMcpPanel ? (
           <DocPreviewPanel className="order-last h-[38vh] w-full shrink-0 md:order-none md:h-auto md:w-[35%] md:min-w-[280px]" />
         ) : null}
+
+        {showMcpPanel ? null : <SourcesCabinet chatId={chatId} />}
 
         <Artifact
           addToolApprovalResponse={addToolApprovalResponse}
