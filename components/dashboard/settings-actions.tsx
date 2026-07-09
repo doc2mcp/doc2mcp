@@ -1,8 +1,9 @@
 "use client";
 
-import { Loader2, Sparkles, Users } from "lucide-react";
+import { Loader2, Users } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -12,6 +13,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+
+type InviteRow = {
+  id: string;
+  email: string;
+  role: string;
+  status: string;
+  expiresAt: string;
+  createdAt: string;
+};
 
 export function ManageBillingButton({
   hasSubscription,
@@ -32,19 +43,59 @@ export function ManageBillingButton({
   );
 }
 
-/**
- * Replaces a previous "fake submit" team-invite form that ran a 600ms
- * setTimeout and toasted a confusing "available once upgraded" message
- * without sending anything. There is no `Team` table, no `TeamMember`
- * table, and no `/api/teams/invite` route in this codebase — the prior
- * UI was misleading and broke user trust (#team-invite-bug).
- *
- * Until the real backend (teams, members, invite tokens, email delivery,
- * RLS policies) ships, render an honest "coming soon" card with a link
- * to register interest. The deferred design ticket tracks the full
- * Phase-2 plan including the schema and route handlers.
- */
 export function TeamInviteForm() {
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [invites, setInvites] = useState<InviteRow[]>([]);
+  const [teamName, setTeamName] = useState<string | null>(null);
+  const [lastAcceptUrl, setLastAcceptUrl] = useState<string | null>(null);
+
+  const load = useCallback(async () => {
+    const res = await fetch("/api/teams/invite");
+    if (!res.ok) {
+      return;
+    }
+    const data = (await res.json()) as {
+      team?: { name?: string };
+      invites?: InviteRow[];
+    };
+    setTeamName(data.team?.name ?? null);
+    setInvites(data.invites ?? []);
+  }, []);
+
+  useEffect(() => {
+    load().catch(() => undefined);
+  }, [load]);
+
+  const onInvite = async () => {
+    setLoading(true);
+    setLastAcceptUrl(null);
+    try {
+      const res = await fetch("/api/teams/invite", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const body = (await res.json().catch(() => ({}))) as {
+        message?: string;
+        acceptUrl?: string;
+        note?: string;
+      };
+      if (!res.ok) {
+        toast.error(body.message ?? "Could not create invite");
+        return;
+      }
+      toast.success(body.note ?? "Invite created");
+      setLastAcceptUrl(body.acceptUrl ?? null);
+      setEmail("");
+      await load();
+    } catch {
+      toast.error("Could not create invite");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -53,43 +104,89 @@ export function TeamInviteForm() {
           Team workspace
         </CardTitle>
         <CardDescription>
-          Invite teammates to collaborate on doc2mcp projects, share MCP tokens,
-          and split usage limits across a workspace.
+          Create a pending invite for {teamName ?? "your workspace"}. Email
+          delivery is not enabled yet — you will get a shareable accept link to
+          copy and send yourself.
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="rounded-md border border-dashed bg-muted/40 p-4">
-          <div className="flex items-start gap-3">
-            <Sparkles
-              aria-hidden="true"
-              className="mt-0.5 size-4 text-primary"
-            />
-            <div className="space-y-1">
-              <p className="font-medium text-sm">Coming soon</p>
-              <p className="text-muted-foreground text-sm">
-                Multi-seat workspaces are on the roadmap. Today, each account is
-                its own workspace. You can still share an MCP server URL with a
-                teammate by sending them the per-project token from a project's{" "}
-                <span className="font-medium">Connect</span> tab.
-              </p>
-            </div>
-          </div>
+      <CardContent className="space-y-4">
+        <div className="rounded-lg border border-border/60 bg-muted/30 px-3 py-2.5 text-muted-foreground text-xs leading-relaxed">
+          <p className="font-medium text-foreground text-sm">Preview invite</p>
+          <p className="mt-1">
+            Step 1: enter a teammate email. Step 2: copy the accept link we
+            generate. Step 3: share it manually (Slack/email). Accept flow lands
+            on Settings.
+          </p>
         </div>
-      </CardContent>
-      <CardFooter className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-muted-foreground text-xs">
-          Want early access? Email{" "}
-          <a
-            className="underline underline-offset-2"
-            href="mailto:doc2mcp@gmail.com?subject=Team%20workspace%20early%20access"
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <Input
+            aria-label="Teammate email"
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="teammate@company.com"
+            type="email"
+            value={email}
+          />
+          <Button
+            disabled={loading || !email.trim()}
+            onClick={onInvite}
+            type="button"
           >
-            doc2mcp@gmail.com
-          </a>
-          .
+            {loading ? (
+              <Loader2 className="mr-1.5 size-4 animate-spin" />
+            ) : null}
+            Create invite link
+          </Button>
+        </div>
+        {lastAcceptUrl ? (
+          <div className="rounded-lg border border-primary/25 bg-primary/5 p-3 text-xs">
+            <p className="font-medium text-foreground text-sm">
+              Accept link ready — copy and share
+            </p>
+            <p className="mt-1 break-all font-mono text-muted-foreground">
+              {lastAcceptUrl}
+            </p>
+            <Button
+              className="mt-2 h-8"
+              onClick={async () => {
+                try {
+                  await navigator.clipboard.writeText(lastAcceptUrl);
+                  toast.success("Accept link copied");
+                } catch {
+                  toast.error("Could not copy — select the link manually");
+                }
+              }}
+              type="button"
+              variant="outline"
+            >
+              Copy link
+            </Button>
+          </div>
+        ) : null}
+        {invites.length > 0 ? (
+          <ul className="space-y-2">
+            {invites.map((invite) => (
+              <li
+                className="flex items-center justify-between gap-2 rounded-lg bg-muted/30 px-3 py-2 text-sm"
+                key={invite.id}
+              >
+                <span className="truncate">{invite.email}</span>
+                <span className="font-mono text-[10px] text-muted-foreground uppercase">
+                  {invite.status}
+                </span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-muted-foreground text-sm">
+            No pending invites yet.
+          </p>
+        )}
+      </CardContent>
+      <CardFooter>
+        <p className="text-muted-foreground text-xs">
+          Automated email invites ship later. Until then, treat the accept link
+          like a password — only share with people you trust.
         </p>
-        <Button asChild size="sm" type="button" variant="outline">
-          <Link href="/pricing">View plans</Link>
-        </Button>
       </CardFooter>
     </Card>
   );
