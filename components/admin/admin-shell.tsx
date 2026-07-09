@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 const NAV = [
   { href: "/admin", label: "Overview" },
   { href: "/admin/mcps", label: "MCPs" },
+  { href: "/admin/mcp-usage", label: "MCP usage" },
   { href: "/admin/domains", label: "Domains" },
   { href: "/admin/users", label: "Users" },
   { href: "/admin/subscriptions", label: "Subscriptions" },
