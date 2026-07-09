@@ -27,7 +27,7 @@ const OUTCOMES: Outcome[] = [
     detail:
       "Agents respond from your real docs — not stale training data — so generated code actually compiles and ships.",
     icon: Brain,
-    accent: "from-[#4285f4]/15 to-[#8ab4f8]/0",
+    accent: "from-primary/15 to-primary/0",
   },
   {
     id: "accuracy",
@@ -35,7 +35,7 @@ const OUTCOMES: Outcome[] = [
     detail:
       "Schema-aware retrieval narrows answers to the right endpoint, the right version, the right example.",
     icon: CheckCircle2,
-    accent: "from-[#4285f4]/15 to-[#8ab4f8]/0",
+    accent: "from-primary/15 to-primary/0",
   },
   {
     id: "manual",
@@ -43,7 +43,7 @@ const OUTCOMES: Outcome[] = [
     detail:
       "Stop hand-writing tool wrappers per product. Doc2MCP generates them from documentation, automatically.",
     icon: GitBranch,
-    accent: "from-[#4285f4]/15 to-[#8ab4f8]/0",
+    accent: "from-primary/15 to-primary/0",
   },
   {
     id: "updates",
@@ -51,7 +51,7 @@ const OUTCOMES: Outcome[] = [
     detail:
       "Live sync keeps the MCP server tracking your source — without redeploys, manual diffs, or token rotation.",
     icon: RefreshCw,
-    accent: "from-[#4285f4]/15 to-[#8ab4f8]/0",
+    accent: "from-primary/15 to-primary/0",
   },
   {
     id: "context",
@@ -59,7 +59,7 @@ const OUTCOMES: Outcome[] = [
     detail:
       "Replace prompt stuffing with structured, retrievable, AI-optimized context — usable across every MCP client.",
     icon: Bot,
-    accent: "from-[#4285f4]/15 to-[#8ab4f8]/0",
+    accent: "from-primary/15 to-primary/0",
   },
   {
     id: "ship",
@@ -67,7 +67,7 @@ const OUTCOMES: Outcome[] = [
     detail:
       "From “read docs” to “write integration” in minutes — across Cursor, Claude, Windsurf, OpenAI Agents.",
     icon: Rocket,
-    accent: "from-[#4285f4]/15 to-[#8ab4f8]/0",
+    accent: "from-primary/15 to-primary/0",
   },
   {
     id: "scale",
@@ -75,7 +75,7 @@ const OUTCOMES: Outcome[] = [
     detail:
       "Convert internal runbooks, ADRs, RFCs, and product docs into a queryable knowledge layer for your agents.",
     icon: Network,
-    accent: "from-[#4285f4]/15 to-[#8ab4f8]/0",
+    accent: "from-primary/15 to-primary/0",
   },
   {
     id: "time",
@@ -83,7 +83,7 @@ const OUTCOMES: Outcome[] = [
     detail:
       "Stop pasting docs into prompts and debugging hallucinations — your team’s time goes back to product.",
     icon: Clock,
-    accent: "from-[#4285f4]/15 to-[#8ab4f8]/0",
+    accent: "from-primary/15 to-primary/0",
   },
 ];
 
@@ -121,7 +121,7 @@ export function WhyTeamsSection() {
             </span>
             <h2 className="font-display text-3xl tracking-tight sm:text-4xl lg:text-5xl leading-tight">
               Why teams use{" "}
-              <span className="text-[#4285f4] dark:text-[#8ab4f8] font-semibold">
+              <span className="text-primary font-semibold">
                 Doc2MCP
               </span>
             </h2>
@@ -142,7 +142,7 @@ export function WhyTeamsSection() {
                 className="group relative overflow-hidden rounded-2xl border border-border/40 bg-card/25 p-5 backdrop-blur-md transition-all duration-300 hover:bg-card/40 hover:border-border/80"
                 key={o.id}
               >
-                <span className="flex size-9 items-center justify-center rounded-xl border border-border/40 bg-background/50 text-[#4285f4] dark:text-[#8ab4f8] group-hover:scale-[1.02] transition-transform duration-300">
+                <span className="flex size-9 items-center justify-center rounded-xl border border-border/40 bg-background/50 text-primary group-hover:scale-[1.02] transition-transform duration-300">
                   <Icon className="size-4.5" />
                 </span>
                 <h3 className="mt-4 font-display font-semibold text-foreground text-base tracking-tight">

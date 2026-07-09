@@ -391,7 +391,7 @@ export function ComparisonSection() {
             >
               Manual MCP development{" "}
               <span className="text-muted-foreground">vs</span>{" "}
-              <span className="text-[#4285f4] dark:text-[#8ab4f8] font-semibold">
+              <span className="text-primary font-semibold">
                 Doc2MCP
               </span>
             </h2>

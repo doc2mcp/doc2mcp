@@ -1,106 +1,96 @@
-# Kombai Style Guide & System Architecture (`design.md`)
+# doc2mcp Design System
 
-This design document breaks down the distinctive, modern technical aesthetic used by **Kombai**. It covers the dark-mode framework, grid alignments, retro-futuristic background pattern mechanics, crisp line splitters, and typographical orchestration.
+Two themes ship together. Toggle via the theme switcher (`class="dark"`).
 
----
-
-## 1. Core Visual Archetype: The "Neo-Noir Canvas"
-
-The overall theme balances a sophisticated dark development landscape with vibrant structural details. It bridges modern AI tools with traditional engineering aesthetics (reminiscent of architectural blueprints, blueprint graph paper, and high-end IDE layout systems).
-
-### Color Palette Matrix
-
-| Token Name | Hex Value | Application Target |
+| Mode | Name | Source |
 | :--- | :--- | :--- |
-| `bg-canvas` | `#0A0A0A` / `#000000` | Absolute primary layout floor. |
-| `bg-surface` | `#121212` | Visual elevation wrapper (cards, modular sections). |
-| `border-grid` | `#1A1A1A` / `#222222` | structural layout grid and bounding borders. |
-| `line-separator` | `#2D2D2D` | Explicit visual partition line strikes. |
-| `accent-primary` | `#CCFF00` (Lime) | Call-to-actions, terminal tags, dynamic emphasis markers. |
-| `text-muted` | `#8E8E93` | Auxiliary copy, structural labels, technical parameters. |
+| Light | **Luminous Engine** | `DESIGN (1).md` |
+| Dark | **Midnight Sanctuary** | `DESIGN (2).md` |
+
+Tokens live in `app/globals.css` (`:root` / `.dark`). Prefer semantic classes (`bg-primary`, `text-primary`, `bg-surface-container-low`) — never hardcode Gemini blues (`#4285f4` / `#8ab4f8`).
 
 ---
 
-## 2. Dynamic Structural Line Separators
+## Light — Luminous Engine
 
-Kombai leverages thin, clean layout partitions to group structural contexts cleanly instead of using heavy background blocks or floating margin gaps.
+**North star:** High-end editorial “command center.” Tonal depth over boxes. White space as structure.
 
-```
-       [ Top Visual Layout Segment ]
-───────────────────── ○ ─────────────────────  <-- line-separator (1px) with crosshair accent
-       [ Bottom Visual Layout Segment ]
-```
+### Surfaces (no hard 1px section borders)
 
-### Technical Specs
-* **Weight & Tint:** `1px` thickness using `#2D2D2D`.
-* **Behavior:** Flows across the width of the main layout column or bounds the section wrappers (`width: 100%`).
-* **Crosshair Intersection Pattern:** Where vertical grids intersect with horizontal separators, a micro-pattern accent is placed:
-    * A miniature filled circle (`5px` diameter) or a plus-sign crosshair `+` centered on the line to break up visual monotonicity.
-    * **CSS Execution Pattern:**
-        ```css
-        .separator-line {
-          position: relative;
-          height: 1px;
-          background-color: #2D2D2D;
-          margin: 40px 0;
-        }
-        .separator-line::after {
-          content: "○";
-          position: absolute;
-          left: 50%;
-          top: 50%;
-          transform: translate(-50%, -50%);
-          background: #0A0A0A;
-          padding: 0 8px;
-          color: #CCFF00;
-          font-size: 10px;
-        }
-        ```
+| Token | Hex | Role |
+| :--- | :--- | :--- |
+| `surface` / page | `#f8f9ff` | Base |
+| `surface-container-low` | `#eff4ff` | Sections |
+| `surface-container` | `#e5eeff` | Modules |
+| `surface-container-highest` | `#d3e4fe` | Floating / modals |
+| `surface-container-lowest` | `#ffffff` | Lifted cards |
 
----
+### Accents
 
-## 3. Background Architecture: Linear & Matrix Grids
+| Token | Hex | Role |
+| :--- | :--- | :--- |
+| `primary` (Energy) | `#006d32` | CTAs, focus, links |
+| `primary-container` | `#00d166` | Gradients / glow |
+| `secondary` (Water) | `#00639b` | Secondary actions |
+| `on-surface` | `#0b1c30` | Body text |
+| `outline-variant` | `#bbcbb9` @ 10–20% | Ghost borders only |
 
-The background uses layered, low-opacity geometric structures to convey an engineered, "infinite design canvas" layout.
+### Typography
 
-### A. The Blueprint Matrix (Dot & Infinite Grid)
-* **Structure:** A continuous grid of soft lines (`1px` every `24px` or `32px`) running across both X and Y axes.
-* **Color Scale:** Rendered with extremely faint transparency (`rgba(255, 255, 255, 0.02)` to `0.04`).
-* **Implementation Archetype:**
-    ```css
-    .bg-blueprint-grid {
-      background-size: 32px 32px;
-      background-image: 
-        linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
-    }
-    ```
+- **Display:** Space Grotesk (`font-display`)
+- **Body:** Inter (`font-sans`)
+- **Mono:** JetBrains Mono
 
-### B. Radial Accent Orbs (Sub-surface Glow)
-* **Concept:** Large, soft radial gradients layered behind primary layout zones to highlight code snippets, terminal mocks, or feature boxes.
-* **Tint Shift:** A desaturated, deeply masked neon hue (e.g., `#CCFF00` or `#00E5FF` at `5%` to `8%` opacity) bleeding outward from a center point over `600px`.
+### Rules
+
+- Boundaries via background shifts, not opaque grey borders.
+- CTAs: `primary` → `primary-container` gradient (`btn-cta-gradient`).
+- Glass: semi-transparent surface + 12–20px blur.
+- Shadows: tinted with `#0b1c30` at 4–8% opacity, blur 24–40px.
 
 ---
 
-## 4. Layout Structural Blocks
+## Dark — Midnight Sanctuary
 
-Kombai frames code editors, design canvas screens, and marketing blocks using highly structured panels.
+**North star:** Restorative night UI — deep charcoal, sage glow, soft blush accents.
 
-* **Panel Borders:** Sharp, zero-radius corners (`border-radius: 0px` or a tiny `4px` limit) framed with a explicit `1px solid #222222`.
-* **The IDE Window Mockup:** * Top window chrome bar styled with a slight surface layout bump (`#121212`).
-    * Minimalistic window control points (three small desaturated dots or micro-labels like `localhost:3000` or `ProductPage.vue`).
-* **Zebra & Data Column Strips:** Alternating tables and rows utilize slight hue shifts between `#0A0A0A` and `#121212` instead of distinct color fills.
+### Surfaces
+
+| Token | Hex | Role |
+| :--- | :--- | :--- |
+| `surface` | `#121412` | Base |
+| `surface-card` | `#1b221b` | Cards (Dark Forest) |
+| `surface-container-low` | `#1a1c1a` | Grouping |
+| `surface-container` | `#1e201e` | Modules |
+| `surface-container-highest` | `#333533` | Highest lift |
+
+### Accents
+
+| Token | Hex | Role |
+| :--- | :--- | :--- |
+| `primary` (Luminous Sage) | `#9eb09e` | Buttons, focus, progress |
+| `secondary` | `#b9cbb9` | Soft secondary |
+| `accent` (Radiant Blush) | `#f0d8d8` | Warm highlights / chips |
+| `on-surface` | `#e2e3df` | Body text |
+| `outline-variant` | `#444843` | Subtle edges |
+
+### Typography
+
+- **Display + body:** Manrope (`.dark` overrides `--font-display` and `body`)
+- **Labels / meta:** JetBrains Mono
+
+### Rules
+
+- Depth via tonal layers + glass (80% Dark Forest + 20px blur).
+- Primary buttons: sage fill, charcoal text (`primary-foreground`).
+- Card edge: 1px inner highlight at ~10% white.
+- Glow: sage at ~20% opacity, 24px blur.
 
 ---
 
-## 5. Typography Hierarchy
+## Implementation checklist
 
-An explicit, high-readability sans-serif typeface combined with monospace technical markers completes the system.
-
-### A. Display Headings
-* **Scale:** Broad, high tracking metrics, with heavy weights.
-* **Pattern:** Main layout highlights run with clean typographic styling where single keywords use the accent color (`#CCFF00`) or are enveloped inside a subtle rounded label block.
-
-### B. The Code & Terminal Layer
-* **Font Family:** Monospace family stack (`JetBrains Mono`, `Fira Code`, or native system `SF Mono`).
-* **Application:** System outputs, file directory pathways (`ProductPage.canvas`), file structures, and code tokens. Includes a distinct color tint for code parameters to separate terminal layers from copy prose.
+1. Put new colors in `app/globals.css` tokens — not inline hex in components.
+2. Use `bg-primary` / `text-primary` / `text-primary-foreground` for brand accents.
+3. Prefer `bg-surface-container-*` for section nesting (Luminous “no-line” rule).
+4. Keep light and dark readable when toggling; never assume dark-only defaults for brand color.

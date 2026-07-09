@@ -42,25 +42,35 @@
   --color-surface-container: var(--surface-container);
   --color-surface-container-low: var(--surface-container-low);
   --color-surface-container-high: var(--surface-container-high);
+  --color-surface-container-lowest: var(--surface-container-lowest);
+  --color-surface-container-highest: var(--surface-container-highest);
+  --color-primary-container: var(--primary-container);
+  --color-on-primary-container: var(--on-primary-container);
+  --color-outline-variant: var(--outline-variant);
 }
 
 :root {
   color-scheme: light;
   --radius: 0.5rem;
-  /* Luminous Engine — light */
+  --font-display: var(--font-space-grotesk), var(--font-manrope), sans-serif;
+  /* DESIGN (1) — Luminous Engine (light) */
   --neon-violet: #006d32;
-  --neon-cyan: #3b4b3c;
+  --neon-cyan: #00639b;
   --neon-lime: #00d166;
   --surface-page: #f8f9ff;
   --surface-card: #ffffff;
+  --surface-container-lowest: #ffffff;
   --surface-container-low: #eff4ff;
   --surface-container: #e5eeff;
-  --surface-container-high: #d3e4fe;
+  --surface-container-high: #dce8ff;
   --surface-container-highest: #d3e4fe;
+  --primary-container: #00d166;
+  --on-primary-container: #003919;
+  --outline-variant: #bbcbb9;
 
-  --background: var(--surface-page);
+  --background: #f8f9ff;
   --foreground: #0b1c30;
-  --card: var(--surface-card);
+  --card: #ffffff;
   --card-foreground: #0b1c30;
   --popover: #ffffff;
   --popover-foreground: #0b1c30;
@@ -72,20 +82,21 @@
   --muted-foreground: #4a5d6e;
   --accent: #e5eeff;
   --accent-foreground: #0b1c30;
-  --destructive: oklch(0.55 0.18 25);
-  --border: color-mix(in srgb, #bbcbb9 18%, transparent);
-  --input: #ffffff;
+  --destructive: #b3261e;
+  --border: color-mix(in srgb, #bbcbb9 16%, transparent);
+  --input: #eff4ff;
   --ring: #006d32;
-  --shadow-glow: 0 24px 40px -12px color-mix(in srgb, #0b1c30 8%, transparent);
-  --shadow-composer: 0 4px 24px -4px color-mix(in srgb, #0b1c30 6%, transparent);
+  --shadow-glow: 0 24px 40px -12px color-mix(in srgb, #0b1c30 7%, transparent);
+  --shadow-composer: 0 4px 24px -4px color-mix(in srgb, #0b1c30 5%, transparent);
   --shadow-composer-focus: 0 8px 32px -4px
-    color-mix(in srgb, #006d32 18%, transparent);
+    color-mix(in srgb, #006d32 20%, transparent);
   --shadow-float: 0 16px 40px -12px color-mix(in srgb, #0b1c30 8%, transparent);
   --cursor-ring: color-mix(in srgb, #006d32 28%, transparent);
   --cursor-dot: #006d32;
   --gradient-hero: radial-gradient(
     ellipse 80% 60% at 50% 0%,
-    color-mix(in srgb, #00d166 10%, transparent) 0%,
+    color-mix(in srgb, #00d166 12%, transparent) 0%,
+    color-mix(in srgb, #00639b 6%, transparent) 35%,
     transparent 70%
   );
   --gradient-cta: linear-gradient(135deg, #006d32 0%, #00d166 100%);
@@ -93,20 +104,25 @@
 
 .dark {
   color-scheme: dark;
-  /* Midnight Sanctuary */
+  --font-display: var(--font-manrope), var(--font-space-grotesk), sans-serif;
+  /* DESIGN (2) — Midnight Sanctuary */
   --neon-violet: #9eb09e;
   --neon-cyan: #b9cbb9;
   --neon-lime: #c1c9be;
   --surface-page: #121412;
   --surface-card: #1b221b;
+  --surface-container-lowest: #0d0f0d;
   --surface-container-low: #1a1c1a;
   --surface-container: #1e201e;
   --surface-container-high: #292a28;
   --surface-container-highest: #333533;
+  --primary-container: #1b221b;
+  --on-primary-container: #828a80;
+  --outline-variant: #444843;
 
-  --background: var(--surface-page);
+  --background: #121412;
   --foreground: #e2e3df;
-  --card: var(--surface-card);
+  --card: #1b221b;
   --card-foreground: #e2e3df;
   --popover: #1e201e;
   --popover-foreground: #e2e3df;
@@ -116,8 +132,8 @@
   --secondary-foreground: #c4c7c1;
   --muted: #1a1c1a;
   --muted-foreground: #8e928c;
-  --accent: #292a28;
-  --accent-foreground: #e2e3df;
+  --accent: #f0d8d8;
+  --accent-foreground: #3b2d2d;
   --destructive: #ffb4ab;
   --border: color-mix(in srgb, #ffffff 10%, transparent);
   --input: #0d0f0d;
@@ -131,7 +147,8 @@
   --cursor-dot: #9eb09e;
   --gradient-hero: radial-gradient(
     ellipse 70% 50% at 50% 0%,
-    color-mix(in srgb, #9eb09e 8%, transparent) 0%,
+    color-mix(in srgb, #9eb09e 10%, transparent) 0%,
+    color-mix(in srgb, #f0d8d8 4%, transparent) 40%,
     transparent 70%
   );
   --gradient-cta: linear-gradient(135deg, #1b221b 0%, #9eb09e 160%);
@@ -158,8 +175,7 @@
   }
   .font-display {
     font-family:
-      var(--font-space-grotesk), var(--font-manrope), var(--font-sans),
-      system-ui, sans-serif;
+      var(--font-display), var(--font-sans), system-ui, sans-serif;
     font-weight: 500;
     letter-spacing: -0.02em;
   }
@@ -198,8 +214,21 @@
 }
 
 .surface-section {
+  background: var(--surface-container-low);
+}
+
+.surface-card-tonal {
+  background: var(--surface-container-lowest);
+}
+
+.dark .surface-card-tonal {
   background: var(--surface-card);
-  border: 1px solid var(--border);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, #ffffff 10%, transparent);
+}
+
+.btn-cta-gradient {
+  background-image: var(--gradient-cta);
+  color: var(--primary-foreground);
 }
 
 .grid-dots-bg {
@@ -226,15 +255,16 @@
 }
 
 @utility glass-card {
-  background: oklch(0.99 0.008 280 / 0.65);
-  backdrop-filter: blur(24px);
-  border: 1px solid oklch(0.55 0.08 280 / 0.12);
+  background: color-mix(in srgb, var(--surface-page) 78%, transparent);
+  backdrop-filter: blur(16px);
+  border: 1px solid color-mix(in srgb, var(--outline-variant) 16%, transparent);
   box-shadow: var(--shadow-glow);
 }
 
 .dark .glass-card {
-  background: oklch(0.12 0.02 280 / 0.7);
-  border-color: oklch(1 0 0 / 0.08);
+  background: color-mix(in srgb, #1b221b 80%, transparent);
+  border-color: color-mix(in srgb, #ffffff 10%, transparent);
+  backdrop-filter: blur(20px);
 }
 
 @utility transition-gemini {
