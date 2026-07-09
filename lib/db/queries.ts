@@ -1,5 +1,6 @@
 import "server-only";
 
+import { createHash } from "node:crypto";
 import {
   and,
   asc,
@@ -41,6 +42,9 @@ import {
   stream,
   subscription,
   suggestion,
+  team,
+  teamInvite,
+  teamMember,
   type User,
   user,
   vote,
@@ -1778,4 +1782,194 @@ export async function getActiveMcpAccessTokenForUser({
     .orderBy(desc(mcpAccessToken.createdAt))
     .limit(1);
   return row ?? null;
+}
+
+export async function getMcpHitStatsForUserProjects({
+  userId,
+}: {
+  userId: string;
+}) {
+  const rows = await db
+    .select({
+      projectId: mcpHit.projectId,
+      projectName: platformProject.name,
+      sourceUrl: platformProject.sourceUrl,
+      day: mcpHit.day,
+      count: mcpHit.count,
+      ownerType: mcpHit.ownerType,
+    })
+    .from(mcpHit)
+    .innerJoin(platformProject, eq(mcpHit.projectId, platformProject.id))
+    .where(eq(platformProject.userId, userId))
+    .orderBy(desc(mcpHit.day));
+
+  return rows;
+}
+
+export async function getAdminMcpHitSummary(limit = 50) {
+  const rows = await db
+    .select({
+      projectId: mcpHit.projectId,
+      projectName: platformProject.name,
+      sourceUrl: platformProject.sourceUrl,
+      userId: platformProject.userId,
+      total: sql<number>`coalesce(sum(${mcpHit.count}), 0)`,
+    })
+    .from(mcpHit)
+    .innerJoin(platformProject, eq(mcpHit.projectId, platformProject.id))
+    .groupBy(
+      mcpHit.projectId,
+      platformProject.name,
+      platformProject.sourceUrl,
+      platformProject.userId
+    )
+    .orderBy(desc(sql`coalesce(sum(${mcpHit.count}), 0)`))
+    .limit(limit);
+
+  return rows.map((r) => ({
+    ...r,
+    total: Number(r.total) || 0,
+  }));
+}
+
+function slugifyTeamName(name: string) {
+  return (
+    name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "")
+      .slice(0, 48) || "workspace"
+  );
+}
+
+export async function getOrCreateOwnedTeam({
+  userId,
+  email,
+}: {
+  userId: string;
+  email?: string | null;
+}) {
+  const [existing] = await db
+    .select()
+    .from(team)
+    .where(eq(team.ownerId, userId))
+    .limit(1);
+  if (existing) {
+    return existing;
+  }
+
+  const baseName = email?.split("@")[0] || "My workspace";
+  const name = `${baseName}'s workspace`;
+  let slug = slugifyTeamName(baseName);
+  const [collision] = await db
+    .select({ id: team.id })
+    .from(team)
+    .where(eq(team.slug, slug))
+    .limit(1);
+  if (collision) {
+    slug = `${slug}-${generateUUID().slice(0, 6)}`;
+  }
+
+  const [created] = await db
+    .insert(team)
+    .values({
+      name,
+      slug,
+      ownerId: userId,
+      plan: "team",
+    })
+    .returning();
+
+  if (created) {
+    await db.insert(teamMember).values({
+      teamId: created.id,
+      userId,
+      role: "owner",
+    });
+  }
+
+  return created;
+}
+
+/** Returns the team only when `userId` is the owner. */
+export async function getOwnedTeamById({
+  teamId,
+  userId,
+}: {
+  teamId: string;
+  userId: string;
+}) {
+  const [owned] = await db
+    .select()
+    .from(team)
+    .where(and(eq(team.id, teamId), eq(team.ownerId, userId)))
+    .limit(1);
+  return owned ?? null;
+}
+
+export async function listTeamInvitesForOwner({ userId }: { userId: string }) {
+  const owned = await db
+    .select({ id: team.id })
+    .from(team)
+    .where(eq(team.ownerId, userId));
+  if (owned.length === 0) {
+    return [];
+  }
+  const teamIds = owned.map((t) => t.id);
+  return db
+    .select()
+    .from(teamInvite)
+    .where(inArray(teamInvite.teamId, teamIds))
+    .orderBy(desc(teamInvite.createdAt));
+}
+
+export async function createTeamInvite({
+  teamId,
+  email,
+  invitedBy,
+  role = "member",
+}: {
+  teamId: string;
+  email: string;
+  invitedBy: string;
+  role?: "admin" | "member";
+}) {
+  const owned = await getOwnedTeamById({ teamId, userId: invitedBy });
+  if (!owned) {
+    throw new Error("forbidden: only the team owner can create invites");
+  }
+
+  const [existingPending] = await db
+    .select({ id: teamInvite.id })
+    .from(teamInvite)
+    .where(
+      and(
+        eq(teamInvite.teamId, owned.id),
+        eq(teamInvite.email, email.trim().toLowerCase()),
+        eq(teamInvite.status, "pending")
+      )
+    )
+    .limit(1);
+  if (existingPending) {
+    throw new Error("conflict: pending invite already exists for this email");
+  }
+
+  const rawToken = generateUUID();
+  const tokenHash = createHash("sha256").update(rawToken).digest("hex");
+  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+
+  const [invite] = await db
+    .insert(teamInvite)
+    .values({
+      teamId: owned.id,
+      email: email.trim().toLowerCase(),
+      role,
+      invitedBy,
+      tokenHash,
+      status: "pending",
+      expiresAt,
+    })
+    .returning();
+
+  return { invite, rawToken };
 }
