@@ -1,18 +1,25 @@
 #!/usr/bin/env node
 /**
- * Posts a structured AI code review on the current GitHub PR.
+ * Posts a CodeRabbit-style AI code review on the current GitHub PR.
  * Used by .github/workflows/pr-ai-review.yml
  *
  * Requires: GEMINI_API_KEY, GITHUB_TOKEN, GITHUB_REPOSITORY, PR_NUMBER,
  *           BASE_SHA, HEAD_SHA
  *
  * Optional: GEMINI_MODEL, PR_TITLE, PR_BODY, BASE_REF, HEAD_REF, REVIEW_DEEP=1
+ *
+ * Output:
+ * - Summary issue comment (upserted via MARKER)
+ * - Inline review comments on changed lines (must_fix / should_fix)
+ * - REQUEST_CHANGES when any must_fix remains; otherwise COMMENT/APPROVE
  */
 
 const MARKER = "<!-- doc2mcp-ai-review -->";
+const INLINE_MARKER = "<!-- doc2mcp-ai-inline -->";
 const MODEL = process.env.GEMINI_MODEL ?? "gemini-2.5-flash";
 const MAX_DIFF_CHARS = Number(process.env.REVIEW_MAX_DIFF_CHARS ?? 180_000);
 const DEEP_REVIEW = process.env.REVIEW_DEEP === "1";
+const MAX_INLINE_COMMENTS = Number(process.env.REVIEW_MAX_INLINE ?? 25);
 
 const apiKey = process.env.GEMINI_API_KEY;
 const token = process.env.GITHUB_TOKEN;
@@ -99,6 +106,7 @@ const SECRET_PATTERNS = [
 
 const DOC2MCP_CHECKLIST = [
   "Auth/session checks on new or changed mutating API routes",
+  "Authorization: callers cannot act on another user's/team's resources",
   "MCP access via resolveMcpProject + token verification (not bypassed)",
   "No secrets, .env*, or real credentials committed",
   "vercel.json functions paths match existing route.ts files",
@@ -106,6 +114,8 @@ const DOC2MCP_CHECKLIST = [
   "Razorpay webhooks verify signatures before trusting payload",
   "No new orphaned legacy MCP REST routes (/pages, /ask, /search, etc.)",
   "CLI routes under /api/cli/* remain backward compatible when changed",
+  "Next.js: uncached auth()/cookies()/headers() behind Suspense or connection()",
+  "SQL/migrations: RLS policies and idempotent DDL when touching tables",
 ];
 
 if (!apiKey) {
@@ -205,6 +215,62 @@ function buildSmartDiff(files) {
   };
 }
 
+/**
+ * Map of file path → Set of new-file line numbers that appear in the diff
+ * (needed so inline comments land on valid HEAD lines).
+ */
+function buildAddedLineIndex(files) {
+  /** @type {Map<string, Set<number>>} */
+  const index = new Map();
+
+  for (const file of files) {
+    const fileDiff = runGit(
+      `git diff -U0 ${baseSha}...${headSha} -- ${JSON.stringify(file.path)}`
+    );
+    if (!fileDiff) {
+      continue;
+    }
+    const lines = new Set();
+    for (const hunk of fileDiff.matchAll(
+      /^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@/gm
+    )) {
+      const start = Number(hunk[1]);
+      const count = hunk[2] === undefined ? 1 : Number(hunk[2]);
+      if (count === 0) {
+        continue;
+      }
+      for (let line = start; line < start + count; line += 1) {
+        lines.add(line);
+      }
+    }
+    if (lines.size > 0) {
+      index.set(file.path, lines);
+    }
+  }
+
+  return index;
+}
+
+function nearestAddedLine(addedLines, requested) {
+  if (!addedLines || addedLines.size === 0) {
+    return null;
+  }
+  if (addedLines.has(requested)) {
+    return requested;
+  }
+  let best = null;
+  let bestDist = Number.POSITIVE_INFINITY;
+  for (const line of addedLines) {
+    const dist = Math.abs(line - requested);
+    if (dist < bestDist) {
+      bestDist = dist;
+      best = line;
+    }
+  }
+  // Only snap within a small window so we don't mis-attribute findings.
+  return bestDist <= 8 ? best : null;
+}
+
 function isExampleEnvFile(filePath) {
   return filePath === ".env.example" || filePath.endsWith("/.env.example");
 }
@@ -294,16 +360,100 @@ function extractJson(text) {
   }
 }
 
-function severityRank(severity) {
-  const map = { critical: 0, high: 1, medium: 2, low: 3, info: 4 };
-  return map[String(severity).toLowerCase()] ?? 5;
+function normalizePriority(value) {
+  const raw = String(value ?? "")
+    .toLowerCase()
+    .replace(/[\s-]+/g, "_");
+  if (
+    raw === "must_fix" ||
+    raw === "mustfix" ||
+    raw === "critical" ||
+    raw === "high" ||
+    raw === "blocker"
+  ) {
+    return "must_fix";
+  }
+  if (
+    raw === "should_fix" ||
+    raw === "shouldfix" ||
+    raw === "medium" ||
+    raw === "major"
+  ) {
+    return "should_fix";
+  }
+  if (raw === "nit" || raw === "low" || raw === "info" || raw === "suggestion") {
+    return "nit";
+  }
+  return "should_fix";
+}
+
+function priorityRank(priority) {
+  const map = { must_fix: 0, should_fix: 1, nit: 2 };
+  return map[normalizePriority(priority)] ?? 3;
+}
+
+function priorityLabel(priority) {
+  const p = normalizePriority(priority);
+  if (p === "must_fix") {
+    return "🚨 Must fix";
+  }
+  if (p === "should_fix") {
+    return "⚠️ Should fix";
+  }
+  return "💡 Nit";
+}
+
+function normalizeFindings(review) {
+  const raw = Array.isArray(review.findings) ? review.findings : [];
+  return raw
+    .map((f) => {
+      const priority = normalizePriority(f.priority ?? f.severity);
+      const line =
+        typeof f.line === "number"
+          ? f.line
+          : Number.parseInt(String(f.line ?? ""), 10) || null;
+      return {
+        priority,
+        severity: priority === "must_fix" ? "high" : priority === "should_fix" ? "medium" : "low",
+        file: typeof f.file === "string" ? f.file : "",
+        line: Number.isFinite(line) && line > 0 ? line : null,
+        title: f.title ?? "Issue",
+        detail: f.detail ?? f.title ?? "",
+        suggestion: typeof f.suggestion === "string" ? f.suggestion : "",
+        breakRisk: typeof f.breakRisk === "string" ? f.breakRisk : "",
+      };
+    })
+    .sort((a, b) => priorityRank(a.priority) - priorityRank(b.priority));
+}
+
+function formatInlineComment(finding) {
+  const parts = [
+    INLINE_MARKER,
+    `**${priorityLabel(finding.priority)}:** ${finding.title}`,
+    "",
+    finding.detail,
+  ];
+  if (finding.breakRisk) {
+    parts.push("", `**Break risk:** ${finding.breakRisk}`);
+  }
+  if (finding.suggestion) {
+    parts.push("", `**Suggested fix:** ${finding.suggestion}`);
+  }
+  return parts.join("\n");
 }
 
 function formatReviewMarkdown(review, context) {
-  const findings = Array.isArray(review.findings) ? review.findings : [];
-  findings.sort((a, b) => severityRank(a.severity) - severityRank(b.severity));
+  const findings = normalizeFindings(review);
 
-  const verdict = review.verdict ?? "comment";
+  const mustFix = findings.filter((f) => f.priority === "must_fix");
+  const shouldFix = findings.filter((f) => f.priority === "should_fix");
+  const nits = findings.filter((f) => f.priority === "nit");
+
+  const verdict =
+    mustFix.length > 0 || context.secretHits.length > 0
+      ? "request_changes"
+      : (review.verdict ?? "comment");
+
   const verdictEmoji =
     verdict === "approve"
       ? "🟢 Approve"
@@ -311,14 +461,8 @@ function formatReviewMarkdown(review, context) {
         ? "🔴 Request changes"
         : "🟡 Comment";
 
-  const criticalCount = findings.filter((f) =>
-    ["critical", "high"].includes(String(f.severity).toLowerCase())
-  ).length;
-
   let md = `**Verdict:** ${verdictEmoji}`;
-  if (criticalCount > 0) {
-    md += ` · ${criticalCount} critical/high finding(s)`;
-  }
+  md += ` · 🚨 ${mustFix.length} must-fix · ⚠️ ${shouldFix.length} should-fix · 💡 ${nits.length} nit(s)`;
   md += "\n\n";
 
   if (context.secretHits.length > 0) {
@@ -330,15 +474,15 @@ function formatReviewMarkdown(review, context) {
   }
 
   if (findings.length > 0) {
-    md += "| Severity | Location | Finding |\n";
-    md += "| --- | --- | --- |\n";
-    for (const f of findings.slice(0, 12)) {
+    md += "| Priority | Location | Finding | Break risk |\n";
+    md += "| --- | --- | --- | --- |\n";
+    for (const f of findings.slice(0, 20)) {
       const loc = f.file ? `\`${f.file}${f.line ? `:${f.line}` : ""}\`` : "—";
-      const title = f.title ?? f.detail ?? "Issue";
-      md += `| ${String(f.severity).toUpperCase()} | ${loc} | ${title} |\n`;
+      const risk = (f.breakRisk || "—").replace(/\|/g, "/");
+      md += `| ${priorityLabel(f.priority)} | ${loc} | ${(f.title ?? "").replace(/\|/g, "/")} | ${risk} |\n`;
     }
-    if (findings.length > 12) {
-      md += `\n_+ ${findings.length - 12} more finding(s) below._\n`;
+    if (findings.length > 20) {
+      md += `\n_+ ${findings.length - 20} more finding(s) below._\n`;
     }
     md += "\n";
   }
@@ -348,22 +492,13 @@ function formatReviewMarkdown(review, context) {
   }
 
   const sections = [
-    ["critical", "Critical / High"],
-    ["medium", "Medium"],
-    ["low", "Low / Suggestions"],
+    ["must_fix", "🚨 Must fix (merge blockers)"],
+    ["should_fix", "⚠️ Should fix"],
+    ["nit", "💡 Nits / suggestions"],
   ];
 
   for (const [key, title] of sections) {
-    const items = findings.filter((f) => {
-      const s = String(f.severity).toLowerCase();
-      if (key === "critical") {
-        return s === "critical" || s === "high";
-      }
-      if (key === "medium") {
-        return s === "medium";
-      }
-      return s === "low" || s === "info";
-    });
+    const items = findings.filter((f) => f.priority === key);
     if (items.length === 0) {
       continue;
     }
@@ -372,7 +507,14 @@ function formatReviewMarkdown(review, context) {
       const loc = item.file
         ? `\`${item.file}${item.line ? `:${item.line}` : ""}\` — `
         : "";
-      md += `- ${loc}${item.detail ?? item.title ?? "See table above"}\n`;
+      md += `- ${loc}**${item.title}** — ${item.detail}`;
+      if (item.breakRisk) {
+        md += `  \n  *Break risk:* ${item.breakRisk}`;
+      }
+      if (item.suggestion) {
+        md += `  \n  *Fix:* ${item.suggestion}`;
+      }
+      md += "\n";
     }
     md += "\n";
   }
@@ -397,13 +539,15 @@ function formatReviewMarkdown(review, context) {
   if (context.skipped.length > 0) {
     md += ` (${context.skipped.length} skipped — size limit)`;
   }
+  md += `\n- Inline comments posted: ${context.inlinePosted ?? 0}`;
   md += `\n- Model: \`${MODEL}\`${DEEP_REVIEW ? " (deep)" : ""}\n`;
+  md += "- Style: CodeRabbit-like must_fix / should_fix + line comments\n";
   md += "</details>\n";
 
-  return md.trim();
+  return { markdown: md.trim(), verdict, findings };
 }
 
-async function callGemini(prompt, { maxTokens = 4096 } = {}) {
+async function callGemini(prompt, { maxTokens = 8192 } = {}) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${apiKey}`;
   const maxAttempts = 4;
   let lastError = "Gemini API request failed";
@@ -415,7 +559,7 @@ async function callGemini(prompt, { maxTokens = 4096 } = {}) {
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
         generationConfig: {
-          temperature: 0.12,
+          temperature: 0.1,
           maxOutputTokens: maxTokens,
           responseMimeType: "application/json",
         },
@@ -457,21 +601,35 @@ async function geminiReview({
   const checklist = DOC2MCP_CHECKLIST.map((item) => `- ${item}`).join("\n");
 
   const fileList = files
-    .slice(0, 60)
+    .slice(0, 80)
     .map((f) => `${f.status}\t${f.path}`)
     .join("\n");
 
   const secretContext =
     secretHits.length > 0
-      ? `\nLOCAL SECRET SCAN HITS (treat as CRITICAL until proven false positive):\n${secretHits
+      ? `\nLOCAL SECRET SCAN HITS (treat as must_fix until proven false positive):\n${secretHits
           .map((h) => `- ${h.label} (${h.count})`)
           .join("\n")}\n`
       : "";
 
-  const systemContext = `You are a principal engineer reviewing doc2mcp — a Next.js 16 App Router monolith with Supabase auth/Postgres, QStash pipeline, Gemini, hosted MCP JSON-RPC at /api/mcp/{id}/mcp, CLI at /api/cli/*, Razorpay billing.
+  const systemContext = `You are a principal engineer reviewing doc2mcp PRs in the style of CodeRabbit.
 
-Be strict on security and auth. Be practical on style nits.
+Product: Next.js 16 App Router + Supabase auth/Postgres + QStash + Gemini + hosted MCP JSON-RPC at /api/mcp/{id}/mcp + CLI /api/cli/* + Razorpay.
+
+Review goals:
+1. Find real bugs and security holes that will break production or leak data.
+2. Classify every finding as must_fix, should_fix, or nit (CodeRabbit style).
+3. For each finding, explain WHERE it breaks (runtime path / user impact) in breakRisk.
+4. Prefer concrete, actionable suggestions over vague advice.
+5. Cite exact file paths and line numbers from the diff (new-file line numbers).
+6. Do NOT invent issues. If unsure, use should_fix or nit — never fabricate must_fix.
+7. Skip pure style nits unless they hide a bug. Prefer fewer, higher-signal findings.
 ${secretContext}
+
+Priority rules:
+- must_fix: auth bypass, IDOR, secret leak, data loss, crash on happy path, broken billing/webhook verify, MCP token bypass, build/prerender blockers
+- should_fix: missing edge-case handling, weak validation, confusing UX that causes wrong actions, perf footguns, incomplete migrations
+- nit: naming, minor clarity, optional polish
 
 Project checklist:
 ${checklist}`;
@@ -479,19 +637,28 @@ ${checklist}`;
   const schema = `Return ONLY valid JSON (no markdown fences) with this shape:
 {
   "verdict": "approve" | "request_changes" | "comment",
-  "summary": "2-4 sentences",
+  "summary": "2-4 sentences covering risk and readiness",
   "mergeRecommendation": "one sentence for maintainer",
   "findings": [
     {
-      "severity": "critical" | "high" | "medium" | "low" | "info",
-      "file": "path/or/empty",
-      "line": "number or null",
-      "title": "short title",
-      "detail": "actionable explanation"
+      "priority": "must_fix" | "should_fix" | "nit",
+      "file": "exact/path.from.diff",
+      "line": 123,
+      "title": "short imperative title",
+      "detail": "what is wrong and why it matters",
+      "breakRisk": "how/where this breaks at runtime (user, API, build, data)",
+      "suggestion": "concrete fix steps or patch outline"
     }
   ],
   "looksGood": ["bullet", "..."]
-}`;
+}
+
+Rules for findings:
+- Always set priority (required).
+- Always set file + line when the issue is in the diff.
+- Always set breakRisk for must_fix and should_fix.
+- Cap at ~15 findings; prioritize must_fix then should_fix.
+- verdict must be request_changes if any must_fix exists.`;
 
   const userPrompt = `${systemContext}
 
@@ -506,16 +673,16 @@ File areas: API=${groups.api}, lib/services=${groups.lib}, UI=${groups.ui}, CI=$
 
 ${schema}
 
-Diff (priority-ordered, may be partial):
+Diff (priority-ordered, may be partial). Use NEW file line numbers from +++ / hunk headers:
 ${diff || "(empty diff)"}`;
 
-  let raw = await callGemini(userPrompt, { maxTokens: 4096 });
+  let raw = await callGemini(userPrompt, { maxTokens: 8192 });
   let parsed = extractJson(raw);
 
   if (!parsed && DEEP_REVIEW) {
     const securityPrompt = `${systemContext}
 
-Focus ONLY on security, auth, secrets, webhooks, MCP token handling, Supabase service role usage.
+Focus ONLY on must_fix security/auth/secrets/webhooks/MCP tokens/RLS/IDOR.
 
 PR: ${prTitle}
 Files:\n${fileList}
@@ -525,7 +692,7 @@ ${schema}
 Diff:
 ${diff.slice(0, 80_000)}`;
 
-    raw = await callGemini(securityPrompt, { maxTokens: 2048 });
+    raw = await callGemini(securityPrompt, { maxTokens: 4096 });
     parsed = extractJson(raw);
   }
 
@@ -539,33 +706,43 @@ ${diff.slice(0, 80_000)}`;
           ? "Do not merge until secret scan hits are resolved."
           : "Human review recommended.",
       findings: secretHits.map((h) => ({
-        severity: "critical",
+        priority: "must_fix",
         file: "",
         line: null,
         title: h.label,
         detail: `${h.count} pattern match(es) in diff`,
+        breakRisk: "Credential exposure if real secrets were committed",
+        suggestion: "Rotate keys and remove secrets from git history if needed",
       })),
       looksGood: [],
       _raw: raw.slice(0, 2000),
     };
   }
 
+  parsed.findings = Array.isArray(parsed.findings) ? parsed.findings : [];
+
   for (const hit of secretHits) {
-    const already = parsed.findings?.some((f) =>
+    const already = parsed.findings.some((f) =>
       String(f.title ?? f.detail ?? "")
         .toLowerCase()
         .includes(hit.id.replace(/_/g, " "))
     );
     if (!already) {
-      parsed.findings = parsed.findings ?? [];
       parsed.findings.unshift({
-        severity: "critical",
+        priority: "must_fix",
         file: "",
         line: null,
         title: hit.label,
         detail: "Detected by local pre-flight secret scan on the PR diff.",
+        breakRisk: "Leaked credentials can be abused immediately",
+        suggestion: "Remove from the PR, rotate the credential, confirm .gitignore",
       });
     }
+  }
+
+  const normalized = normalizeFindings(parsed);
+  if (normalized.some((f) => f.priority === "must_fix")) {
+    parsed.verdict = "request_changes";
   }
 
   return parsed;
@@ -618,32 +795,111 @@ async function upsertReviewComment(body) {
   }
 }
 
-async function submitPullRequestReview(review) {
-  const verdict = review.verdict ?? "comment";
-  if (verdict !== "request_changes" && verdict !== "approve") {
-    return;
+async function dismissStaleBotReviews() {
+  const [owner, name] = repo.split("/");
+  try {
+    const reviews = await githubRequest(
+      `/repos/${owner}/${name}/pulls/${prNumber}/reviews?per_page=50`
+    );
+    for (const review of reviews ?? []) {
+      if (
+        review.state === "CHANGES_REQUESTED" &&
+        review.body?.includes(MARKER) &&
+        review.user?.type === "Bot"
+      ) {
+        await githubRequest(
+          `/repos/${owner}/${name}/pulls/${prNumber}/reviews/${review.id}/dismissals`,
+          {
+            method: "PUT",
+            body: {
+              message: "Superseded by a newer AI review on this PR.",
+              event: "DISMISS",
+            },
+          }
+        );
+        console.log(`Dismissed stale bot review ${review.id}.`);
+      }
+    }
+  } catch (error) {
+    console.warn(
+      "Could not dismiss stale reviews:",
+      error instanceof Error ? error.message : error
+    );
+  }
+}
+
+/**
+ * Post inline comments via a single pull-request review so GitHub attaches
+ * them to the exact changed lines (CodeRabbit-style).
+ */
+async function submitInlineReview({ findings, verdict, summary }) {
+  const [owner, name] = repo.split("/");
+  const fullIndex = buildAddedLineIndex(getChangedFiles());
+
+  const comments = [];
+  const seen = new Set();
+
+  for (const finding of findings) {
+    if (comments.length >= MAX_INLINE_COMMENTS) {
+      break;
+    }
+    if (!finding.file || !finding.line) {
+      continue;
+    }
+    // Skip nits for inline noise unless deep review.
+    if (finding.priority === "nit" && !DEEP_REVIEW) {
+      continue;
+    }
+
+    const added = fullIndex.get(finding.file);
+    const line = nearestAddedLine(added, finding.line);
+    if (!line) {
+      continue;
+    }
+
+    const key = `${finding.file}:${line}:${finding.priority}:${finding.title}`;
+    if (seen.has(key)) {
+      continue;
+    }
+    seen.add(key);
+
+    comments.push({
+      path: finding.file,
+      line,
+      side: "RIGHT",
+      body: formatInlineComment(finding),
+    });
   }
 
-  const [owner, name] = repo.split("/");
-  const event = verdict === "request_changes" ? "REQUEST_CHANGES" : "APPROVE";
-  const criticalCount = (review.findings ?? []).filter((f) =>
-    ["critical", "high"].includes(String(f.severity).toLowerCase())
+  const event =
+    verdict === "request_changes"
+      ? "REQUEST_CHANGES"
+      : verdict === "approve"
+        ? "APPROVE"
+        : "COMMENT";
+
+  const mustCount = findings.filter((f) => f.priority === "must_fix").length;
+  const shouldCount = findings.filter(
+    (f) => f.priority === "should_fix"
   ).length;
 
   const shortBody = [
     MARKER,
-    `## 🤖 doc2mcp AI review — ${verdict === "request_changes" ? "changes requested" : "approved"}`,
+    `## 🤖 doc2mcp AI review — ${
+      event === "REQUEST_CHANGES"
+        ? "changes requested"
+        : event === "APPROVE"
+          ? "approved"
+          : "commented"
+    }`,
     "",
-    review.summary ?? "Automated review complete.",
-    criticalCount > 0
-      ? `\n**${criticalCount} critical/high finding(s).** See the full review comment below.`
-      : "",
-    review.mergeRecommendation
-      ? `\n**Recommendation:** ${review.mergeRecommendation}`
-      : "",
-  ]
-    .filter(Boolean)
-    .join("\n");
+    summary ?? "Automated review complete.",
+    "",
+    `**🚨 ${mustCount} must-fix · ⚠️ ${shouldCount} should-fix** · ${comments.length} inline comment(s).`,
+    "See the summary comment for the full table.",
+  ].join("\n");
+
+  await dismissStaleBotReviews();
 
   try {
     await githubRequest(`/repos/${owner}/${name}/pulls/${prNumber}/reviews`, {
@@ -652,14 +908,35 @@ async function submitPullRequestReview(review) {
         commit_id: headSha,
         body: shortBody.slice(0, 8000),
         event,
+        comments,
       },
     });
-    console.log(`Submitted PR review (${event}).`);
+    console.log(
+      `Submitted PR review (${event}) with ${comments.length} inline comment(s).`
+    );
+    return comments.length;
   } catch (error) {
     console.warn(
-      "Could not submit PR review event:",
+      "Inline review failed, falling back to event-only review:",
       error instanceof Error ? error.message : error
     );
+    try {
+      await githubRequest(`/repos/${owner}/${name}/pulls/${prNumber}/reviews`, {
+        method: "POST",
+        body: {
+          commit_id: headSha,
+          body: shortBody.slice(0, 8000),
+          event,
+        },
+      });
+      console.log(`Submitted PR review (${event}) without inline comments.`);
+    } catch (fallbackError) {
+      console.warn(
+        "Could not submit PR review event:",
+        fallbackError instanceof Error ? fallbackError.message : fallbackError
+      );
+    }
+    return 0;
   }
 }
 
@@ -680,23 +957,40 @@ try {
     groups,
   });
 
-  let markdown = formatReviewMarkdown(review, {
+  const findings = normalizeFindings(review);
+  const { markdown, verdict } = formatReviewMarkdown(review, {
     files,
     included,
     skipped,
     secretHits,
     groups,
+    inlinePosted: 0,
   });
 
+  const inlinePosted = await submitInlineReview({
+    findings,
+    verdict,
+    summary: review.summary,
+  });
+
+  const { markdown: finalMarkdown } = formatReviewMarkdown(review, {
+    files,
+    included,
+    skipped,
+    secretHits,
+    groups,
+    inlinePosted,
+  });
+
+  let body = finalMarkdown;
   if (review._raw) {
-    markdown += `\n\n<details><summary>Raw model output (parse fallback)</summary>\n\n${review._raw}\n</details>`;
+    body += `\n\n<details><summary>Raw model output (parse fallback)</summary>\n\n${review._raw}\n</details>`;
   }
 
-  await upsertReviewComment(markdown);
-  await submitPullRequestReview(review);
+  await upsertReviewComment(body);
 
-  if (review.verdict === "request_changes" || secretHits.length > 0) {
-    console.log("Review completed with blocking findings.");
+  if (verdict === "request_changes" || secretHits.length > 0) {
+    console.log("Review completed with must-fix / blocking findings.");
   } else {
     console.log("Review completed.");
   }
