@@ -1,24 +1,12 @@
 import { redirect } from "next/navigation";
-import { connection } from "next/server";
-import { Suspense } from "react";
 import { auth } from "@/app/(auth)/auth";
 
-async function PlaygroundRedirectContent(): Promise<null> {
-  await connection();
+export default async function PlaygroundRedirectPage() {
   const session = await auth();
 
   if (!session?.user?.id || session.user.type === "guest") {
-    redirect("/login?redirectUrl=/dashboard/playground");
+    redirect("/login?redirectUrl=/chat");
   }
 
-  redirect("/dashboard/playground");
-  return null;
-}
-
-export default function PlaygroundRedirectPage() {
-  return (
-    <Suspense fallback={null}>
-      <PlaygroundRedirectContent />
-    </Suspense>
-  );
+  redirect("/chat");
 }
