@@ -8,10 +8,10 @@ async function PlaygroundRedirectContent(): Promise<null> {
   const session = await auth();
 
   if (!session?.user?.id || session.user.type === "guest") {
-    redirect("/login?redirectUrl=/dashboard/playground");
+    redirect("/login?redirectUrl=/chat");
   }
 
-  redirect("/dashboard/playground");
+  redirect("/chat");
   return null;
 }
 

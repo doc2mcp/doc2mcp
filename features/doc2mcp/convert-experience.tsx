@@ -7,7 +7,6 @@ import {
   LayoutDashboard,
   LayoutGrid,
   Loader2,
-  MessageSquare,
   Server,
   Share2,
   Wrench,
@@ -39,7 +38,6 @@ const PIPELINE_STEPS = [
 const SECTIONS = [
   { id: "overview", label: "Overview", icon: LayoutGrid },
   { id: "connect", label: "Connect", icon: Server },
-  { id: "chat", label: "Chat", icon: MessageSquare },
   { id: "tools", label: "Tools", icon: Wrench },
   { id: "insights", label: "Insights", icon: Activity },
 ] as const;

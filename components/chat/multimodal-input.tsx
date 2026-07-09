@@ -8,6 +8,7 @@ import {
   BrainIcon,
   EyeIcon,
   LockIcon,
+  Plug,
   WrenchIcon,
 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -37,7 +38,9 @@ import {
   ModelSelectorName,
   ModelSelectorTrigger,
 } from "@/components/ai-elements/model-selector";
+import { useChatCabinets } from "@/components/chat/chat-cabinets-context";
 import { useChatDocPreview } from "@/components/chat/chat-doc-preview-context";
+import { useChatMcp } from "@/components/chat/chat-mcp-context";
 import { Doc2McpModeToggle } from "@/components/doc2mcp/mode-toggle";
 import { UrlDetectBanner } from "@/components/doc2mcp/url-detect-banner";
 import {
@@ -347,6 +350,47 @@ function PureMultimodalInput({
     !doc2mcpLoading;
 
   const { setPreview } = useChatDocPreview();
+  const { openCabinet } = useChatCabinets();
+  const {
+    enabled: mcpEnabled,
+    setEnabled: setMcpEnabled,
+    projectId: mcpProjectId,
+    setProjectId: setMcpProjectId,
+    projects: mcpProjects,
+    setProjects: setMcpProjects,
+  } = useChatMcp();
+
+  useEffect(() => {
+    if (isGuest) {
+      return;
+    }
+    let cancelled = false;
+    fetch("/api/user/mcp-projects")
+      .then(async (res) => {
+        if (!res.ok) {
+          return;
+        }
+        const data = (await res.json()) as {
+          projects?: {
+            id: string;
+            name: string;
+            sourceUrl: string | null;
+            pageCount?: number;
+          }[];
+        };
+        if (!cancelled && data.projects) {
+          setMcpProjects(data.projects);
+          if (!mcpProjectId && data.projects[0]) {
+            setMcpProjectId(data.projects[0].id);
+          }
+        }
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [isGuest, mcpProjectId, setMcpProjectId, setMcpProjects]);
+
   useEffect(() => {
     setPreview({
       url: detectedUrl,
@@ -785,6 +829,60 @@ function PureMultimodalInput({
                 }}
               />
             </span>
+            <Button
+              aria-label="Toggle MCP playground"
+              className={cn(
+                "h-8 gap-1.5 rounded-lg px-2 text-xs",
+                mcpEnabled
+                  ? "bg-primary/15 text-foreground"
+                  : "text-muted-foreground"
+              )}
+              onClick={() => {
+                if (isGuest) {
+                  toast.error("Sign in to use MCP playground");
+                  router.push(
+                    `/login?redirectUrl=${encodeURIComponent("/chat")}`
+                  );
+                  return;
+                }
+                if (mcpProjects.length === 0) {
+                  toast.error("Convert a docs URL first to unlock MCP chat");
+                  return;
+                }
+                setMcpEnabled(!mcpEnabled);
+              }}
+              size="sm"
+              type="button"
+              variant="ghost"
+            >
+              <Plug className="size-3.5" />
+              MCP
+            </Button>
+            {mcpEnabled && mcpProjects.length > 0 ? (
+              <select
+                aria-label="Select MCP project"
+                className="h-8 max-w-[140px] rounded-lg border border-border/50 bg-background px-2 text-xs"
+                onChange={(e) => setMcpProjectId(e.target.value)}
+                value={mcpProjectId ?? mcpProjects[0]?.id}
+              >
+                {mcpProjects.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name}
+                  </option>
+                ))}
+              </select>
+            ) : null}
+            <Button
+              aria-label="Open sources cabinet"
+              className="h-8 gap-1.5 rounded-lg px-2 text-muted-foreground text-xs"
+              onClick={() => openCabinet("web")}
+              size="sm"
+              type="button"
+              variant="ghost"
+            >
+              <EyeIcon />
+              Sources
+            </Button>
           </PromptInputTools>
 
           {status === "submitted" ? (
