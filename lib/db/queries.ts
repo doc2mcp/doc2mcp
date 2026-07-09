@@ -1939,6 +1939,21 @@ export async function createTeamInvite({
     throw new Error("forbidden: only the team owner can create invites");
   }
 
+  const [existingPending] = await db
+    .select({ id: teamInvite.id })
+    .from(teamInvite)
+    .where(
+      and(
+        eq(teamInvite.teamId, owned.id),
+        eq(teamInvite.email, email.trim().toLowerCase()),
+        eq(teamInvite.status, "pending")
+      )
+    )
+    .limit(1);
+  if (existingPending) {
+    throw new Error("conflict: pending invite already exists for this email");
+  }
+
   const rawToken = generateUUID();
   const tokenHash = createHash("sha256").update(rawToken).digest("hex");
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);

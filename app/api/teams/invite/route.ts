@@ -91,12 +91,21 @@ export async function POST(request: Request) {
     );
   }
 
-  if (email === session.user.email?.trim().toLowerCase()) {
+  const sessionEmail = (session.user.email ?? "").trim().toLowerCase();
+  if (email === sessionEmail) {
     return Response.json(
       {
         error: "invalid_email",
         message: "You cannot invite your own account.",
       },
+      { status: 400 }
+    );
+  }
+
+  // Basic RFC-ish check — enough to reject obvious garbage before DB write.
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return Response.json(
+      { error: "invalid_email", message: "Enter a valid email address." },
       { status: 400 }
     );
   }
@@ -135,7 +144,17 @@ export async function POST(request: Request) {
       acceptUrl,
       note: "Email delivery is not wired yet — share this accept link with your teammate.",
     });
-  } catch {
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "";
+    if (message.startsWith("conflict:")) {
+      return Response.json(
+        {
+          error: "conflict",
+          message: "A pending invite already exists for this email.",
+        },
+        { status: 409 }
+      );
+    }
     return Response.json(
       {
         error: "forbidden",
