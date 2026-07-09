@@ -4,16 +4,16 @@ import {
   getOrCreateOwnedTeam,
   listTeamInvitesForOwner,
 } from "@/lib/db/queries";
+import { getDoc2McpBaseUrl } from "@/lib/doc2mcp/app-url";
 
 /**
  * Team invites are owner-scoped only:
- * - GET lists invites for teams where session.user.id === Team.ownerId
- * - POST creates an invite only after resolving/creating the caller's owned team
- *   and re-checking ownership inside createTeamInvite()
- * Guests and unauthenticated callers get 401. Non-owners cannot target another
- * team's id — the API never accepts a client-supplied teamId.
+ * - Session must be a signed-in non-guest user
+ * - Workspace is the caller's owned team (get-or-create personal workspace)
+ * - createTeamInvite re-checks Team.ownerId === invitedBy before insert
+ * - Client never supplies teamId (IDOR-safe)
  */
-async function requireTeamOwnerSession() {
+async function requireSignedInUser() {
   const session = await auth();
   if (!session?.user?.id || session.user.type === "guest") {
     return {
@@ -23,18 +23,26 @@ async function requireTeamOwnerSession() {
   return { session } as const;
 }
 
+async function resolveOwnedWorkspace(userId: string, email?: string | null) {
+  const ownedTeam = await getOrCreateOwnedTeam({ userId, email });
+  if (!ownedTeam || ownedTeam.ownerId !== userId) {
+    return null;
+  }
+  return ownedTeam;
+}
+
 export async function GET() {
-  const authResult = await requireTeamOwnerSession();
+  const authResult = await requireSignedInUser();
   if ("error" in authResult) {
     return authResult.error;
   }
   const { session } = authResult;
 
-  const ownedTeam = await getOrCreateOwnedTeam({
-    userId: session.user.id,
-    email: session.user.email,
-  });
-  if (!ownedTeam || ownedTeam.ownerId !== session.user.id) {
+  const ownedTeam = await resolveOwnedWorkspace(
+    session.user.id,
+    session.user.email
+  );
+  if (!ownedTeam) {
     return Response.json(
       {
         error: "forbidden",
@@ -65,7 +73,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const authResult = await requireTeamOwnerSession();
+  const authResult = await requireSignedInUser();
   if ("error" in authResult) {
     return authResult.error;
   }
@@ -83,11 +91,21 @@ export async function POST(request: Request) {
     );
   }
 
-  const ownedTeam = await getOrCreateOwnedTeam({
-    userId: session.user.id,
-    email: session.user.email,
-  });
-  if (!ownedTeam || ownedTeam.ownerId !== session.user.id) {
+  if (email === session.user.email?.trim().toLowerCase()) {
+    return Response.json(
+      {
+        error: "invalid_email",
+        message: "You cannot invite your own account.",
+      },
+      { status: 400 }
+    );
+  }
+
+  const ownedTeam = await resolveOwnedWorkspace(
+    session.user.id,
+    session.user.email
+  );
+  if (!ownedTeam) {
     return Response.json(
       {
         error: "forbidden",
@@ -105,10 +123,7 @@ export async function POST(request: Request) {
       role: body.role === "admin" ? "admin" : "member",
     });
 
-    const origin =
-      process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ??
-      "https://doc2mcp.site";
-    const acceptUrl = `${origin}/dashboard/settings?invite=${rawToken}`;
+    const acceptUrl = `${getDoc2McpBaseUrl()}/dashboard/settings?invite=${rawToken}`;
 
     return Response.json({
       invite: {

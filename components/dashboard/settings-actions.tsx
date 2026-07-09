@@ -104,11 +104,20 @@ export function TeamInviteForm() {
           Team workspace
         </CardTitle>
         <CardDescription>
-          Invite teammates to collaborate on doc2mcp projects, share MCP tokens,
-          and split usage across {teamName ?? "your workspace"}.
+          Create a pending invite for {teamName ?? "your workspace"}. Email
+          delivery is not enabled yet — you will get a shareable accept link to
+          copy and send yourself.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
+        <div className="rounded-lg border border-border/60 bg-muted/30 px-3 py-2.5 text-muted-foreground text-xs leading-relaxed">
+          <p className="font-medium text-foreground text-sm">Preview invite</p>
+          <p className="mt-1">
+            Step 1: enter a teammate email. Step 2: copy the accept link we
+            generate. Step 3: share it manually (Slack/email). Accept flow lands
+            on Settings.
+          </p>
+        </div>
         <div className="flex flex-col gap-2 sm:flex-row">
           <Input
             aria-label="Teammate email"
@@ -125,15 +134,32 @@ export function TeamInviteForm() {
             {loading ? (
               <Loader2 className="mr-1.5 size-4 animate-spin" />
             ) : null}
-            Invite
+            Create invite link
           </Button>
         </div>
         {lastAcceptUrl ? (
-          <div className="rounded-lg bg-muted/40 p-3 text-xs">
-            <p className="font-medium text-sm">Share this accept link</p>
+          <div className="rounded-lg border border-primary/25 bg-primary/5 p-3 text-xs">
+            <p className="font-medium text-foreground text-sm">
+              Accept link ready — copy and share
+            </p>
             <p className="mt-1 break-all font-mono text-muted-foreground">
               {lastAcceptUrl}
             </p>
+            <Button
+              className="mt-2 h-8"
+              onClick={async () => {
+                try {
+                  await navigator.clipboard.writeText(lastAcceptUrl);
+                  toast.success("Accept link copied");
+                } catch {
+                  toast.error("Could not copy — select the link manually");
+                }
+              }}
+              type="button"
+              variant="outline"
+            >
+              Copy link
+            </Button>
           </div>
         ) : null}
         {invites.length > 0 ? (
@@ -152,13 +178,14 @@ export function TeamInviteForm() {
           </ul>
         ) : (
           <p className="text-muted-foreground text-sm">
-            No invites yet. Add a teammate email to create a pending invite.
+            No pending invites yet.
           </p>
         )}
       </CardContent>
       <CardFooter>
         <p className="text-muted-foreground text-xs">
-          Email delivery is not wired yet — copy the accept link after inviting.
+          Automated email invites ship later. Until then, treat the accept link
+          like a password — only share with people you trust.
         </p>
       </CardFooter>
     </Card>
