@@ -96,9 +96,7 @@ function CrawlingCard() {
       <div className="flex flex-col justify-between gap-3 p-3.5 rounded-xl border border-border/40 bg-card/30">
         <span className="text-[9px] text-muted-foreground uppercase tracking-wider font-semibold border-b border-border/20 pb-1.5 flex items-center justify-between">
           <span>Metadata &amp; Stats</span>
-          <span className="text-primary font-bold">
-            doc2mcp-crawler/1.0
-          </span>
+          <span className="text-primary font-bold">doc2mcp-crawler/1.0</span>
         </span>
         <div className="grid grid-cols-2 gap-2.5 my-auto">
           {stats.map((stat) => (
@@ -182,9 +180,7 @@ function RetrievalCard() {
   return (
     <div className="flex flex-col gap-2.5 w-full">
       <div className="rounded-lg border border-border/40 bg-card/25 px-3 py-2 flex items-center gap-2 font-mono text-[10.5px]">
-        <span className="text-primary font-bold">
-          Query:
-        </span>
+        <span className="text-primary font-bold">Query:</span>
         <span className="text-foreground font-medium truncate">
           stripe session return URL parameters
         </span>

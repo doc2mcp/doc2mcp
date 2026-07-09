@@ -174,8 +174,7 @@
       sans-serif;
   }
   .font-display {
-    font-family:
-      var(--font-display), var(--font-sans), system-ui, sans-serif;
+    font-family: var(--font-display), var(--font-sans), system-ui, sans-serif;
     font-weight: 500;
     letter-spacing: -0.02em;
   }

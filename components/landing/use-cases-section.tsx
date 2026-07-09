@@ -117,9 +117,7 @@ export function UseCasesSection() {
             </span>
             <h2 className="font-display text-3xl tracking-tight sm:text-4xl lg:text-5xl leading-tight text-foreground">
               Infrastructure for every{" "}
-              <span className="text-primary font-semibold">
-                AI-native
-              </span>{" "}
+              <span className="text-primary font-semibold">AI-native</span>{" "}
               team.
             </h2>
           </div>
@@ -217,9 +215,7 @@ export function UseCasesSection() {
                     <span className="text-zinc-500 font-bold uppercase">
                       claude_desktop_config.json
                     </span>
-                    <span className="text-primary font-bold">
-                      ● Connected
-                    </span>
+                    <span className="text-primary font-bold">● Connected</span>
                   </div>
                   <div className="space-y-1 text-zinc-300">
                     <p className="text-zinc-500">

@@ -113,10 +113,7 @@ export function SocialProofSection() {
 
           {/* Customer Quote Box on the right */}
           <figure className="rounded-2xl border border-border/40 bg-card/25 p-6 sm:p-8 backdrop-blur-md relative overflow-hidden h-full">
-            <Quote
-              aria-hidden="true"
-              className="size-5 text-primary mb-3"
-            />
+            <Quote aria-hidden="true" className="size-5 text-primary mb-3" />
             <blockquote className="font-display text-foreground text-base sm:text-lg leading-relaxed font-medium italic">
               “We stopped pasting docs into prompts. Our agents finally know
               what our APIs actually do — across every editor in our stack.”

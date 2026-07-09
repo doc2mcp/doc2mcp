@@ -294,9 +294,7 @@ export function HowItWorksSection() {
                     <ArrowRight
                       className={cn(
                         "size-4",
-                        isActive
-                          ? "text-primary"
-                          : "text-muted-foreground"
+                        isActive ? "text-primary" : "text-muted-foreground"
                       )}
                     />
                   </div>

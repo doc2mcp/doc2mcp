@@ -121,9 +121,7 @@ export function WhyTeamsSection() {
             </span>
             <h2 className="font-display text-3xl tracking-tight sm:text-4xl lg:text-5xl leading-tight">
               Why teams use{" "}
-              <span className="text-primary font-semibold">
-                Doc2MCP
-              </span>
+              <span className="text-primary font-semibold">Doc2MCP</span>
             </h2>
           </div>
           <div className="flex flex-col justify-end lg:pb-1">

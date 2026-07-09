@@ -411,9 +411,7 @@ export function PricingSection({
                     <Check
                       className={cn(
                         "mt-0.5 size-3.5 shrink-0",
-                        plan.highlight
-                          ? "text-primary"
-                          : "text-primary"
+                        plan.highlight ? "text-primary" : "text-primary"
                       )}
                     />
                     <span className="text-muted-foreground leading-relaxed">
