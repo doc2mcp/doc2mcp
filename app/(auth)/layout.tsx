@@ -13,7 +13,7 @@ export default function AuthLayout({
       <div className="relative flex flex-col bg-background px-4 py-8 sm:px-8 lg:px-12 xl:px-16">
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,color-mix(in_srgb,var(--primary)_14%,transparent),transparent)] lg:hidden"
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(66,133,244,0.12),transparent)] lg:hidden"
         />
 
         <div className="relative mx-auto flex w-full max-w-md flex-1 flex-col justify-center py-6 lg:max-w-lg lg:py-10">

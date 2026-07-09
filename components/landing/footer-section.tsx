@@ -132,7 +132,7 @@ export function FooterSection() {
               >
                 <Heart
                   aria-hidden="true"
-                  className="size-3.5 text-primary transition-transform group-hover:scale-110"
+                  className="size-3.5 text-[#4285f4] dark:text-[#8ab4f8] transition-transform group-hover:scale-110"
                   fill="currentColor"
                 />
                 <span className="font-medium">Sponsor on GitHub</span>
@@ -205,7 +205,7 @@ function AnimatedWordmark() {
             110deg,
             color-mix(in oklab, var(--foreground) 8%, transparent) 0%,
             color-mix(in oklab, var(--foreground) 8%, transparent) 38%,
-            var(--primary) 50%,
+            #4285f4 50%,
             color-mix(in oklab, var(--foreground) 8%, transparent) 62%,
             color-mix(in oklab, var(--foreground) 8%, transparent) 100%
           );
@@ -222,7 +222,7 @@ function AnimatedWordmark() {
             110deg,
             color-mix(in oklab, var(--foreground) 10%, transparent) 0%,
             color-mix(in oklab, var(--foreground) 10%, transparent) 38%,
-            var(--primary) 50%,
+            #8ab4f8 50%,
             color-mix(in oklab, var(--foreground) 10%, transparent) 62%,
             color-mix(in oklab, var(--foreground) 10%, transparent) 100%
           );

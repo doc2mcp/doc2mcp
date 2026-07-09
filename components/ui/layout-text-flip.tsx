@@ -30,7 +30,7 @@ export const LayoutTextFlip = ({
         <span className="text-inherit font-semibold font-display text-foreground">
           {text}
         </span>
-        <span className="relative w-fit overflow-hidden px-1 font-display text-[0.92em] font-semibold text-primary">
+        <span className="relative w-fit overflow-hidden px-1 font-display text-[0.92em] font-semibold text-[#4285f4] dark:text-[#8ab4f8]">
           {words[0]}
         </span>
       </div>
@@ -64,7 +64,7 @@ export const LayoutTextFlip = ({
               duration: 0.35,
               ease: [0.4, 0, 0.2, 1],
             }}
-            className={cn("inline-block whitespace-nowrap text-primary")}
+            className={cn("inline-block whitespace-nowrap text-[#4285f4] dark:text-[#8ab4f8]")}
           >
             {words[currentIndex]}
           </motion.span>

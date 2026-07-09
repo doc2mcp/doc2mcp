@@ -46,8 +46,8 @@
 .driver-popover.doc2mcp-tour
   .driver-popover-navigation-btns
   button.driver-popover-next-btn {
-  background-color: var(--primary);
-  color: var(--primary-foreground);
+  background-color: #4285f4;
+  color: #ffffff;
   border-color: transparent;
 }
 
@@ -85,8 +85,8 @@ html.dark
   .driver-popover.doc2mcp-tour
   .driver-popover-navigation-btns
   button.driver-popover-next-btn {
-  background-color: var(--primary);
-  color: var(--primary-foreground);
+  background-color: #8ab4f8;
+  color: #131314;
 }
 
 html.dark .driver-popover.doc2mcp-tour .driver-popover-arrow {

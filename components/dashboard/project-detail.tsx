@@ -593,7 +593,7 @@ function DomainTab({
           <label className="flex items-start gap-3 text-sm">
             <input
               checked={isCompany}
-              className="mt-0.5 size-4 accent-primary"
+              className="mt-0.5 size-4 accent-[#4285f4]"
               disabled={!canPublishCompany}
               onChange={(e) => setIsCompany(e.target.checked)}
               type="checkbox"
@@ -616,7 +616,7 @@ function DomainTab({
               Custom domain
             </p>
             <input
-              className="w-full rounded-lg border border-border/60 bg-background px-3 py-2 font-mono text-sm outline-none focus:border-primary"
+              className="w-full rounded-lg border border-border/60 bg-background px-3 py-2 font-mono text-sm outline-none focus:border-[#4285f4]"
               disabled={!canPublishCompany}
               onChange={(e) => setDomain(e.target.value)}
               placeholder="mcp.acme.com"
