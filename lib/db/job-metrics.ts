@@ -85,7 +85,9 @@ export type JobMetricSummary = {
 export async function getJobMetricSummary(
   windowHours = 24
 ): Promise<JobMetricSummary[]> {
-  const cutoff = new Date(Date.now() - windowHours * 60 * 60 * 1000);
+  const cutoffIso = new Date(
+    Date.now() - windowHours * 60 * 60 * 1000
+  ).toISOString();
   const rows = (await db.execute(sql`
     SELECT
       "jobType" AS "jobType",
@@ -107,7 +109,7 @@ export async function getJobMetricSummary(
         0
       )::int AS "p95"
     FROM "JobMetric"
-    WHERE "startedAt" >= ${cutoff}
+    WHERE "startedAt" >= ${cutoffIso}::timestamptz
     GROUP BY "jobType"
     ORDER BY total DESC
   `)) as Array<{
@@ -218,7 +220,9 @@ export type DurationBucket = {
 export async function getHourlyBuckets(
   windowHours = 24
 ): Promise<DurationBucket[]> {
-  const cutoff = new Date(Date.now() - windowHours * 60 * 60 * 1000);
+  const cutoffIso = new Date(
+    Date.now() - windowHours * 60 * 60 * 1000
+  ).toISOString();
   const rows = (await db.execute(sql`
     SELECT
       date_trunc('hour', "startedAt") AS "hourStart",
@@ -226,7 +230,7 @@ export async function getHourlyBuckets(
       SUM(CASE WHEN status = 'failed' THEN 1 ELSE 0 END)::int AS failed,
       COALESCE(AVG(NULLIF("durationMs", '')::int), 0)::int AS "avgDuration"
     FROM "JobMetric"
-    WHERE "startedAt" >= ${cutoff}
+    WHERE "startedAt" >= ${cutoffIso}::timestamptz
     GROUP BY date_trunc('hour', "startedAt")
     ORDER BY "hourStart" ASC
   `)) as Array<{
