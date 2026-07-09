@@ -81,9 +81,7 @@ export function WhyNowSection() {
             </span>
             <h2 className="font-display text-3xl tracking-tight sm:text-4xl lg:text-5xl leading-tight text-foreground">
               Why this matters{" "}
-              <span className="text-[#4285f4] dark:text-[#8ab4f8] font-semibold">
-                right now.
-              </span>
+              <span className="text-primary font-semibold">right now.</span>
             </h2>
           </div>
           <div className="flex flex-col justify-end lg:pb-1">
@@ -101,10 +99,7 @@ export function WhyNowSection() {
 
         {/* Highlighted quote */}
         <figure className="mx-auto max-w-4xl rounded-2xl border border-border/40 bg-card/25 p-6 sm:p-8 backdrop-blur-md transition-all duration-300">
-          <Sparkles
-            aria-hidden="true"
-            className="size-5 text-[#4285f4] dark:text-[#8ab4f8] mb-3"
-          />
+          <Sparkles aria-hidden="true" className="size-5 text-primary mb-3" />
           <blockquote className="font-display text-foreground text-lg sm:text-xl md:text-2xl font-medium italic leading-relaxed tracking-tight">
             “Documentation is becoming the knowledge layer for AI agents.”
           </blockquote>
@@ -124,7 +119,7 @@ export function WhyNowSection() {
               >
                 <div>
                   <div className="flex items-center justify-between gap-3">
-                    <span className="flex size-8 items-center justify-center rounded-lg border border-border/40 bg-background/50 text-[#4285f4] dark:text-[#8ab4f8] group-hover:scale-[1.02] transition-transform duration-300">
+                    <span className="flex size-8 items-center justify-center rounded-lg border border-border/40 bg-background/50 text-primary group-hover:scale-[1.02] transition-transform duration-300">
                       <Icon className="size-4" />
                     </span>
                     <span className="font-mono text-xs font-bold text-foreground">

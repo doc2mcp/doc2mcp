@@ -36,18 +36,18 @@ export function LoginHeroPanel({ className }: { className?: string }) {
       />
       <div
         aria-hidden="true"
-        className="absolute inset-0 bg-gradient-to-br from-[#0f172a]/92 via-[#1e3a8a]/78 to-[#4285f4]/55"
+        className="absolute inset-0 bg-gradient-to-br from-[#0b1c30]/92 via-[#006d32]/55 to-[#00d166]/40"
       />
       <div
         aria-hidden="true"
-        className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(138,180,248,0.25),transparent_45%)]"
+        className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,color-mix(in_srgb,#00d166_28%,transparent),transparent_45%)]"
       />
 
       <div className="relative z-10 flex flex-col gap-8 p-10 xl:p-14">
         <div className="flex items-center gap-2.5">
           <Doc2McpMark size={40} />
           <span className="font-display font-semibold text-xl tracking-tight text-white">
-            doc<span className="text-[#8ab4f8]">2</span>mcp
+            doc<span className="text-primary-container">2</span>mcp
           </span>
         </div>
 
@@ -97,7 +97,7 @@ export function LoginHeroPanel({ className }: { className?: string }) {
               .cursor/mcp.json
             </span>
           </div>
-          <pre className="overflow-x-auto p-4 font-mono text-[11px] leading-relaxed text-[#a5f3fc] xl:text-xs">
+          <pre className="overflow-x-auto p-4 font-mono text-[11px] leading-relaxed text-primary-container xl:text-xs">
             <code>{MCP_SNIPPET}</code>
           </pre>
         </div>
@@ -124,7 +124,7 @@ export function LoginHeroStrip() {
         />
         <div
           aria-hidden="true"
-          className="absolute inset-0 bg-gradient-to-r from-[#0f172a]/90 to-[#4285f4]/70"
+          className="absolute inset-0 bg-gradient-to-r from-[#0b1c30]/90 to-[#006d32]/70"
         />
         <div className="absolute inset-0 flex flex-col justify-end p-4">
           <p className="font-display text-lg font-semibold text-white">

@@ -1,7 +1,11 @@
 import { Analytics } from "@vercel/analytics/next";
-import { GeistMono } from "geist/font/mono";
 import type { Metadata } from "next";
-import { Inter, Space_Grotesk } from "next/font/google";
+import {
+  Inter,
+  JetBrains_Mono,
+  Manrope,
+  Space_Grotesk,
+} from "next/font/google";
 import { Toaster } from "sonner";
 import { ThemeProvider } from "@/components/theme-provider";
 import { CustomCursor } from "@/components/ui/custom-cursor";
@@ -68,12 +72,24 @@ const inter = Inter({
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["300", "400", "500", "600", "700"],
   variable: "--font-space-grotesk",
   display: "swap",
 });
 
-const geistMono = GeistMono;
+const manrope = Manrope({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-manrope",
+  display: "swap",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-jetbrains-mono",
+  display: "swap",
+});
 
 export default function RootLayout({
   children,
@@ -82,7 +98,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      className={`${inter.variable} ${spaceGrotesk.variable} ${geistMono.variable}`}
+      className={`${inter.variable} ${spaceGrotesk.variable} ${manrope.variable} ${jetbrainsMono.variable}`}
       data-scroll-behavior="smooth"
       lang="en"
       suppressHydrationWarning
