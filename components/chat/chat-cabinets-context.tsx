@@ -3,6 +3,7 @@
 import {
   createContext,
   type ReactNode,
+  useCallback,
   useContext,
   useMemo,
   useState,
@@ -24,6 +25,7 @@ type ChatCabinetsState = {
   setTab: (tab: CabinetTab) => void;
   setWebSources: (sources: WebSource[]) => void;
   openCabinet: (tab?: CabinetTab) => void;
+  toggleCabinet: (tab?: CabinetTab) => void;
 };
 
 const ChatCabinetsContext = createContext<ChatCabinetsState | null>(null);
@@ -33,6 +35,25 @@ export function ChatCabinetsProvider({ children }: { children: ReactNode }) {
   const [tab, setTab] = useState<CabinetTab>("web");
   const [webSources, setWebSources] = useState<WebSource[]>([]);
 
+  const openCabinet = useCallback((next?: CabinetTab) => {
+    if (next) {
+      setTab(next);
+    }
+    setOpen(true);
+  }, []);
+
+  const toggleCabinet = useCallback((next?: CabinetTab) => {
+    setOpen((wasOpen) => {
+      if (wasOpen) {
+        return false;
+      }
+      if (next) {
+        setTab(next);
+      }
+      return true;
+    });
+  }, []);
+
   const value = useMemo(
     () => ({
       open,
@@ -41,14 +62,10 @@ export function ChatCabinetsProvider({ children }: { children: ReactNode }) {
       setOpen,
       setTab,
       setWebSources,
-      openCabinet: (next?: CabinetTab) => {
-        if (next) {
-          setTab(next);
-        }
-        setOpen(true);
-      },
+      openCabinet,
+      toggleCabinet,
     }),
-    [open, tab, webSources]
+    [open, tab, webSources, openCabinet, toggleCabinet]
   );
 
   return (
