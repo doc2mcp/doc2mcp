@@ -6,6 +6,7 @@
       "main": false
     }
   },
+  "ignoreCommand": "bash scripts/vercel-ignore.sh",
   "functions": {
     "app/api/convert/route.ts": { "maxDuration": 60 },
     "app/api/internal/pipeline-worker/route.ts": { "maxDuration": 60 },
