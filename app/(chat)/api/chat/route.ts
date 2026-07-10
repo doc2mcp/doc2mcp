@@ -11,10 +11,9 @@ import { auth, type UserType } from "@/app/(auth)/auth";
 import { isAdminEmail } from "@/lib/admin/admin-access";
 import { entitlementsByUserType } from "@/lib/ai/entitlements";
 import {
-  allowedModelIds,
   chatModels,
-  DEFAULT_CHAT_MODEL,
   getCapabilities,
+  resolveChatModelId,
 } from "@/lib/ai/models";
 import { type RequestHints, systemPrompt } from "@/lib/ai/prompts";
 import { getLanguageModel } from "@/lib/ai/providers";
@@ -56,6 +55,10 @@ import { type PostRequestBody, postRequestBodySchema } from "./schema";
 
 export const maxDuration = 60;
 
+/** Hybrid MCP + general tools need more agentic steps than plain chat. */
+const MAX_HYBRID_TOOL_STEPS = 10;
+const MAX_STANDARD_TOOL_STEPS = 5;
+
 export async function POST(request: Request) {
   let requestBody: PostRequestBody;
 
@@ -85,9 +88,7 @@ export async function POST(request: Request) {
       return new ChatbotError("unauthorized:chat").toResponse();
     }
 
-    const chatModel = allowedModelIds.has(selectedChatModel)
-      ? selectedChatModel
-      : DEFAULT_CHAT_MODEL;
+    const chatModel = resolveChatModelId(selectedChatModel);
 
     const userType: UserType = session.user.type;
 
@@ -348,7 +349,9 @@ export async function POST(request: Request) {
               webSearchAvailable,
             }),
           messages: modelMessages,
-          stopWhen: stepCountIs(docTools ? 10 : 5),
+          stopWhen: stepCountIs(
+            docTools ? MAX_HYBRID_TOOL_STEPS : MAX_STANDARD_TOOL_STEPS
+          ),
           experimental_activeTools:
             isReasoningModel && !supportsTools ? [] : [...baseActiveTools],
           providerOptions: {},

@@ -5,7 +5,7 @@ import {
   type UIMessage,
 } from "ai";
 import { auth } from "@/app/(auth)/auth";
-import { getAsi1Model } from "@/lib/asi1/provider";
+import { getLanguageModel } from "@/lib/ai/providers";
 import {
   getPlatformProjectById,
   getPlatformProjectForMcp,
@@ -112,7 +112,7 @@ export async function POST(
   });
 
   const result = streamText({
-    model: getAsi1Model(),
+    model: getLanguageModel("gemini"),
     system: buildDocAgentSystemPrompt(resolved.project.name),
     messages: await convertToModelMessages(body.messages ?? []),
     tools: createDocAgentTools(ctx),
