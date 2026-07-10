@@ -344,7 +344,7 @@ export function SidebarHistory({
             }}
           />
 
-          {hasReachedEnd ? null : (
+          {hasReachedEnd || !(isLoading || isValidating) ? null : (
             <div className="mt-1 flex flex-row items-center gap-2 px-4 py-2 text-sidebar-foreground/50">
               <div className="animate-spin">
                 <LoaderIcon />

@@ -176,6 +176,7 @@ export function ProjectDetail({
 
       <ProjectStats
         artifacts={artifacts}
+        hitStats={hitStats}
         logs={logs}
         report={report}
         tools={tools}
@@ -314,11 +315,13 @@ export function ProjectDetail({
 
 function ProjectStats({
   artifacts,
+  hitStats,
   logs,
   report,
   tools,
 }: {
   artifacts: ProjectArtifacts | null;
+  hitStats: HitStats;
   logs: ProcessingLog[];
   report: GenerationReport | undefined;
   tools: CompressedTool[];
@@ -328,7 +331,7 @@ function ProjectStats({
   const totalEndpoints = artifacts?.endpoints?.length ?? 0;
   const lastLog = logs.at(-1);
   return (
-    <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
       <StatTile hint="Pages crawled" label="Docs pages" value={docsPages} />
       <StatTile
         hint="Endpoints extracted"
@@ -339,6 +342,11 @@ function ProjectStats({
         hint="After validation"
         label="MCP tools"
         value={tools.length}
+      />
+      <StatTile
+        hint="Live MCP + chat tool calls"
+        label="MCP hits"
+        value={hitStats.total}
       />
       <StatTile
         hint={confidence === null ? "Pending" : "Avg tool confidence"}

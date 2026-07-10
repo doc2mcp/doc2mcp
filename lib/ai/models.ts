@@ -1,7 +1,7 @@
-export const DEFAULT_CHAT_MODEL = "asi1";
+export const DEFAULT_CHAT_MODEL = "gemini";
 
 export const titleModel = {
-  id: "asi1",
+  id: "gemini",
   name: "Gemini",
   provider: "gemini",
   description: "Google Gemini model",
@@ -23,11 +23,11 @@ export type ChatModel = {
 
 export const chatModels: ChatModel[] = [
   {
-    id: "asi1",
+    id: "gemini",
     name: "Gemini",
     provider: "gemini",
     description:
-      "Production AI for docs ingestion, MCP generation, and developer workflows",
+      "Google Gemini 2.5 Flash — large context, tools, vision, and web search",
   },
 ];
 
@@ -36,10 +36,9 @@ export async function getCapabilities(): Promise<
   Record<string, ModelCapabilities>
 > {
   return {
-    asi1: {
+    gemini: {
       tools: true,
       vision: true,
-      // flash-lite is not a thinking model; don't request/forward reasoning.
       reasoning: false,
     },
   };
@@ -69,7 +68,19 @@ export function getActiveModels(): ChatModel[] {
   return chatModels;
 }
 
-export const allowedModelIds = new Set(chatModels.map((m) => m.id));
+export const allowedModelIds = new Set([
+  ...chatModels.map((m) => m.id),
+  // Legacy alias from older sessions / localStorage
+  "asi1",
+]);
+
+/** Normalize legacy model ids (asi1 → gemini). */
+export function resolveChatModelId(modelId: string): string {
+  if (modelId === "asi1") {
+    return DEFAULT_CHAT_MODEL;
+  }
+  return allowedModelIds.has(modelId) ? modelId : DEFAULT_CHAT_MODEL;
+}
 
 export const modelsByProvider = chatModels.reduce(
   (acc, model) => {

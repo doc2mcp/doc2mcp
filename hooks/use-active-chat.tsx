@@ -159,10 +159,10 @@ export function ActiveChatProvider({ children }: { children: ReactNode }) {
               : { message: lastMessage }),
             selectedChatModel: currentModelIdRef.current,
             selectedVisibilityType: visibility,
+            ...request.body,
             ...(mcpProjectIdRef.current
               ? { mcpProjectId: mcpProjectIdRef.current }
               : {}),
-            ...request.body,
           },
         };
       },
@@ -177,7 +177,14 @@ export function ActiveChatProvider({ children }: { children: ReactNode }) {
       if (error.message?.includes("AI Gateway requires a valid credit card")) {
         setShowCreditCardAlert(true);
       } else if (error instanceof ChatbotError) {
-        toast({ type: "error", description: error.message });
+        const detail =
+          typeof error.cause === "string" && error.cause.length > 0
+            ? error.cause
+            : error.message;
+        toast({
+          type: "error",
+          description: detail,
+        });
       } else {
         toast({
           type: "error",

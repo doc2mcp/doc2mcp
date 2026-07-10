@@ -11,10 +11,9 @@ import { auth, type UserType } from "@/app/(auth)/auth";
 import { isAdminEmail } from "@/lib/admin/admin-access";
 import { entitlementsByUserType } from "@/lib/ai/entitlements";
 import {
-  allowedModelIds,
   chatModels,
-  DEFAULT_CHAT_MODEL,
   getCapabilities,
+  resolveChatModelId,
 } from "@/lib/ai/models";
 import { type RequestHints, systemPrompt } from "@/lib/ai/prompts";
 import { getLanguageModel } from "@/lib/ai/providers";
@@ -40,9 +39,10 @@ import {
 } from "@/lib/db/queries";
 import type { DBMessage } from "@/lib/db/schema";
 import {
-  buildDocAgentSystemPrompt,
+  buildHybridMcpSystemPrompt,
   createDocAgentTools,
 } from "@/lib/doc2mcp/doc-agent-tools";
+import { attributeMcpHit } from "@/lib/doc2mcp/mcp-api";
 import type { DocMcpContext } from "@/lib/doc2mcp/mcp-tools-runtime";
 import { ChatbotError } from "@/lib/errors";
 import { checkIpRateLimit } from "@/lib/ratelimit";
@@ -54,6 +54,10 @@ import { generateTitleFromUserMessage } from "../../actions";
 import { type PostRequestBody, postRequestBodySchema } from "./schema";
 
 export const maxDuration = 60;
+
+/** Hybrid MCP + general tools need more agentic steps than plain chat. */
+const MAX_HYBRID_TOOL_STEPS = 10;
+const MAX_STANDARD_TOOL_STEPS = 5;
 
 export async function POST(request: Request) {
   let requestBody: PostRequestBody;
@@ -84,9 +88,7 @@ export async function POST(request: Request) {
       return new ChatbotError("unauthorized:chat").toResponse();
     }
 
-    const chatModel = allowedModelIds.has(selectedChatModel)
-      ? selectedChatModel
-      : DEFAULT_CHAT_MODEL;
+    const chatModel = resolveChatModelId(selectedChatModel);
 
     const userType: UserType = session.user.type;
 
@@ -265,6 +267,11 @@ export async function POST(request: Request) {
         pages: (project.crawlData as CrawlResult[] | null) ?? [],
         artifacts: project.artifacts as ProjectArtifacts | null,
       };
+      attributeMcpHit({
+        id: project.id,
+        ownerType: project.ownerType,
+        teamId: project.teamId,
+      });
     }
 
     const docTools = docAgentCtx ? createDocAgentTools(docAgentCtx) : null;
@@ -274,6 +281,14 @@ export async function POST(request: Request) {
           "search_documentation",
           "get_documentation_page",
           "read_full_documentation",
+          "getWeather",
+          "generateImage",
+          "generatePdf",
+          "createDocument",
+          "editDocument",
+          "updateDocument",
+          "requestSuggestions",
+          ...(webSearchAvailable ? (["webSearch"] as const) : []),
         ] as const)
       : ([
           "getWeather",
@@ -285,6 +300,17 @@ export async function POST(request: Request) {
           "requestSuggestions",
           ...(webSearchAvailable ? (["webSearch"] as const) : []),
         ] as const);
+
+    const hybridSystemPrompt = docAgentCtx
+      ? buildHybridMcpSystemPrompt(
+          docAgentCtx.project.name,
+          systemPrompt({
+            requestHints,
+            supportsTools,
+            webSearchAvailable,
+          })
+        )
+      : null;
 
     const stream = createUIMessageStream({
       originalMessages: isToolApprovalFlow ? uiMessages : undefined,
@@ -315,15 +341,17 @@ export async function POST(request: Request) {
 
         const result = streamText({
           model: getLanguageModel(chatModel),
-          system: docAgentCtx
-            ? buildDocAgentSystemPrompt(docAgentCtx.project.name)
-            : systemPrompt({
-                requestHints,
-                supportsTools,
-                webSearchAvailable,
-              }),
+          system:
+            hybridSystemPrompt ??
+            systemPrompt({
+              requestHints,
+              supportsTools,
+              webSearchAvailable,
+            }),
           messages: modelMessages,
-          stopWhen: stepCountIs(docTools ? 8 : 5),
+          stopWhen: stepCountIs(
+            docTools ? MAX_HYBRID_TOOL_STEPS : MAX_STANDARD_TOOL_STEPS
+          ),
           experimental_activeTools:
             isReasoningModel && !supportsTools ? [] : [...baseActiveTools],
           providerOptions: {},

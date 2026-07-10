@@ -24,19 +24,19 @@ function readEnv(name: string): string | undefined {
   return value ? value : undefined;
 }
 
-// Default to flash-lite: gemini-2.5-flash is a "thinking" model that burns the
-// token budget on internal reasoning (often returning empty content) and is
-// rate-limited / 503-prone on the free tier, which surfaced as "Failed after 3
-// attempts / Too Many Requests" in chat. flash-lite returns content reliably,
-// is faster, and has higher free-tier limits.
-export const ASI1_MODEL =
-  readEnv("GEMINI_MODEL") ?? readEnv("ASI1_MODEL") ?? "gemini-2.5-flash-lite";
+// Default: gemini-2.5-flash (1M token context). Override via GEMINI_MODEL.
+export const GEMINI_TEXT_MODEL =
+  readEnv("GEMINI_MODEL") ?? readEnv("ASI1_MODEL") ?? "gemini-2.5-flash";
+
+/** @deprecated Use GEMINI_TEXT_MODEL */
+export const ASI1_MODEL = GEMINI_TEXT_MODEL;
 export const ASI1_IMAGE_MODEL =
   readEnv("GEMINI_IMAGE_MODEL") ??
   readEnv("ASI1_IMAGE_MODEL") ??
   "gemini-3-pro-image-preview";
 const DEFAULT_TEXT_FALLBACK_MODELS = [
-  ASI1_MODEL,
+  GEMINI_TEXT_MODEL,
+  "gemini-2.5-flash",
   "gemini-2.5-flash-lite",
   "gemini-flash-lite-latest",
 ];
@@ -96,7 +96,7 @@ export async function asi1ChatCompletion(
       Authorization: `Bearer ${getApiKey()}`,
     },
     body: JSON.stringify({
-      model: ASI1_MODEL,
+      model: GEMINI_TEXT_MODEL,
       ...request,
     }),
   });
@@ -124,7 +124,7 @@ export async function asi1ChatCompletionStream(
       Authorization: `Bearer ${getApiKey()}`,
     },
     body: JSON.stringify({
-      model: ASI1_MODEL,
+      model: GEMINI_TEXT_MODEL,
       stream: true,
       ...rest,
     }),
