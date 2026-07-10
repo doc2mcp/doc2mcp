@@ -56,8 +56,9 @@ import { type PostRequestBody, postRequestBodySchema } from "./schema";
 export const maxDuration = 60;
 
 /** Hybrid MCP + general tools need more agentic steps than plain chat. */
-const MAX_HYBRID_TOOL_STEPS = 10;
-const MAX_STANDARD_TOOL_STEPS = 5;
+const MAX_HYBRID_TOOL_STEPS = 12;
+/** Tool call + follow-up answer needs at least 2 model steps. */
+const MAX_STANDARD_TOOL_STEPS = 8;
 
 export async function POST(request: Request) {
   let requestBody: PostRequestBody;
@@ -354,7 +355,11 @@ export async function POST(request: Request) {
           ),
           experimental_activeTools:
             isReasoningModel && !supportsTools ? [] : [...baseActiveTools],
-          providerOptions: {},
+          providerOptions: {
+            openai: {
+              parallelToolCalls: false,
+            },
+          },
           tools: chatTools,
           experimental_telemetry: {
             isEnabled: isProductionEnvironment,
