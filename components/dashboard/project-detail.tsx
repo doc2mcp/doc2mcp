@@ -17,7 +17,6 @@ import Link from "next/link";
 import { useMemo, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { updateProjectOwnership } from "@/app/(dashboard)/dashboard/projects/[id]/ownership-actions";
-import { McpChat } from "@/components/doc2mcp/mcp-chat";
 import { RegistryStatusCard } from "@/components/doc2mcp/registry-status-card";
 import { RetryConversionButton } from "@/components/doc2mcp/retry-conversion-button";
 import { Badge } from "@/components/ui/badge";
@@ -159,6 +158,11 @@ export function ProjectDetail({
               </Button>
             </>
           ) : null}
+          {artifacts?.mcpAccessToken ? (
+            <Button asChild size="sm" type="button" variant="default">
+              <Link href="/chat">Ask in chat</Link>
+            </Button>
+          ) : null}
           {artifacts?.mcpConfig ? (
             <Button asChild size="sm" type="button" variant="outline">
               <Link href={`/convert/${project.id}`}>
@@ -203,7 +207,6 @@ export function ProjectDetail({
         <TabsList className="w-full justify-start overflow-x-auto">
           <TabsTrigger value="tools">Tools</TabsTrigger>
           <TabsTrigger value="exports">Exports</TabsTrigger>
-          <TabsTrigger value="inspector">Chat</TabsTrigger>
           <TabsTrigger value="domain">Domain</TabsTrigger>
           <TabsTrigger value="logs">Logs</TabsTrigger>
         </TabsList>
@@ -289,20 +292,6 @@ export function ProjectDetail({
             <EmptyTabState
               description="MCP config exports will be available once the pipeline finishes."
               title="No exports yet"
-            />
-          )}
-        </TabsContent>
-
-        <TabsContent className="mt-4 space-y-4" value="inspector">
-          {artifacts?.mcpAccessToken ? (
-            <McpChat
-              pageCount={artifacts.docsPageCount}
-              projectId={project.id}
-            />
-          ) : (
-            <EmptyTabState
-              description="MCP chat unlocks once the access token is generated."
-              title="MCP not ready"
             />
           )}
         </TabsContent>

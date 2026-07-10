@@ -3,10 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useChatCabinets } from "@/components/chat/chat-cabinets-context";
 import { useChatDocPreviewVisible } from "@/components/chat/chat-doc-preview-context";
-import { useChatMcp } from "@/components/chat/chat-mcp-context";
 import { DocPreviewPanel } from "@/components/chat/doc-preview-panel";
 import { SourcesCabinet } from "@/components/chat/sources-cabinet";
-import { McpChat } from "@/components/doc2mcp/mcp-chat";
 import { ChatTour } from "@/components/onboarding/chat-tour";
 import {
   AlertDialog,
@@ -66,22 +64,10 @@ export function ChatShell() {
     setOpen: setCabinetsOpen,
     setWebSources,
   } = useChatCabinets();
-  const {
-    enabled: mcpEnabled,
-    setEnabled: setMcpEnabled,
-    projectId: mcpProjectId,
-    projects,
-  } = useChatMcp();
-  const selectedMcp = projects.find((p) => p.id === mcpProjectId);
-  const showMcpPanel =
-    mcpEnabled && Boolean(mcpProjectId) && !isArtifactVisible;
-  // One right-rail panel at a time (desktop). Doc preview yields to Sources/MCP.
+  // One right-rail panel at a time (desktop). Doc preview yields to Sources.
   const showDocPreview =
-    useChatDocPreviewVisible() &&
-    !isArtifactVisible &&
-    !showMcpPanel &&
-    !cabinetsOpen;
-  const desktopSideOpen = showDocPreview || cabinetsOpen || showMcpPanel;
+    useChatDocPreviewVisible() && !isArtifactVisible && !cabinetsOpen;
+  const desktopSideOpen = showDocPreview || cabinetsOpen;
 
   const stopRef = useRef(stop);
   stopRef.current = stop;
@@ -95,16 +81,8 @@ export function ChatShell() {
       setEditingMessage(null);
       setAttachments([]);
       setCabinetsOpen(false);
-      setMcpEnabled(false);
     }
-  }, [chatId, setArtifact, setCabinetsOpen, setMcpEnabled]);
-
-  // Exclusive: MCP and Sources never both open.
-  useEffect(() => {
-    if (showMcpPanel && cabinetsOpen) {
-      setCabinetsOpen(false);
-    }
-  }, [showMcpPanel, cabinetsOpen, setCabinetsOpen]);
+  }, [chatId, setArtifact, setCabinetsOpen]);
 
   useEffect(() => {
     const sources: { title: string; url: string; snippet?: string }[] = [];
@@ -229,23 +207,6 @@ export function ChatShell() {
           </div>
         </div>
 
-        {showMcpPanel && mcpProjectId ? (
-          <div
-            className={cn(
-              // Mobile: full-screen overlay. Desktop: right rail.
-              "fixed inset-0 z-40 flex flex-col border-border/40 bg-background p-3",
-              "md:static md:inset-auto md:z-auto md:h-auto md:w-[42%] md:min-w-[300px] md:max-w-[520px] md:border-l"
-            )}
-          >
-            <McpChat
-              key={mcpProjectId}
-              onClose={() => setMcpEnabled(false)}
-              pageCount={selectedMcp?.pageCount}
-              projectId={mcpProjectId}
-            />
-          </div>
-        ) : null}
-
         {showDocPreview ? (
           <DocPreviewPanel
             className={cn(
@@ -255,7 +216,7 @@ export function ChatShell() {
           />
         ) : null}
 
-        {showMcpPanel ? null : <SourcesCabinet chatId={chatId} />}
+        <SourcesCabinet chatId={chatId} />
 
         <Artifact
           addToolApprovalResponse={addToolApprovalResponse}

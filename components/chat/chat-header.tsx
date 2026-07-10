@@ -3,7 +3,6 @@
 import { EyeIcon, PanelLeftIcon } from "lucide-react";
 import { memo } from "react";
 import { useChatCabinets } from "@/components/chat/chat-cabinets-context";
-import { useChatMcp } from "@/components/chat/chat-mcp-context";
 import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
@@ -20,7 +19,6 @@ function PureChatHeader({
 }) {
   const { state, toggleSidebar, isMobile } = useSidebar();
   const { open, toggleCabinet, webSources } = useChatCabinets();
-  const { setEnabled: setMcpEnabled } = useChatMcp();
 
   if (state === "collapsed" && !isMobile) {
     return null;
@@ -54,9 +52,6 @@ function PureChatHeader({
             open && "border-primary/40 bg-primary/10 text-foreground"
           )}
           onClick={() => {
-            if (!open) {
-              setMcpEnabled(false);
-            }
             toggleCabinet("web");
           }}
           size="sm"
