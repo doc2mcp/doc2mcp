@@ -38,7 +38,6 @@ import {
   ModelSelectorName,
   ModelSelectorTrigger,
 } from "@/components/ai-elements/model-selector";
-import { useChatCabinets } from "@/components/chat/chat-cabinets-context";
 import { useChatDocPreview } from "@/components/chat/chat-doc-preview-context";
 import { useChatMcp } from "@/components/chat/chat-mcp-context";
 import { Doc2McpModeToggle } from "@/components/doc2mcp/mode-toggle";
@@ -350,7 +349,6 @@ function PureMultimodalInput({
     !doc2mcpLoading;
 
   const { setPreview } = useChatDocPreview();
-  const { setOpen: setCabinetsOpen } = useChatCabinets();
   const {
     enabled: mcpEnabled,
     setEnabled: setMcpEnabled,
@@ -798,7 +796,9 @@ function PureMultimodalInput({
               ? "Edit your message..."
               : hasMounted && doc2mcpMode
                 ? "Paste docs URL — https://docs.example.com"
-                : "Ask anything — or sign in and enable doc2mcp"
+                : hasMounted && mcpEnabled
+                  ? "Ask your documentation anything..."
+                  : "Ask anything — or sign in and enable doc2mcp"
           }
           ref={textareaRef}
           value={input}
@@ -830,7 +830,7 @@ function PureMultimodalInput({
               />
             </span>
             <Button
-              aria-label="Toggle MCP playground"
+              aria-label="Toggle MCP docs mode"
               className={cn(
                 "h-8 gap-1.5 rounded-lg px-2 text-xs",
                 mcpEnabled
@@ -839,7 +839,7 @@ function PureMultimodalInput({
               )}
               onClick={() => {
                 if (isGuest) {
-                  toast.error("Sign in to use MCP playground");
+                  toast.error("Sign in to chat with your MCP docs");
                   router.push(
                     `/login?redirectUrl=${encodeURIComponent("/chat")}`
                   );
@@ -849,11 +849,7 @@ function PureMultimodalInput({
                   toast.error("Convert a docs URL first to unlock MCP chat");
                   return;
                 }
-                const next = !mcpEnabled;
-                if (next) {
-                  setCabinetsOpen(false);
-                }
-                setMcpEnabled(next);
+                setMcpEnabled(!mcpEnabled);
               }}
               size="sm"
               type="button"

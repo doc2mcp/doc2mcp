@@ -9,6 +9,7 @@ import type { requestSuggestions } from "./ai/tools/request-suggestions";
 import type { updateDocument } from "./ai/tools/update-document";
 import type { webSearchTool } from "./ai/tools/web-search";
 import type { Suggestion } from "./db/schema";
+import type { DocAgentTools } from "./doc2mcp/doc-agent-tools";
 
 export const messageMetadataSchema = z.object({
   createdAt: z.string(),
@@ -34,6 +35,14 @@ export type ChatTools = {
   createDocument: createDocumentTool;
   updateDocument: updateDocumentTool;
   requestSuggestions: requestSuggestionsTool;
+  list_documentation_pages: InferUITool<
+    DocAgentTools["list_documentation_pages"]
+  >;
+  search_documentation: InferUITool<DocAgentTools["search_documentation"]>;
+  get_documentation_page: InferUITool<DocAgentTools["get_documentation_page"]>;
+  read_full_documentation: InferUITool<
+    DocAgentTools["read_full_documentation"]
+  >;
 };
 
 export type CustomUIDataTypes = {

@@ -534,6 +534,51 @@ const PurePreviewMessage = ({
       );
     }
 
+    if (
+      type === "tool-list_documentation_pages" ||
+      type === "tool-search_documentation" ||
+      type === "tool-get_documentation_page" ||
+      type === "tool-read_full_documentation"
+    ) {
+      const docPart = part as {
+        toolCallId: string;
+        state: string;
+        input?: unknown;
+        output?: unknown;
+      };
+      const { toolCallId, state } = docPart;
+      const rawOutput = docPart.output;
+      const outputText =
+        state === "output-available" && typeof rawOutput === "string"
+          ? rawOutput
+          : state === "output-available" && rawOutput !== undefined
+            ? JSON.stringify(rawOutput, null, 2)
+            : undefined;
+
+      return (
+        <Tool
+          className="w-[min(100%,520px)]"
+          defaultOpen={state !== "output-available"}
+          key={toolCallId}
+        >
+          <ToolHeader state={state as never} type={type} />
+          <ToolContent>
+            {docPart.input ? <ToolInput input={docPart.input} /> : null}
+            {outputText ? (
+              <ToolOutput
+                errorText={undefined}
+                output={
+                  <pre className="max-h-48 overflow-auto whitespace-pre-wrap rounded-lg bg-muted/40 p-2 font-mono text-[11px] leading-relaxed">
+                    {outputText}
+                  </pre>
+                }
+              />
+            ) : null}
+          </ToolContent>
+        </Tool>
+      );
+    }
+
     return null;
   });
 
