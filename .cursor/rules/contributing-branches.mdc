@@ -7,11 +7,14 @@ alwaysApply: true
 
 ## Protected branches
 
-Never push directly to `main` or `staging`. Always:
+By default, never push directly to `main` or `staging`. Always:
 
 1. Branch from `staging`: `git switch -c feature/my-change`
 2. Open PR → `staging` (QA), then `staging` → `main` for release
 3. Wait for CI: TypeScript, Biome + Ultracite, Next build
+
+**Exception:** `@gautammanak1` may push directly to `main` and `staging` for hotfixes
+and releases (maintainer bypass). Other collaborators must use PRs.
 
 ## License
 

@@ -31,7 +31,8 @@ export function buildHybridMcpSystemPrompt(
 ## Active documentation MCP: "${projectName}"
 You have documentation tools for this project's crawled docs. Use them when the user asks about this documentation or when doc search would help.
 You may still use web search, image generation, PDFs, and other tools for general questions, current events, or when docs alone are insufficient.
-Prefer documentation tools for doc-specific questions; combine with web search when the user needs both.`;
+Prefer documentation tools for doc-specific questions; combine with web search when the user needs both.
+After any tool use (docs or webSearch), always finish with a clear written answer for the user — never stop after the tool alone.`;
 }
 
 export function createDocAgentTools(ctx: DocMcpContext) {
