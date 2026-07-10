@@ -15,6 +15,7 @@ import {
 import { useMemo, useRef, useState } from "react";
 import { MessageResponse } from "@/components/ai-elements/message";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 type Source = { title: string; url: string };
 
@@ -116,9 +117,13 @@ function collectSources(parts: AnyPart[]): Source[] {
 export function McpChat({
   projectId,
   pageCount,
+  onClose,
+  className,
 }: {
   projectId: string;
   pageCount?: number;
+  onClose?: () => void;
+  className?: string;
 }) {
   const transport = useMemo(
     () =>
@@ -160,24 +165,42 @@ export function McpChat({
   };
 
   return (
-    <div className="flex h-[580px] flex-col overflow-hidden rounded-2xl border border-border bg-card/60 shadow-sm backdrop-blur-xl">
+    <div
+      className={cn(
+        "flex h-full min-h-0 w-full flex-col overflow-hidden rounded-none border-0 bg-card md:rounded-2xl md:border md:border-border md:bg-card/60 md:shadow-sm md:backdrop-blur-xl",
+        className
+      )}
+    >
       <div className="flex items-center justify-between gap-3 border-border/70 border-b bg-background/40 px-4 py-3">
-        <div className="flex items-center gap-2.5">
-          <span className="flex size-7 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500 to-fuchsia-500 text-white">
+        <div className="flex min-w-0 items-center gap-2.5">
+          <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500 to-fuchsia-500 text-white">
             <Sparkles className="size-3.5" />
           </span>
-          <div className="leading-tight">
+          <div className="min-w-0 leading-tight">
             <p className="font-medium text-sm">MCP assistant</p>
-            <p className="font-mono text-[10px] text-muted-foreground">
+            <p className="truncate font-mono text-[10px] text-muted-foreground">
               agentic · calls your MCP tools
               {typeof pageCount === "number" ? ` · ${pageCount} pages` : ""}
             </p>
           </div>
         </div>
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 font-mono text-[10px] text-emerald-600 uppercase tracking-wider dark:text-emerald-300">
-          <span className="size-1.5 rounded-full bg-emerald-400" />
-          connected
-        </span>
+        <div className="flex shrink-0 items-center gap-2">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 font-mono text-[10px] text-emerald-600 uppercase tracking-wider dark:text-emerald-300">
+            <span className="size-1.5 rounded-full bg-emerald-400" />
+            connected
+          </span>
+          {onClose ? (
+            <Button
+              aria-label="Close MCP assistant"
+              onClick={onClose}
+              size="icon"
+              type="button"
+              variant="ghost"
+            >
+              <X className="size-4" />
+            </Button>
+          ) : null}
+        </div>
       </div>
 
       <div

@@ -350,7 +350,7 @@ function PureMultimodalInput({
     !doc2mcpLoading;
 
   const { setPreview } = useChatDocPreview();
-  const { openCabinet } = useChatCabinets();
+  const { setOpen: setCabinetsOpen } = useChatCabinets();
   const {
     enabled: mcpEnabled,
     setEnabled: setMcpEnabled,
@@ -803,8 +803,8 @@ function PureMultimodalInput({
           ref={textareaRef}
           value={input}
         />
-        <PromptInputFooter className="px-3 pb-3">
-          <PromptInputTools>
+        <PromptInputFooter className="px-2 pb-2 sm:px-3 sm:pb-3">
+          <PromptInputTools className="flex-wrap gap-1">
             <AttachmentsButton
               fileInputRef={fileInputRef}
               selectedModelId={selectedModelId}
@@ -849,7 +849,11 @@ function PureMultimodalInput({
                   toast.error("Convert a docs URL first to unlock MCP chat");
                   return;
                 }
-                setMcpEnabled(!mcpEnabled);
+                const next = !mcpEnabled;
+                if (next) {
+                  setCabinetsOpen(false);
+                }
+                setMcpEnabled(next);
               }}
               size="sm"
               type="button"
@@ -861,7 +865,7 @@ function PureMultimodalInput({
             {mcpEnabled && mcpProjects.length > 0 ? (
               <select
                 aria-label="Select MCP project"
-                className="h-8 max-w-[140px] rounded-lg border border-border/50 bg-background px-2 text-xs"
+                className="h-8 max-w-[110px] rounded-lg border border-border/50 bg-background px-1.5 text-[11px] sm:max-w-[140px] sm:px-2 sm:text-xs"
                 onChange={(e) => setMcpProjectId(e.target.value)}
                 value={mcpProjectId ?? mcpProjects[0]?.id}
               >
@@ -872,17 +876,6 @@ function PureMultimodalInput({
                 ))}
               </select>
             ) : null}
-            <Button
-              aria-label="Open sources cabinet"
-              className="h-8 gap-1.5 rounded-lg px-2 text-muted-foreground text-xs"
-              onClick={() => openCabinet("web")}
-              size="sm"
-              type="button"
-              variant="ghost"
-            >
-              <EyeIcon />
-              Sources
-            </Button>
           </PromptInputTools>
 
           {status === "submitted" ? (
