@@ -89,7 +89,20 @@ const PurePreviewMessage = ({
         part.text?.trim().length > 0) ||
       part.type.startsWith("tool-")
   );
+  const hasTextContent = message.parts?.some(
+    (part) => part.type === "text" && part.text?.trim().length > 0
+  );
+  const hasCompletedTool = message.parts?.some(
+    (part) =>
+      part.type.startsWith("tool-") &&
+      "state" in part &&
+      part.state === "output-available"
+  );
   const isThinking = isAssistant && isLoading && !hasAnyContent;
+  const isWritingAnswerAfterTool =
+    isAssistant && isLoading && hasCompletedTool && !hasTextContent;
+  const isMissingAnswerAfterTool =
+    isAssistant && !isLoading && hasCompletedTool && !hasTextContent;
 
   const attachments = attachmentsFromMessage.length > 0 && (
     <div
@@ -145,7 +158,7 @@ const PurePreviewMessage = ({
       return (
         <MessageContent
           className={cn("text-[13px] leading-[1.65]", {
-            "w-fit max-w-[min(80%,56ch)] overflow-hidden break-words rounded-2xl rounded-br-lg border border-border/30 bg-gradient-to-br from-secondary to-muted px-3.5 py-2 shadow-[var(--shadow-card)]":
+            "w-fit max-w-[min(92vw,56ch)] overflow-hidden break-words rounded-2xl rounded-br-lg border border-border/30 bg-gradient-to-br from-secondary to-muted px-3.5 py-2 shadow-[var(--shadow-card)] sm:max-w-[min(80%,56ch)]":
               message.role === "user",
           })}
           data-testid="message-content"
@@ -534,6 +547,51 @@ const PurePreviewMessage = ({
       );
     }
 
+    if (
+      type === "tool-list_documentation_pages" ||
+      type === "tool-search_documentation" ||
+      type === "tool-get_documentation_page" ||
+      type === "tool-read_full_documentation"
+    ) {
+      const docPart = part as {
+        toolCallId: string;
+        state: string;
+        input?: unknown;
+        output?: unknown;
+      };
+      const { toolCallId, state } = docPart;
+      const rawOutput = docPart.output;
+      const outputText =
+        state === "output-available" && typeof rawOutput === "string"
+          ? rawOutput
+          : state === "output-available" && rawOutput !== undefined
+            ? JSON.stringify(rawOutput, null, 2)
+            : undefined;
+
+      return (
+        <Tool
+          className="w-[min(100%,520px)]"
+          defaultOpen={state !== "output-available"}
+          key={toolCallId}
+        >
+          <ToolHeader state={state as never} type={type} />
+          <ToolContent>
+            {docPart.input ? <ToolInput input={docPart.input} /> : null}
+            {outputText ? (
+              <ToolOutput
+                errorText={undefined}
+                output={
+                  <pre className="max-h-48 overflow-auto whitespace-pre-wrap rounded-lg bg-muted/40 p-2 font-mono text-[11px] leading-relaxed">
+                    {outputText}
+                  </pre>
+                }
+              />
+            ) : null}
+          </ToolContent>
+        </Tool>
+      );
+    }
+
     return null;
   });
 
@@ -558,6 +616,19 @@ const PurePreviewMessage = ({
     <>
       {attachments}
       {parts}
+      {isWritingAnswerAfterTool ? (
+        <div className="flex h-[calc(13px*1.65)] items-center text-[13px] leading-[1.65]">
+          <Shimmer className="font-medium" duration={1}>
+            Writing answer...
+          </Shimmer>
+        </div>
+      ) : null}
+      {isMissingAnswerAfterTool ? (
+        <p className="text-[13px] text-muted-foreground leading-[1.65]">
+          The model stopped after running a tool. Use retry on this message to
+          get a written answer.
+        </p>
+      ) : null}
       {actions}
     </>
   );

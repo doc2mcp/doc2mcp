@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 import { auth } from "@/app/(auth)/auth";
 import { CustomDomainCard } from "@/components/dashboard/custom-domain-card";
 import {
@@ -6,6 +7,7 @@ import {
   SignOutButton,
   TeamInviteForm,
 } from "@/components/dashboard/settings-actions";
+import { TeamInviteAcceptBanner } from "@/components/dashboard/team-invite-accept";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -17,10 +19,18 @@ import {
 import { getUserPlan } from "@/lib/billing/entitlements";
 import { getUserById } from "@/lib/db/queries";
 
-export default async function DashboardSettingsPage() {
+export default async function DashboardSettingsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ invite?: string }>;
+}) {
+  const params = await searchParams;
   const session = await auth();
   if (!session?.user?.id) {
-    redirect("/login?redirectUrl=/dashboard/settings");
+    const redirectTarget = params.invite
+      ? `/dashboard/settings?invite=${encodeURIComponent(params.invite)}`
+      : "/dashboard/settings";
+    redirect(`/login?redirectUrl=${encodeURIComponent(redirectTarget)}`);
   }
 
   const [appUser, plan] = await Promise.all([
@@ -43,6 +53,10 @@ export default async function DashboardSettingsPage() {
           Manage your profile, billing, and team workspace.
         </p>
       </header>
+
+      <Suspense fallback={null}>
+        <TeamInviteAcceptBanner />
+      </Suspense>
 
       <section className="grid gap-4 lg:grid-cols-2">
         <Card>

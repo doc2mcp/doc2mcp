@@ -17,8 +17,8 @@ import Link from "next/link";
 import { useMemo, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { updateProjectOwnership } from "@/app/(dashboard)/dashboard/projects/[id]/ownership-actions";
-import { McpPlayground } from "@/components/doc2mcp/mcp-playground";
 import { RegistryStatusCard } from "@/components/doc2mcp/registry-status-card";
+import { RetryConversionButton } from "@/components/doc2mcp/retry-conversion-button";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -143,6 +143,26 @@ export function ProjectDetail({
               Live
             </Badge>
           ) : null}
+          {project.status === "error" ? (
+            <>
+              <RetryConversionButton
+                projectId={project.id}
+                size="sm"
+                variant="default"
+              />
+              <Button asChild size="sm" type="button" variant="outline">
+                <Link href={`/convert/${project.id}`}>
+                  <ExternalLink className="mr-1 size-3.5" />
+                  Pipeline view
+                </Link>
+              </Button>
+            </>
+          ) : null}
+          {artifacts?.mcpAccessToken ? (
+            <Button asChild size="sm" type="button" variant="default">
+              <Link href="/chat">Ask in chat</Link>
+            </Button>
+          ) : null}
           {artifacts?.mcpConfig ? (
             <Button asChild size="sm" type="button" variant="outline">
               <Link href={`/convert/${project.id}`}>
@@ -156,10 +176,29 @@ export function ProjectDetail({
 
       <ProjectStats
         artifacts={artifacts}
+        hitStats={hitStats}
         logs={logs}
         report={report}
         tools={tools}
       />
+
+      {project.status === "error" ? (
+        <Card className="border-red-500/30 bg-red-500/5">
+          <CardHeader>
+            <CardTitle className="text-base">Conversion failed</CardTitle>
+            <CardDescription>
+              Retry with the same documentation URL. Failed attempts are not
+              counted in your monthly conversion limit.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-wrap gap-3">
+            <RetryConversionButton projectId={project.id} redirectToConvert />
+            <Button asChild type="button" variant="outline">
+              <Link href={`/convert/${project.id}`}>View pipeline</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      ) : null}
 
       {artifacts?.mcpAccessToken ? (
         <RegistryStatusCard registry={artifacts.registry} />
@@ -169,7 +208,6 @@ export function ProjectDetail({
         <TabsList className="w-full justify-start overflow-x-auto">
           <TabsTrigger value="tools">Tools</TabsTrigger>
           <TabsTrigger value="exports">Exports</TabsTrigger>
-          <TabsTrigger value="inspector">Inspector</TabsTrigger>
           <TabsTrigger value="domain">Domain</TabsTrigger>
           <TabsTrigger value="logs">Logs</TabsTrigger>
         </TabsList>
@@ -259,17 +297,6 @@ export function ProjectDetail({
           )}
         </TabsContent>
 
-        <TabsContent className="mt-4 space-y-4" value="inspector">
-          {artifacts?.mcpAccessToken ? (
-            <McpPlayground projectId={project.id} tools={tools} />
-          ) : (
-            <EmptyTabState
-              description="The MCP playground unlocks once the access token is generated."
-              title="MCP not ready"
-            />
-          )}
-        </TabsContent>
-
         <TabsContent className="mt-4 space-y-4" value="domain">
           <DomainTab
             canPublishCompany={canPublishCompany}
@@ -288,11 +315,13 @@ export function ProjectDetail({
 
 function ProjectStats({
   artifacts,
+  hitStats,
   logs,
   report,
   tools,
 }: {
   artifacts: ProjectArtifacts | null;
+  hitStats: HitStats;
   logs: ProcessingLog[];
   report: GenerationReport | undefined;
   tools: CompressedTool[];
@@ -302,7 +331,7 @@ function ProjectStats({
   const totalEndpoints = artifacts?.endpoints?.length ?? 0;
   const lastLog = logs.at(-1);
   return (
-    <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
       <StatTile hint="Pages crawled" label="Docs pages" value={docsPages} />
       <StatTile
         hint="Endpoints extracted"
@@ -313,6 +342,11 @@ function ProjectStats({
         hint="After validation"
         label="MCP tools"
         value={tools.length}
+      />
+      <StatTile
+        hint="Live MCP + chat tool calls"
+        label="MCP hits"
+        value={hitStats.total}
       />
       <StatTile
         hint={confidence === null ? "Pending" : "Avg tool confidence"}

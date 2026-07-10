@@ -71,6 +71,20 @@
       "when": 1780701000000,
       "tag": "0012_grant_founder_enterprise",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1780800000000,
+      "tag": "0013_mcp_rls",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1780900000000,
+      "tag": "0014_ensure_mcp_hits",
+      "breakpoints": true
     }
   ]
 }

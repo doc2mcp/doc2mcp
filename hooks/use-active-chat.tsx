@@ -17,6 +17,7 @@ import {
 } from "react";
 import useSWR, { useSWRConfig } from "swr";
 import { unstable_serialize } from "swr/infinite";
+import { useChatMcp } from "@/components/chat/chat-mcp-context";
 import { useDataStream } from "@/components/chat/data-stream-provider";
 import { getChatHistoryPaginationKey } from "@/components/chat/sidebar-history";
 import { toast } from "@/components/chat/toast";
@@ -60,6 +61,19 @@ export function ActiveChatProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const { setDataStream } = useDataStream();
   const { mutate } = useSWRConfig();
+  const {
+    enabled: mcpEnabled,
+    projectId: mcpProjectId,
+    projects: mcpProjects,
+  } = useChatMcp();
+  const resolvedMcpProjectId =
+    mcpEnabled && (mcpProjectId ?? mcpProjects[0]?.id)
+      ? (mcpProjectId ?? mcpProjects[0]?.id ?? null)
+      : null;
+  const mcpProjectIdRef = useRef(resolvedMcpProjectId);
+  useEffect(() => {
+    mcpProjectIdRef.current = resolvedMcpProjectId;
+  }, [resolvedMcpProjectId]);
 
   const chatIdFromUrl = extractChatId(pathname);
   const isNewChat = !chatIdFromUrl;
@@ -146,6 +160,9 @@ export function ActiveChatProvider({ children }: { children: ReactNode }) {
             selectedChatModel: currentModelIdRef.current,
             selectedVisibilityType: visibility,
             ...request.body,
+            ...(mcpProjectIdRef.current
+              ? { mcpProjectId: mcpProjectIdRef.current }
+              : {}),
           },
         };
       },
@@ -160,7 +177,14 @@ export function ActiveChatProvider({ children }: { children: ReactNode }) {
       if (error.message?.includes("AI Gateway requires a valid credit card")) {
         setShowCreditCardAlert(true);
       } else if (error instanceof ChatbotError) {
-        toast({ type: "error", description: error.message });
+        const detail =
+          typeof error.cause === "string" && error.cause.length > 0
+            ? error.cause
+            : error.message;
+        toast({
+          type: "error",
+          description: detail,
+        });
       } else {
         toast({
           type: "error",

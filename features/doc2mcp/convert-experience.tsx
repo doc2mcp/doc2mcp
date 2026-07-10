@@ -7,10 +7,8 @@ import {
   LayoutDashboard,
   LayoutGrid,
   Loader2,
-  MessageSquare,
   Server,
   Share2,
-  TerminalSquare,
   Wrench,
 } from "lucide-react";
 import Link from "next/link";
@@ -21,6 +19,7 @@ import {
   ResultDashboard,
   StatusBadge,
 } from "@/components/doc2mcp/result-dashboard";
+import { RetryConversionButton } from "@/components/doc2mcp/retry-conversion-button";
 import { TerminalLog } from "@/components/doc2mcp/terminal-log";
 import { Button } from "@/components/ui/button";
 import type { PlatformProject } from "@/lib/db/schema";
@@ -39,9 +38,7 @@ const PIPELINE_STEPS = [
 const SECTIONS = [
   { id: "overview", label: "Overview", icon: LayoutGrid },
   { id: "connect", label: "Connect", icon: Server },
-  { id: "chat", label: "Chat", icon: MessageSquare },
   { id: "tools", label: "Tools", icon: Wrench },
-  { id: "test", label: "Test", icon: TerminalSquare },
   { id: "insights", label: "Insights", icon: Activity },
 ] as const;
 
@@ -292,12 +289,31 @@ export function ConvertExperience({
                   className="rounded-2xl border border-red-500/30 bg-red-500/10 p-6 text-center"
                   initial={{ opacity: 0 }}
                 >
-                  <p className="text-red-500 dark:text-red-300">
-                    Conversion failed. Try another URL.
+                  <p className="font-medium text-red-500 dark:text-red-300">
+                    Conversion failed
                   </p>
-                  <Button asChild className="mt-4" variant="outline">
-                    <Link href="/">Start over</Link>
-                  </Button>
+                  <p className="mt-2 text-muted-foreground text-sm">
+                    Retry the same URL from here or your dashboard. Retries do
+                    not count toward your monthly limit.
+                  </p>
+                  <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+                    <RetryConversionButton
+                      onSuccess={async () => {
+                        const res = await fetch(`/api/projects/${project.id}`);
+                        if (res.ok) {
+                          const data = (await res.json()) as {
+                            project: PlatformProject;
+                          };
+                          setProject(data.project);
+                        }
+                      }}
+                      projectId={project.id}
+                      redirectToConvert={false}
+                    />
+                    <Button asChild type="button" variant="outline">
+                      <Link href="/dashboard/projects">Open dashboard</Link>
+                    </Button>
+                  </div>
                 </motion.div>
               ) : null}
             </AnimatePresence>

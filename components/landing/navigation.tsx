@@ -123,7 +123,9 @@ export function LandingNavigation({
   const appHref = activeSession?.isAdmin ? "/admin" : "/chat";
   const appLabel = activeSession?.isAdmin ? "Admin" : "Open app";
 
-  const navItems = NAV_LINKS.map((link) => ({
+  const visibleNavLinks = NAV_LINKS;
+
+  const navItems = visibleNavLinks.map((link) => ({
     name: link.name,
     link: link.href,
   }));
@@ -176,7 +178,7 @@ export function LandingNavigation({
         </MobileNavHeader>
 
         <MobileNavMenu isOpen={isMobileMenuOpen}>
-          {NAV_LINKS.map((item) => {
+          {visibleNavLinks.map((item) => {
             const Icon = item.icon;
             return (
               <Link

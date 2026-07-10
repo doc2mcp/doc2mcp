@@ -3,6 +3,9 @@ import Script from "next/script";
 import { Suspense } from "react";
 import { Toaster } from "sonner";
 import { AppSidebar } from "@/components/chat/app-sidebar";
+import { ChatCabinetsProvider } from "@/components/chat/chat-cabinets-context";
+import { ChatDocPreviewProvider } from "@/components/chat/chat-doc-preview-context";
+import { ChatMcpProvider } from "@/components/chat/chat-mcp-context";
 import { DataStreamProvider } from "@/components/chat/data-stream-provider";
 import { ChatShell } from "@/components/chat/shell";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
@@ -45,9 +48,15 @@ async function SidebarShell({ children }: { children: React.ReactNode }) {
           }}
         />
         <Suspense fallback={<div className="flex h-dvh" />}>
-          <ActiveChatProvider>
-            <ChatShell />
-          </ActiveChatProvider>
+          <ChatMcpProvider>
+            <ActiveChatProvider>
+              <ChatDocPreviewProvider>
+                <ChatCabinetsProvider>
+                  <ChatShell />
+                </ChatCabinetsProvider>
+              </ChatDocPreviewProvider>
+            </ActiveChatProvider>
+          </ChatMcpProvider>
         </Suspense>
         {children}
       </SidebarInset>

@@ -46,7 +46,10 @@ const realtimeAddendum = (canSearch: boolean) => {
 - Use focused queries (4-10 words). Cite urls in your final answer.
 - If the first search returns nothing useful, retry with a refined query
   before falling back to your own knowledge.
-- Never claim "I don't have access to the internet" — you do, via webSearch.`;
+- Never claim "I don't have access to the internet" — you do, via webSearch.
+- CRITICAL: After webSearch (or any tool) returns, you MUST always send a
+  final text message that answers the user. Never end your turn with only a
+  tool call — the user does not see tool output as your reply.`;
   }
   return `Real-time knowledge:
 - You do NOT have live internet access on this deployment.

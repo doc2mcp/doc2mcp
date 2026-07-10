@@ -8,6 +8,7 @@ import {
   BrainIcon,
   EyeIcon,
   LockIcon,
+  Plug,
   WrenchIcon,
 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -37,6 +38,8 @@ import {
   ModelSelectorName,
   ModelSelectorTrigger,
 } from "@/components/ai-elements/model-selector";
+import { useChatDocPreview } from "@/components/chat/chat-doc-preview-context";
+import { useChatMcp } from "@/components/chat/chat-mcp-context";
 import { Doc2McpModeToggle } from "@/components/doc2mcp/mode-toggle";
 import { UrlDetectBanner } from "@/components/doc2mcp/url-detect-banner";
 import {
@@ -344,6 +347,63 @@ function PureMultimodalInput({
     detectedUrl !== null &&
     detectedUrl !== dismissedUrl &&
     !doc2mcpLoading;
+
+  const { setPreview } = useChatDocPreview();
+  const {
+    enabled: mcpEnabled,
+    setEnabled: setMcpEnabled,
+    projectId: mcpProjectId,
+    setProjectId: setMcpProjectId,
+    projects: mcpProjects,
+    setProjects: setMcpProjects,
+  } = useChatMcp();
+
+  useEffect(() => {
+    if (isGuest) {
+      return;
+    }
+    let cancelled = false;
+    fetch("/api/user/mcp-projects")
+      .then(async (res) => {
+        if (!res.ok) {
+          return;
+        }
+        const data = (await res.json()) as {
+          projects?: {
+            id: string;
+            name: string;
+            sourceUrl: string | null;
+            pageCount?: number;
+          }[];
+        };
+        if (!cancelled && data.projects) {
+          setMcpProjects(data.projects);
+          if (!mcpProjectId && data.projects[0]) {
+            setMcpProjectId(data.projects[0].id);
+          }
+        }
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [isGuest, mcpProjectId, setMcpProjectId, setMcpProjects]);
+
+  useEffect(() => {
+    setPreview({
+      url: detectedUrl,
+      doc2mcpMode: hasMounted && doc2mcpMode,
+      isLoading: doc2mcpLoading,
+      isDismissed: detectedUrl !== null && detectedUrl === dismissedUrl,
+    });
+  }, [
+    detectedUrl,
+    doc2mcpMode,
+    doc2mcpLoading,
+    dismissedUrl,
+    hasMounted,
+    setPreview,
+  ]);
 
   const handleBannerGenerate = useCallback(() => {
     if (!detectedUrl) {
@@ -736,13 +796,15 @@ function PureMultimodalInput({
               ? "Edit your message..."
               : hasMounted && doc2mcpMode
                 ? "Paste docs URL — https://docs.example.com"
-                : "Ask anything — or sign in and enable doc2mcp"
+                : hasMounted && mcpEnabled
+                  ? "Ask your documentation anything..."
+                  : "Ask anything — or sign in and enable doc2mcp"
           }
           ref={textareaRef}
           value={input}
         />
-        <PromptInputFooter className="px-3 pb-3">
-          <PromptInputTools>
+        <PromptInputFooter className="px-2 pb-2 sm:px-3 sm:pb-3">
+          <PromptInputTools className="flex-wrap gap-1">
             <AttachmentsButton
               fileInputRef={fileInputRef}
               selectedModelId={selectedModelId}
@@ -767,6 +829,49 @@ function PureMultimodalInput({
                 }}
               />
             </span>
+            <Button
+              aria-label="Toggle MCP docs mode"
+              className={cn(
+                "h-8 gap-1.5 rounded-lg px-2 text-xs",
+                mcpEnabled
+                  ? "bg-primary/15 text-foreground"
+                  : "text-muted-foreground"
+              )}
+              onClick={() => {
+                if (isGuest) {
+                  toast.error("Sign in to chat with your MCP docs");
+                  router.push(
+                    `/login?redirectUrl=${encodeURIComponent("/chat")}`
+                  );
+                  return;
+                }
+                if (mcpProjects.length === 0) {
+                  toast.error("Convert a docs URL first to unlock MCP chat");
+                  return;
+                }
+                setMcpEnabled(!mcpEnabled);
+              }}
+              size="sm"
+              type="button"
+              variant="ghost"
+            >
+              <Plug className="size-3.5" />
+              MCP
+            </Button>
+            {mcpEnabled && mcpProjects.length > 0 ? (
+              <select
+                aria-label="Select MCP project"
+                className="h-8 max-w-[110px] rounded-lg border border-border/50 bg-background px-1.5 text-[11px] sm:max-w-[140px] sm:px-2 sm:text-xs"
+                onChange={(e) => setMcpProjectId(e.target.value)}
+                value={mcpProjectId ?? mcpProjects[0]?.id}
+              >
+                {mcpProjects.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name}
+                  </option>
+                ))}
+              </select>
+            ) : null}
           </PromptInputTools>
 
           {status === "submitted" ? (

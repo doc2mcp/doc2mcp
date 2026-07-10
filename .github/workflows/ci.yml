@@ -4,6 +4,7 @@ on:
   push:
     branches: [main, master, staging]
   pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
     branches: [main, master, staging]
   workflow_dispatch:
 
@@ -137,6 +138,9 @@ jobs:
       - name: Build CLI
         run: pnpm build
 
+  # Required check name must stay "Next build (no migrate)".
+  # Label `skip-next-build` skips the build step but the job still reports SUCCESS
+  # (required checks fail on SKIPPED status from job-level `if:`).
   build:
     name: Next build (no migrate)
     needs: [typecheck, lint]
@@ -155,15 +159,38 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 1
+
+      - name: Detect skip-next-build label
+        id: skip
+        if: github.event_name == 'pull_request'
+        run: |
+          LABELS='${{ join(github.event.pull_request.labels.*.name, ',') }}'
+          if echo "$LABELS" | grep -q 'skip-next-build'; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "skip-next-build label present — will skip Next build"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: pnpm/action-setup@v4
+        if: steps.skip.outputs.skip != 'true'
         with:
           version: ${{ env.PNPM_VERSION }}
           run_install: false
       - uses: actions/setup-node@v4
+        if: steps.skip.outputs.skip != 'true'
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
-      - run: pnpm install --frozen-lockfile
+      - if: steps.skip.outputs.skip != 'true'
+        run: pnpm install --frozen-lockfile
 
       - name: Next build
+        if: steps.skip.outputs.skip != 'true'
         run: pnpm exec next build
+
+      - name: Skipped Next build
+        if: steps.skip.outputs.skip == 'true'
+        run: |
+          echo "Skipped via \`skip-next-build\` label (no migrate / no full Next build)."
+          echo "Remove the label and push/re-run to build normally."

@@ -11,10 +11,9 @@ import { auth, type UserType } from "@/app/(auth)/auth";
 import { isAdminEmail } from "@/lib/admin/admin-access";
 import { entitlementsByUserType } from "@/lib/ai/entitlements";
 import {
-  allowedModelIds,
   chatModels,
-  DEFAULT_CHAT_MODEL,
   getCapabilities,
+  resolveChatModelId,
 } from "@/lib/ai/models";
 import { type RequestHints, systemPrompt } from "@/lib/ai/prompts";
 import { getLanguageModel } from "@/lib/ai/providers";
@@ -32,21 +31,34 @@ import {
   getChatById,
   getMessageCountByUserId,
   getMessagesByChatId,
+  getPlatformProjectById,
   saveChat,
   saveMessages,
   updateChatTitleById,
   updateMessage,
 } from "@/lib/db/queries";
 import type { DBMessage } from "@/lib/db/schema";
+import {
+  buildHybridMcpSystemPrompt,
+  createDocAgentTools,
+} from "@/lib/doc2mcp/doc-agent-tools";
+import { attributeMcpHit } from "@/lib/doc2mcp/mcp-api";
+import type { DocMcpContext } from "@/lib/doc2mcp/mcp-tools-runtime";
 import { ChatbotError } from "@/lib/errors";
 import { checkIpRateLimit } from "@/lib/ratelimit";
 import { isWebSearchEnabled } from "@/lib/search/providers";
 import type { ChatMessage } from "@/lib/types";
 import { convertToUIMessages, generateUUID } from "@/lib/utils";
+import type { CrawlResult, ProjectArtifacts } from "@/types/platform";
 import { generateTitleFromUserMessage } from "../../actions";
 import { type PostRequestBody, postRequestBodySchema } from "./schema";
 
 export const maxDuration = 60;
+
+/** Hybrid MCP + general tools need more agentic steps than plain chat. */
+const MAX_HYBRID_TOOL_STEPS = 12;
+/** Tool call + follow-up answer needs at least 2 model steps. */
+const MAX_STANDARD_TOOL_STEPS = 8;
 
 export async function POST(request: Request) {
   let requestBody: PostRequestBody;
@@ -59,8 +71,14 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { id, message, messages, selectedChatModel, selectedVisibilityType } =
-      requestBody;
+    const {
+      id,
+      message,
+      messages,
+      selectedChatModel,
+      selectedVisibilityType,
+      mcpProjectId,
+    } = requestBody;
 
     const [, session] = await Promise.all([
       checkBotId().catch(() => null),
@@ -71,9 +89,7 @@ export async function POST(request: Request) {
       return new ChatbotError("unauthorized:chat").toResponse();
     }
 
-    const chatModel = allowedModelIds.has(selectedChatModel)
-      ? selectedChatModel
-      : DEFAULT_CHAT_MODEL;
+    const chatModel = resolveChatModelId(selectedChatModel);
 
     const userType: UserType = session.user.type;
 
@@ -225,65 +241,126 @@ export async function POST(request: Request) {
 
     const modelMessages = await convertToModelMessages(sanitizedUiMessages);
 
-    type ChatToolName =
-      | "getWeather"
-      | "webSearch"
-      | "generateImage"
-      | "generatePdf"
-      | "createDocument"
-      | "editDocument"
-      | "updateDocument"
-      | "requestSuggestions";
-    const baseActiveTools: ChatToolName[] = [
-      "getWeather",
-      "generateImage",
-      "generatePdf",
-      "createDocument",
-      "editDocument",
-      "updateDocument",
-      "requestSuggestions",
-    ];
-    if (webSearchAvailable) {
-      baseActiveTools.push("webSearch");
+    let docAgentCtx: DocMcpContext | null = null;
+    if (mcpProjectId) {
+      const project = await getPlatformProjectById({
+        id: mcpProjectId,
+        userId: session.user.id,
+      });
+      if (!project) {
+        return new ChatbotError(
+          "forbidden:chat",
+          "MCP project not found or not owned by you."
+        ).toResponse();
+      }
+      if (project.status !== "ready") {
+        return new ChatbotError(
+          "bad_request:api",
+          "MCP project is not ready yet."
+        ).toResponse();
+      }
+      docAgentCtx = {
+        project: {
+          id: project.id,
+          name: project.name,
+          sourceUrl: project.sourceUrl,
+        },
+        pages: (project.crawlData as CrawlResult[] | null) ?? [],
+        artifacts: project.artifacts as ProjectArtifacts | null,
+      };
+      attributeMcpHit({
+        id: project.id,
+        ownerType: project.ownerType,
+        teamId: project.teamId,
+      });
     }
+
+    const docTools = docAgentCtx ? createDocAgentTools(docAgentCtx) : null;
+    const baseActiveTools = docTools
+      ? ([
+          "list_documentation_pages",
+          "search_documentation",
+          "get_documentation_page",
+          "read_full_documentation",
+          "getWeather",
+          "generateImage",
+          "generatePdf",
+          "createDocument",
+          "editDocument",
+          "updateDocument",
+          "requestSuggestions",
+          ...(webSearchAvailable ? (["webSearch"] as const) : []),
+        ] as const)
+      : ([
+          "getWeather",
+          "generateImage",
+          "generatePdf",
+          "createDocument",
+          "editDocument",
+          "updateDocument",
+          "requestSuggestions",
+          ...(webSearchAvailable ? (["webSearch"] as const) : []),
+        ] as const);
+
+    const hybridSystemPrompt = docAgentCtx
+      ? buildHybridMcpSystemPrompt(
+          docAgentCtx.project.name,
+          systemPrompt({
+            requestHints,
+            supportsTools,
+            webSearchAvailable,
+          })
+        )
+      : null;
 
     const stream = createUIMessageStream({
       originalMessages: isToolApprovalFlow ? uiMessages : undefined,
       execute: async ({ writer: dataStream }) => {
+        const chatTools = {
+          getWeather,
+          webSearch: webSearchTool,
+          generateImage: generateImageTool,
+          generatePdf: generatePdfTool({ userId: session.user.id }),
+          createDocument: createDocument({
+            session,
+            dataStream,
+            modelId: chatModel,
+          }),
+          editDocument: editDocument({ dataStream, session }),
+          updateDocument: updateDocument({
+            session,
+            dataStream,
+            modelId: chatModel,
+          }),
+          requestSuggestions: requestSuggestions({
+            session,
+            dataStream,
+            modelId: chatModel,
+          }),
+          ...(docTools ?? {}),
+        };
+
         const result = streamText({
           model: getLanguageModel(chatModel),
-          system: systemPrompt({
-            requestHints,
-            supportsTools,
-            webSearchAvailable,
-          }),
+          system:
+            hybridSystemPrompt ??
+            systemPrompt({
+              requestHints,
+              supportsTools,
+              webSearchAvailable,
+            }),
           messages: modelMessages,
-          stopWhen: stepCountIs(5),
+          stopWhen: stepCountIs(
+            docTools ? MAX_HYBRID_TOOL_STEPS : MAX_STANDARD_TOOL_STEPS
+          ),
           experimental_activeTools:
-            isReasoningModel && !supportsTools ? [] : baseActiveTools,
-          providerOptions: {},
-          tools: {
-            getWeather,
-            webSearch: webSearchTool,
-            generateImage: generateImageTool,
-            generatePdf: generatePdfTool({ userId: session.user.id }),
-            createDocument: createDocument({
-              session,
-              dataStream,
-              modelId: chatModel,
-            }),
-            editDocument: editDocument({ dataStream, session }),
-            updateDocument: updateDocument({
-              session,
-              dataStream,
-              modelId: chatModel,
-            }),
-            requestSuggestions: requestSuggestions({
-              session,
-              dataStream,
-              modelId: chatModel,
-            }),
+            isReasoningModel && !supportsTools ? [] : [...baseActiveTools],
+          providerOptions: {
+            openai: {
+              parallelToolCalls: false,
+            },
           },
+          tools: chatTools,
           experimental_telemetry: {
             isEnabled: isProductionEnvironment,
             functionId: "stream-text",

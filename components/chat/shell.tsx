@@ -1,6 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useChatCabinets } from "@/components/chat/chat-cabinets-context";
+import { useChatDocPreviewVisible } from "@/components/chat/chat-doc-preview-context";
+import { DocPreviewPanel } from "@/components/chat/doc-preview-panel";
+import { SourcesCabinet } from "@/components/chat/sources-cabinet";
 import { ChatTour } from "@/components/onboarding/chat-tour";
 import {
   AlertDialog,
@@ -55,6 +59,15 @@ export function ChatShell() {
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const isArtifactVisible = useArtifactSelector((state) => state.isVisible);
   const { setArtifact } = useArtifact();
+  const {
+    open: cabinetsOpen,
+    setOpen: setCabinetsOpen,
+    setWebSources,
+  } = useChatCabinets();
+  // One right-rail panel at a time (desktop). Doc preview yields to Sources.
+  const showDocPreview =
+    useChatDocPreviewVisible() && !isArtifactVisible && !cabinetsOpen;
+  const desktopSideOpen = showDocPreview || cabinetsOpen;
 
   const stopRef = useRef(stop);
   stopRef.current = stop;
@@ -67,16 +80,57 @@ export function ChatShell() {
       setArtifact(initialArtifactData);
       setEditingMessage(null);
       setAttachments([]);
+      setCabinetsOpen(false);
     }
-  }, [chatId, setArtifact]);
+  }, [chatId, setArtifact, setCabinetsOpen]);
+
+  useEffect(() => {
+    const sources: { title: string; url: string; snippet?: string }[] = [];
+    const seen = new Set<string>();
+    for (const message of messages) {
+      for (const part of message.parts ?? []) {
+        if (part.type !== "tool-webSearch") {
+          continue;
+        }
+        const output = "output" in part ? part.output : undefined;
+        if (!(output && typeof output === "object" && "results" in output)) {
+          continue;
+        }
+        const results = (output as { results?: unknown }).results;
+        if (!Array.isArray(results)) {
+          continue;
+        }
+        for (const row of results) {
+          if (!(row && typeof row === "object")) {
+            continue;
+          }
+          const r = row as { title?: string; url?: string; snippet?: string };
+          if (typeof r.url !== "string" || seen.has(r.url)) {
+            continue;
+          }
+          seen.add(r.url);
+          sources.push({
+            title: typeof r.title === "string" ? r.title : r.url,
+            url: r.url,
+            snippet: typeof r.snippet === "string" ? r.snippet : undefined,
+          });
+        }
+      }
+    }
+    setWebSources(sources);
+  }, [messages, setWebSources]);
 
   return (
     <>
-      <div className="flex h-dvh w-full flex-row overflow-hidden">
+      <div className="relative flex h-dvh w-full overflow-hidden md:flex-row">
         <div
           className={cn(
-            "flex min-w-0 flex-col bg-sidebar transition-[width] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
-            isArtifactVisible ? "w-[40%]" : "w-full"
+            "flex min-h-0 min-w-0 flex-1 flex-col bg-sidebar transition-[width] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
+            isArtifactVisible
+              ? "w-full md:w-[40%]"
+              : desktopSideOpen
+                ? "w-full md:w-[58%]"
+                : "w-full"
           )}
         >
           <ChatHeader
@@ -152,6 +206,17 @@ export function ChatShell() {
             </div>
           </div>
         </div>
+
+        {showDocPreview ? (
+          <DocPreviewPanel
+            className={cn(
+              "fixed inset-0 z-40 flex flex-col",
+              "md:static md:inset-auto md:z-auto md:h-auto md:w-[36%] md:min-w-[280px] md:max-w-[440px]"
+            )}
+          />
+        ) : null}
+
+        <SourcesCabinet chatId={chatId} />
 
         <Artifact
           addToolApprovalResponse={addToolApprovalResponse}

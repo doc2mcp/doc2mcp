@@ -2,7 +2,7 @@ import { z } from "zod";
 
 const textPartSchema = z.object({
   type: z.enum(["text"]),
-  text: z.string().min(1).max(2000),
+  text: z.string().min(1),
 });
 
 const filePartSchema = z.object({
@@ -40,6 +40,11 @@ export const postRequestBodySchema = z.object({
   messages: z.array(toolApprovalMessageSchema).optional(),
   selectedChatModel: z.string(),
   selectedVisibilityType: z.enum(["public", "private"]),
+  /** When set, the chat uses this project's documentation MCP tools. */
+  mcpProjectId: z.preprocess(
+    (value) => (value === "" || value === null ? undefined : value),
+    z.string().uuid().optional()
+  ),
 });
 
 export type PostRequestBody = z.infer<typeof postRequestBodySchema>;

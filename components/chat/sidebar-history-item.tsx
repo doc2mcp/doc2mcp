@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { memo } from "react";
 import { useChatVisibility } from "@/hooks/use-chat-visibility";
+import { useIsMobile } from "@/hooks/use-mobile";
 import type { Chat } from "@/lib/db/schema";
 import {
   DropdownMenu,
@@ -37,6 +38,7 @@ const PureChatItem = ({
   onDelete: (chatId: string) => void;
   setOpenMobile: (open: boolean) => void;
 }) => {
+  const isMobile = useIsMobile();
   const { visibilityType, setVisibilityType } = useChatVisibility({
     chatId: chat.id,
     initialVisibilityType: chat.visibility,
@@ -46,10 +48,14 @@ const PureChatItem = ({
     <SidebarMenuItem>
       <SidebarMenuButton
         asChild
-        className="h-8 rounded-none text-[13px] text-sidebar-foreground/50 transition-all duration-150 hover:bg-transparent hover:text-sidebar-foreground data-active:bg-transparent data-active:font-normal data-active:text-sidebar-foreground/50 data-[active=true]:text-sidebar-foreground data-[active=true]:font-medium data-[active=true]:border-b data-[active=true]:border-dashed data-[active=true]:border-sidebar-foreground/50"
+        className="h-10 rounded-lg text-[13px] text-sidebar-foreground/70 transition-all duration-150 hover:bg-sidebar-accent/40 hover:text-sidebar-foreground data-[active=true]:bg-sidebar-accent/60 data-[active=true]:font-medium data-[active=true]:text-sidebar-foreground sm:h-9 sm:rounded-none sm:hover:bg-transparent sm:data-[active=true]:rounded-none sm:data-[active=true]:border-b sm:data-[active=true]:border-dashed sm:data-[active=true]:border-sidebar-foreground/50 sm:data-[active=true]:bg-transparent"
         isActive={isActive}
       >
-        <Link href={`/chat/${chat.id}`} onClick={() => setOpenMobile(false)}>
+        <Link
+          className="flex min-w-0 flex-1 items-center pr-10"
+          href={`/chat/${chat.id}`}
+          onClick={() => setOpenMobile(false)}
+        >
           <span className="truncate">{chat.title}</span>
         </Link>
       </SidebarMenuButton>
@@ -57,8 +63,8 @@ const PureChatItem = ({
       <DropdownMenu modal={true}>
         <DropdownMenuTrigger asChild>
           <SidebarMenuAction
-            className="mr-0.5 rounded-md text-sidebar-foreground/50 ring-0 transition-colors duration-150 focus-visible:ring-0 hover:text-sidebar-foreground data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-            showOnHover={!isActive}
+            className="mr-0.5 size-8 rounded-md text-sidebar-foreground/50 ring-0 transition-colors duration-150 focus-visible:ring-0 hover:text-sidebar-foreground data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+            showOnHover={!isActive && !isMobile}
           >
             <MoreHorizontalIcon />
             <span className="sr-only">More</span>

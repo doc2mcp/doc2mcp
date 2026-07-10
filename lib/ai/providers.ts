@@ -1,9 +1,9 @@
-import { getAsi1Model } from "@/lib/asi1/provider";
+import { getGeminiModel } from "@/lib/asi1/provider";
 
 export function getLanguageModel(modelId: string) {
-  return getAsi1Model(modelId);
+  return getGeminiModel(modelId);
 }
 
 export function getTitleModel() {
-  return getAsi1Model("title-model");
+  return getGeminiModel("title-model");
 }

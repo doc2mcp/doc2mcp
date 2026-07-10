@@ -1,9 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { LoaderIcon } from "@/components/chat/icons";
 import { Button } from "@/components/ui/button";
-import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
 function GoogleIcon({ className }: { className?: string }) {
@@ -47,34 +46,25 @@ export function GoogleAuthButton({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleGoogleSignIn = async () => {
+  useEffect(() => {
+    const message = new URLSearchParams(window.location.search).get("error");
+    if (message) {
+      setError(decodeURIComponent(message));
+    }
+  }, []);
+
+  const handleGoogleSignIn = () => {
     setLoading(true);
     setError(null);
 
-    try {
-      const supabase = createClient();
-      const next = redirectUrl
-        ? `/post-login?redirectUrl=${encodeURIComponent(redirectUrl)}`
-        : "/post-login";
-      const redirectTo = `${window.location.origin}/auth/oauth?next=${encodeURIComponent(next)}`;
-
-      const { error: oauthError } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo,
-        },
-      });
-
-      if (oauthError) {
-        setError(oauthError.message);
-        setLoading(false);
-      }
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to start Google sign-in"
-      );
-      setLoading(false);
+    const params = new URLSearchParams();
+    if (redirectUrl) {
+      params.set("redirectUrl", redirectUrl);
     }
+    const query = params.toString();
+    window.location.href = query
+      ? `/api/auth/google?${query}`
+      : "/api/auth/google";
   };
 
   return (

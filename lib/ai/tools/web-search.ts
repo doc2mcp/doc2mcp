@@ -10,6 +10,7 @@ export const webSearchTool = tool({
     "facts (today's date, latest release), and any question where your training",
     "data could be stale. Prefer this over guessing.",
     "Pass a focused query (4-10 words). Cite urls returned in the response.",
+    "After results return, you must still write a full answer for the user.",
   ].join(" "),
   inputSchema: z.object({
     query: z

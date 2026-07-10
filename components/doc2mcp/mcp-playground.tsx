@@ -183,7 +183,7 @@ export function McpPlayground({ projectId, tools }: McpPlaygroundProps) {
   };
 
   return (
-    <div className="grid gap-4 rounded-2xl border border-border/60 bg-card/45 p-5 backdrop-blur-xl lg:grid-cols-[280px_1fr]">
+    <div className="grid gap-4 rounded-xl border border-border/60 bg-white/90 p-4 backdrop-blur-sm lg:grid-cols-[240px_1fr] dark:bg-white/95">
       <div className="flex flex-col gap-1 max-h-[500px] overflow-y-auto pr-2 no-scrollbar border-r border-border/60">
         <p className="mb-2 font-mono text-muted-foreground text-xs uppercase tracking-wider">
           semantic tools

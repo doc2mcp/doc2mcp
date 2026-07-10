@@ -7,7 +7,7 @@ deployment workflow, and our PR conventions.
 ## Getting started
 
 ```bash
-git clone https://github.com/gautammanak1/doc2mcp.git
+git clone https://github.com/doc2mcp/doc2mcp.git
 cd doc2mcp
 pnpm install
 cp .env.example .env.local   # then fill in values (see below)
