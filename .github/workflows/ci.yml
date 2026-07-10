@@ -4,6 +4,7 @@ on:
   push:
     branches: [main, master, staging]
   pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
     branches: [main, master, staging]
   workflow_dispatch:
 
@@ -137,9 +138,14 @@ jobs:
       - name: Build CLI
         run: pnpm build
 
+  # Required check name must stay "Next build (no migrate)".
+  # Label `skip-next-build` reports success without building (for release/sync PRs).
   build:
     name: Next build (no migrate)
     needs: [typecheck, lint]
+    if: >-
+      github.event_name != 'pull_request' ||
+      !contains(join(github.event.pull_request.labels.*.name, ','), 'skip-next-build')
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
@@ -167,3 +173,16 @@ jobs:
 
       - name: Next build
         run: pnpm exec next build
+
+  build-skipped:
+    name: Next build (no migrate)
+    if: >-
+      github.event_name == 'pull_request' &&
+      contains(join(github.event.pull_request.labels.*.name, ','), 'skip-next-build')
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Skip Next build
+        run: |
+          echo "Skipped via \`skip-next-build\` label (no migrate / no full Next build)."
+          echo "Remove the label and push/re-run to build normally."
