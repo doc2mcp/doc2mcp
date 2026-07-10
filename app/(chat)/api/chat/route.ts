@@ -32,17 +32,24 @@ import {
   getChatById,
   getMessageCountByUserId,
   getMessagesByChatId,
+  getPlatformProjectById,
   saveChat,
   saveMessages,
   updateChatTitleById,
   updateMessage,
 } from "@/lib/db/queries";
 import type { DBMessage } from "@/lib/db/schema";
+import {
+  buildDocAgentSystemPrompt,
+  createDocAgentTools,
+} from "@/lib/doc2mcp/doc-agent-tools";
+import type { DocMcpContext } from "@/lib/doc2mcp/mcp-tools-runtime";
 import { ChatbotError } from "@/lib/errors";
 import { checkIpRateLimit } from "@/lib/ratelimit";
 import { isWebSearchEnabled } from "@/lib/search/providers";
 import type { ChatMessage } from "@/lib/types";
 import { convertToUIMessages, generateUUID } from "@/lib/utils";
+import type { CrawlResult, ProjectArtifacts } from "@/types/platform";
 import { generateTitleFromUserMessage } from "../../actions";
 import { type PostRequestBody, postRequestBodySchema } from "./schema";
 
@@ -59,8 +66,14 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { id, message, messages, selectedChatModel, selectedVisibilityType } =
-      requestBody;
+    const {
+      id,
+      message,
+      messages,
+      selectedChatModel,
+      selectedVisibilityType,
+      mcpProjectId,
+    } = requestBody;
 
     const [, session] = await Promise.all([
       checkBotId().catch(() => null),
@@ -225,65 +238,96 @@ export async function POST(request: Request) {
 
     const modelMessages = await convertToModelMessages(sanitizedUiMessages);
 
-    type ChatToolName =
-      | "getWeather"
-      | "webSearch"
-      | "generateImage"
-      | "generatePdf"
-      | "createDocument"
-      | "editDocument"
-      | "updateDocument"
-      | "requestSuggestions";
-    const baseActiveTools: ChatToolName[] = [
-      "getWeather",
-      "generateImage",
-      "generatePdf",
-      "createDocument",
-      "editDocument",
-      "updateDocument",
-      "requestSuggestions",
-    ];
-    if (webSearchAvailable) {
-      baseActiveTools.push("webSearch");
+    let docAgentCtx: DocMcpContext | null = null;
+    if (mcpProjectId) {
+      const project = await getPlatformProjectById({
+        id: mcpProjectId,
+        userId: session.user.id,
+      });
+      if (!project) {
+        return new ChatbotError(
+          "forbidden:chat",
+          "MCP project not found or not owned by you."
+        ).toResponse();
+      }
+      if (project.status !== "ready") {
+        return new ChatbotError(
+          "bad_request:api",
+          "MCP project is not ready yet."
+        ).toResponse();
+      }
+      docAgentCtx = {
+        project: {
+          id: project.id,
+          name: project.name,
+          sourceUrl: project.sourceUrl,
+        },
+        pages: (project.crawlData as CrawlResult[] | null) ?? [],
+        artifacts: project.artifacts as ProjectArtifacts | null,
+      };
     }
+
+    const docTools = docAgentCtx ? createDocAgentTools(docAgentCtx) : null;
+    const baseActiveTools = docTools
+      ? ([
+          "list_documentation_pages",
+          "search_documentation",
+          "get_documentation_page",
+          "read_full_documentation",
+        ] as const)
+      : ([
+          "getWeather",
+          "generateImage",
+          "generatePdf",
+          "createDocument",
+          "editDocument",
+          "updateDocument",
+          "requestSuggestions",
+          ...(webSearchAvailable ? (["webSearch"] as const) : []),
+        ] as const);
 
     const stream = createUIMessageStream({
       originalMessages: isToolApprovalFlow ? uiMessages : undefined,
       execute: async ({ writer: dataStream }) => {
+        const chatTools = {
+          getWeather,
+          webSearch: webSearchTool,
+          generateImage: generateImageTool,
+          generatePdf: generatePdfTool({ userId: session.user.id }),
+          createDocument: createDocument({
+            session,
+            dataStream,
+            modelId: chatModel,
+          }),
+          editDocument: editDocument({ dataStream, session }),
+          updateDocument: updateDocument({
+            session,
+            dataStream,
+            modelId: chatModel,
+          }),
+          requestSuggestions: requestSuggestions({
+            session,
+            dataStream,
+            modelId: chatModel,
+          }),
+          ...(docTools ?? {}),
+        };
+
         const result = streamText({
           model: getLanguageModel(chatModel),
-          system: systemPrompt({
-            requestHints,
-            supportsTools,
-            webSearchAvailable,
-          }),
+          system: docAgentCtx
+            ? buildDocAgentSystemPrompt(docAgentCtx.project.name)
+            : systemPrompt({
+                requestHints,
+                supportsTools,
+                webSearchAvailable,
+              }),
           messages: modelMessages,
-          stopWhen: stepCountIs(5),
+          stopWhen: stepCountIs(docTools ? 8 : 5),
           experimental_activeTools:
-            isReasoningModel && !supportsTools ? [] : baseActiveTools,
+            isReasoningModel && !supportsTools ? [] : [...baseActiveTools],
           providerOptions: {},
-          tools: {
-            getWeather,
-            webSearch: webSearchTool,
-            generateImage: generateImageTool,
-            generatePdf: generatePdfTool({ userId: session.user.id }),
-            createDocument: createDocument({
-              session,
-              dataStream,
-              modelId: chatModel,
-            }),
-            editDocument: editDocument({ dataStream, session }),
-            updateDocument: updateDocument({
-              session,
-              dataStream,
-              modelId: chatModel,
-            }),
-            requestSuggestions: requestSuggestions({
-              session,
-              dataStream,
-              modelId: chatModel,
-            }),
-          },
+          tools: chatTools,
           experimental_telemetry: {
             isEnabled: isProductionEnvironment,
             functionId: "stream-text",
