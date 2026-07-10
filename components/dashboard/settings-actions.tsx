@@ -114,8 +114,9 @@ export function TeamInviteForm() {
           <p className="font-medium text-foreground text-sm">Preview invite</p>
           <p className="mt-1">
             Step 1: enter a teammate email. Step 2: copy the accept link we
-            generate. Step 3: share it manually (Slack/email). Accept flow lands
-            on Settings.
+            generate. Step 3: share it manually (Slack/email). When they open
+            the link and sign in, they are added to your workspace
+            automatically.
           </p>
         </div>
         <div className="flex flex-col gap-2 sm:flex-row">

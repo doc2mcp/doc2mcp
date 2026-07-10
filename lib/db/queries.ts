@@ -1973,3 +1973,71 @@ export async function createTeamInvite({
 
   return { invite, rawToken };
 }
+
+export async function acceptTeamInviteByToken({
+  rawToken,
+  userId,
+  userEmail,
+}: {
+  rawToken: string;
+  userId: string;
+  userEmail: string;
+}) {
+  const tokenHash = createHash("sha256").update(rawToken).digest("hex");
+  const normalizedEmail = userEmail.trim().toLowerCase();
+
+  const [invite] = await db
+    .select()
+    .from(teamInvite)
+    .where(
+      and(eq(teamInvite.tokenHash, tokenHash), eq(teamInvite.status, "pending"))
+    )
+    .limit(1);
+
+  if (!invite) {
+    throw new Error("not_found: invite not found or already used");
+  }
+
+  if (invite.expiresAt < new Date()) {
+    await db
+      .update(teamInvite)
+      .set({ status: "expired" })
+      .where(eq(teamInvite.id, invite.id));
+    throw new Error("expired: invite link has expired");
+  }
+
+  if (invite.email !== normalizedEmail) {
+    throw new Error(
+      "email_mismatch: sign in with the email address that received the invite"
+    );
+  }
+
+  const [existingMember] = await db
+    .select({ id: teamMember.id })
+    .from(teamMember)
+    .where(
+      and(eq(teamMember.teamId, invite.teamId), eq(teamMember.userId, userId))
+    )
+    .limit(1);
+
+  if (!existingMember) {
+    await db.insert(teamMember).values({
+      teamId: invite.teamId,
+      userId,
+      role: invite.role,
+    });
+  }
+
+  await db
+    .update(teamInvite)
+    .set({ status: "accepted", acceptedAt: new Date() })
+    .where(eq(teamInvite.id, invite.id));
+
+  const [joinedTeam] = await db
+    .select()
+    .from(team)
+    .where(eq(team.id, invite.teamId))
+    .limit(1);
+
+  return { team: joinedTeam ?? null, invite };
+}

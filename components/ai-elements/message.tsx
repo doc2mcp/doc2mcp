@@ -326,7 +326,10 @@ export const MessageResponse = memo(
   ({ className, ...props }: MessageResponseProps) => (
     <Streamdown
       className={cn(
-        "size-full [&>*:first-child]:mt-0 [&>*:last-child]:mb-0",
+        "size-full max-w-full min-w-0 overflow-x-auto break-words",
+        "[&>*:first-child]:mt-0 [&>*:last-child]:mb-0",
+        "[&_pre]:max-w-full [&_pre]:overflow-x-auto [&_pre]:text-[0.8rem] [&_pre]:leading-relaxed",
+        "[&_code]:break-words [&_table]:block [&_table]:max-w-full [&_table]:overflow-x-auto",
         className
       )}
       plugins={streamdownPlugins}

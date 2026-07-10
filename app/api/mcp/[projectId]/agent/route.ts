@@ -15,7 +15,7 @@ import {
   createDocAgentTools,
 } from "@/lib/doc2mcp/doc-agent-tools";
 import { readMcpAuthToken, verifyMcpToken } from "@/lib/doc2mcp/mcp-access";
-import { mcpError } from "@/lib/doc2mcp/mcp-api";
+import { attributeMcpHit, mcpError } from "@/lib/doc2mcp/mcp-api";
 import type { DocMcpContext } from "@/lib/doc2mcp/mcp-tools-runtime";
 import type { CrawlResult, ProjectArtifacts } from "@/types/platform";
 
@@ -104,6 +104,12 @@ export async function POST(
     pages: resolved.pages,
     artifacts: resolved.artifacts,
   };
+
+  attributeMcpHit({
+    id: resolved.project.id,
+    ownerType: resolved.project.ownerType,
+    teamId: resolved.project.teamId,
+  });
 
   const result = streamText({
     model: getAsi1Model(),

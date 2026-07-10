@@ -40,9 +40,10 @@ import {
 } from "@/lib/db/queries";
 import type { DBMessage } from "@/lib/db/schema";
 import {
-  buildDocAgentSystemPrompt,
+  buildHybridMcpSystemPrompt,
   createDocAgentTools,
 } from "@/lib/doc2mcp/doc-agent-tools";
+import { attributeMcpHit } from "@/lib/doc2mcp/mcp-api";
 import type { DocMcpContext } from "@/lib/doc2mcp/mcp-tools-runtime";
 import { ChatbotError } from "@/lib/errors";
 import { checkIpRateLimit } from "@/lib/ratelimit";
@@ -265,6 +266,11 @@ export async function POST(request: Request) {
         pages: (project.crawlData as CrawlResult[] | null) ?? [],
         artifacts: project.artifacts as ProjectArtifacts | null,
       };
+      attributeMcpHit({
+        id: project.id,
+        ownerType: project.ownerType,
+        teamId: project.teamId,
+      });
     }
 
     const docTools = docAgentCtx ? createDocAgentTools(docAgentCtx) : null;
@@ -274,6 +280,14 @@ export async function POST(request: Request) {
           "search_documentation",
           "get_documentation_page",
           "read_full_documentation",
+          "getWeather",
+          "generateImage",
+          "generatePdf",
+          "createDocument",
+          "editDocument",
+          "updateDocument",
+          "requestSuggestions",
+          ...(webSearchAvailable ? (["webSearch"] as const) : []),
         ] as const)
       : ([
           "getWeather",
@@ -285,6 +299,17 @@ export async function POST(request: Request) {
           "requestSuggestions",
           ...(webSearchAvailable ? (["webSearch"] as const) : []),
         ] as const);
+
+    const hybridSystemPrompt = docAgentCtx
+      ? buildHybridMcpSystemPrompt(
+          docAgentCtx.project.name,
+          systemPrompt({
+            requestHints,
+            supportsTools,
+            webSearchAvailable,
+          })
+        )
+      : null;
 
     const stream = createUIMessageStream({
       originalMessages: isToolApprovalFlow ? uiMessages : undefined,
@@ -315,15 +340,15 @@ export async function POST(request: Request) {
 
         const result = streamText({
           model: getLanguageModel(chatModel),
-          system: docAgentCtx
-            ? buildDocAgentSystemPrompt(docAgentCtx.project.name)
-            : systemPrompt({
-                requestHints,
-                supportsTools,
-                webSearchAvailable,
-              }),
+          system:
+            hybridSystemPrompt ??
+            systemPrompt({
+              requestHints,
+              supportsTools,
+              webSearchAvailable,
+            }),
           messages: modelMessages,
-          stopWhen: stepCountIs(docTools ? 8 : 5),
+          stopWhen: stepCountIs(docTools ? 10 : 5),
           experimental_activeTools:
             isReasoningModel && !supportsTools ? [] : [...baseActiveTools],
           providerOptions: {},
