@@ -89,7 +89,20 @@ const PurePreviewMessage = ({
         part.text?.trim().length > 0) ||
       part.type.startsWith("tool-")
   );
+  const hasTextContent = message.parts?.some(
+    (part) => part.type === "text" && part.text?.trim().length > 0
+  );
+  const hasCompletedTool = message.parts?.some(
+    (part) =>
+      part.type.startsWith("tool-") &&
+      "state" in part &&
+      part.state === "output-available"
+  );
   const isThinking = isAssistant && isLoading && !hasAnyContent;
+  const isWritingAnswerAfterTool =
+    isAssistant && isLoading && hasCompletedTool && !hasTextContent;
+  const isMissingAnswerAfterTool =
+    isAssistant && !isLoading && hasCompletedTool && !hasTextContent;
 
   const attachments = attachmentsFromMessage.length > 0 && (
     <div
@@ -603,6 +616,19 @@ const PurePreviewMessage = ({
     <>
       {attachments}
       {parts}
+      {isWritingAnswerAfterTool ? (
+        <div className="flex h-[calc(13px*1.65)] items-center text-[13px] leading-[1.65]">
+          <Shimmer className="font-medium" duration={1}>
+            Writing answer...
+          </Shimmer>
+        </div>
+      ) : null}
+      {isMissingAnswerAfterTool ? (
+        <p className="text-[13px] text-muted-foreground leading-[1.65]">
+          The model stopped after running a tool. Use retry on this message to
+          get a written answer.
+        </p>
+      ) : null}
       {actions}
     </>
   );

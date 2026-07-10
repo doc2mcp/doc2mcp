@@ -179,26 +179,29 @@ function Sidebar({
           data-sidebar="sidebar"
           data-slot="sidebar"
           data-mobile="true"
-          className="inset-x-0 bottom-0 top-auto h-[70dvh] w-full rounded-t-2xl border-t border-border/30 bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
+          className="w-[min(100vw,20rem)] max-w-[min(100vw,20rem)] border-r border-border/30 bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
           showCloseButton={false}
-          side="bottom"
+          side="left"
         >
           <SheetHeader className="sr-only">
             <SheetTitle>Sidebar</SheetTitle>
             <SheetDescription>Displays the mobile sidebar.</SheetDescription>
           </SheetHeader>
-          <div className="relative">
-            <div className="mx-auto mt-2 h-1 w-10 rounded-full bg-sidebar-foreground/20" />
-            <button
-              aria-label="Close sidebar"
-              className="absolute top-1 right-2 flex size-9 items-center justify-center rounded-full text-sidebar-foreground/60 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
-              onClick={() => setOpenMobile(false)}
-              type="button"
-            >
-              <XIcon className="size-5" />
-            </button>
+          <div className="flex h-full min-h-0 flex-col overflow-hidden pt-[max(0.5rem,env(safe-area-inset-top))]">
+            <div className="relative shrink-0 border-b border-sidebar-border/40 px-2 pb-2">
+              <button
+                aria-label="Close sidebar"
+                className="absolute top-0 right-1 flex size-9 items-center justify-center rounded-full text-sidebar-foreground/60 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                onClick={() => setOpenMobile(false)}
+                type="button"
+              >
+                <XIcon className="size-5" />
+              </button>
+            </div>
+            <div className="flex min-h-0 flex-1 flex-col overflow-hidden [&_[data-slot=sidebar-content]]:min-h-0 [&_[data-slot=sidebar-content]]:flex-1 [&_[data-slot=sidebar-content]]:overflow-y-auto [&_[data-slot=sidebar-footer]]:shrink-0 [&_[data-slot=sidebar-footer]]:pb-[max(0.75rem,env(safe-area-inset-bottom))] [&_[data-slot=sidebar-header]]:shrink-0">
+              {children}
+            </div>
           </div>
-          <div className="flex h-full w-full flex-col overflow-y-auto pt-2">{children}</div>
         </SheetContent>
       </Sheet>
     )
