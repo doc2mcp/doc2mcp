@@ -60,17 +60,28 @@ export function ChatShell() {
   );
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const isArtifactVisible = useArtifactSelector((state) => state.isVisible);
-  const showDocPreview = useChatDocPreviewVisible() && !isArtifactVisible;
   const { setArtifact } = useArtifact();
-  const { open: cabinetsOpen, setWebSources } = useChatCabinets();
+  const {
+    open: cabinetsOpen,
+    setOpen: setCabinetsOpen,
+    setWebSources,
+  } = useChatCabinets();
   const {
     enabled: mcpEnabled,
+    setEnabled: setMcpEnabled,
     projectId: mcpProjectId,
     projects,
   } = useChatMcp();
   const selectedMcp = projects.find((p) => p.id === mcpProjectId);
   const showMcpPanel =
     mcpEnabled && Boolean(mcpProjectId) && !isArtifactVisible;
+  // One right-rail panel at a time (desktop). Doc preview yields to Sources/MCP.
+  const showDocPreview =
+    useChatDocPreviewVisible() &&
+    !isArtifactVisible &&
+    !showMcpPanel &&
+    !cabinetsOpen;
+  const desktopSideOpen = showDocPreview || cabinetsOpen || showMcpPanel;
 
   const stopRef = useRef(stop);
   stopRef.current = stop;
@@ -83,8 +94,17 @@ export function ChatShell() {
       setArtifact(initialArtifactData);
       setEditingMessage(null);
       setAttachments([]);
+      setCabinetsOpen(false);
+      setMcpEnabled(false);
     }
-  }, [chatId, setArtifact]);
+  }, [chatId, setArtifact, setCabinetsOpen, setMcpEnabled]);
+
+  // Exclusive: MCP and Sources never both open.
+  useEffect(() => {
+    if (showMcpPanel && cabinetsOpen) {
+      setCabinetsOpen(false);
+    }
+  }, [showMcpPanel, cabinetsOpen, setCabinetsOpen]);
 
   useEffect(() => {
     const sources: { title: string; url: string; snippet?: string }[] = [];
@@ -122,18 +142,16 @@ export function ChatShell() {
     setWebSources(sources);
   }, [messages, setWebSources]);
 
-  const sideOpen = showDocPreview || cabinetsOpen || showMcpPanel;
-
   return (
     <>
-      <div className="flex h-dvh w-full flex-col overflow-hidden md:flex-row">
+      <div className="relative flex h-dvh w-full overflow-hidden md:flex-row">
         <div
           className={cn(
-            "flex min-h-0 min-w-0 flex-col bg-sidebar transition-[width] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
+            "flex min-h-0 min-w-0 flex-1 flex-col bg-sidebar transition-[width] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
             isArtifactVisible
               ? "w-full md:w-[40%]"
-              : sideOpen
-                ? "w-full md:w-[55%]"
+              : desktopSideOpen
+                ? "w-full md:w-[58%]"
                 : "w-full"
           )}
         >
@@ -212,17 +230,29 @@ export function ChatShell() {
         </div>
 
         {showMcpPanel && mcpProjectId ? (
-          <div className="order-last h-[42vh] w-full shrink-0 border-border/40 border-l p-3 md:order-none md:h-auto md:w-[40%] md:min-w-[300px]">
+          <div
+            className={cn(
+              // Mobile: full-screen overlay. Desktop: right rail.
+              "fixed inset-0 z-40 flex flex-col border-border/40 bg-background p-3",
+              "md:static md:inset-auto md:z-auto md:h-auto md:w-[42%] md:min-w-[300px] md:max-w-[520px] md:border-l"
+            )}
+          >
             <McpChat
               key={mcpProjectId}
+              onClose={() => setMcpEnabled(false)}
               pageCount={selectedMcp?.pageCount}
               projectId={mcpProjectId}
             />
           </div>
         ) : null}
 
-        {showDocPreview && !showMcpPanel ? (
-          <DocPreviewPanel className="order-last h-[38vh] w-full shrink-0 md:order-none md:h-auto md:w-[35%] md:min-w-[280px]" />
+        {showDocPreview ? (
+          <DocPreviewPanel
+            className={cn(
+              "fixed inset-0 z-40 flex flex-col",
+              "md:static md:inset-auto md:z-auto md:h-auto md:w-[36%] md:min-w-[280px] md:max-w-[440px]"
+            )}
+          />
         ) : null}
 
         {showMcpPanel ? null : <SourcesCabinet chatId={chatId} />}
