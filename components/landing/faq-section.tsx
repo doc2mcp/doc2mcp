@@ -100,13 +100,13 @@ export function FaqSection() {
             return (
               <div
                 className={cn(
-                  "overflow-hidden rounded-xl border border-border/50 bg-card/45 backdrop-blur-md transition-all duration-300",
+                  "landing-glass overflow-hidden rounded-xl border backdrop-blur-md transition-all duration-300",
                   isVisible
                     ? "translate-y-0 opacity-100"
                     : "translate-y-4 opacity-0",
                   isOpen
-                    ? "border-border shadow-[0_4px_16px_rgba(0,0,0,0.02)]"
-                    : "hover:border-border/80"
+                    ? "border-[var(--landing-border-hover)] border-l-2 border-l-[var(--landing-accent)] shadow-[0_8px_32px_-16px_var(--landing-accent-glow)]"
+                    : "border-[var(--landing-border)] hover:border-[var(--landing-border-hover)]"
                 )}
                 key={faq.id}
                 style={{ transitionDelay: `${i * 40}ms` }}
@@ -152,7 +152,7 @@ export function FaqSection() {
         <p className="mt-10 text-center text-muted-foreground text-xs">
           Still curious?{" "}
           <a
-            className="font-medium text-foreground underline underline-offset-4 hover:text-[#4285f4] transition-colors"
+            className="font-medium text-foreground underline underline-offset-4 hover:text-[var(--landing-accent)] transition-colors"
             href="https://calendly.com/doc2mcp/30min"
             rel="noopener noreferrer"
             target="_blank"

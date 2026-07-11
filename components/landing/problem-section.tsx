@@ -251,7 +251,7 @@ export function ProblemSection() {
               const Icon = pt.icon;
               return (
                 <motion.li
-                  className="group relative overflow-hidden rounded-2xl border border-border/60 bg-card/40 p-5 backdrop-blur-xl transition-all duration-300 hover:border-rose-500/30 hover:bg-card/60 flex items-start gap-4 shadow-[0_4px_20px_rgba(0,0,0,0.01)]"
+                  className="landing-glass group relative flex items-start gap-4 overflow-hidden rounded-2xl border p-5 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-[color-mix(in_srgb,var(--landing-accent)_30%,transparent)] hover:shadow-[0_16px_40px_-20px_var(--landing-accent-glow)]"
                   key={pt.title}
                   variants={{
                     hidden: { opacity: 0, y: 16 },
@@ -290,7 +290,7 @@ export function ProblemSection() {
             <div className="h-10 w-[1px] bg-gradient-to-b from-transparent to-border/80" />
           </div>
 
-          <h3 className="font-display text-2xl sm:text-3xl lg:text-4xl font-normal tracking-tight text-foreground leading-tight max-w-2xl mx-auto italic">
+          <h3 className="mx-auto max-w-2xl border-[var(--landing-accent)] border-l-2 pl-5 text-left font-display text-2xl leading-tight tracking-tight sm:text-3xl lg:text-4xl lg:text-center lg:border-l-0 lg:pl-0 lg:italic">
             &ldquo;What if your AI assistant actually knew every endpoint,
             version, and example?&rdquo;
           </h3>

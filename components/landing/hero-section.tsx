@@ -1,9 +1,12 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { CountUp } from "@/components/animations/count-up";
+import { FadeUp } from "@/components/animations/fade-up";
+import { ProductShowcase } from "@/components/home/product-showcase";
 import { LayoutTextFlip } from "@/components/ui/layout-text-flip";
 
 const words = [
@@ -28,12 +31,17 @@ const STATS = [
 
 export function HeroSection() {
   const router = useRouter();
+  const reduce = useReducedMotion();
   const [mounted, setMounted] = useState(false);
   const [urlInput, setUrlInput] = useState("");
+  const [showDemo, setShowDemo] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    const delay = reduce ? 0 : 800;
+    const id = setTimeout(() => setShowDemo(true), delay);
+    return () => clearTimeout(id);
+  }, [reduce]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,101 +53,105 @@ export function HeroSection() {
   };
 
   return (
-    <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden pb-24 pt-28 sm:pb-32 sm:pt-32">
-      <div className="noise-texture pointer-events-none absolute inset-0" />
-      <div
-        aria-hidden="true"
-        className="auth-orb-glow pointer-events-none top-1/3 left-1/2 -translate-x-1/2"
-      />
+    <section className="relative overflow-hidden pb-16 pt-28 sm:pb-24 sm:pt-32 lg:pb-28 lg:pt-36">
+      <div className="landing-hero-glow pointer-events-none absolute inset-0" />
+      <div className="noise-texture pointer-events-none absolute inset-0 opacity-60" />
 
-      <div className="relative z-10 mx-auto flex w-[90vw] max-w-4xl flex-col items-center justify-center px-4 text-center sm:w-5/6 2xl:w-4/6">
-        <motion.div
-          animate={mounted ? { opacity: 1, scale: 1 } : false}
-          className="mb-8 inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-3.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground backdrop-blur-md"
-          initial={false}
-          transition={{ duration: 0.5 }}
-        >
-          Any URL to Model Context Protocol
-        </motion.div>
-
-        <h1 className="font-display text-[clamp(2.25rem,6.5vw,4.5rem)] font-thin leading-[1.02] tracking-tight">
-          <span className="block text-foreground">Turn Any Documentation</span>
-          <div className="relative mt-3 flex flex-col items-center justify-center gap-2 sm:flex-row">
-            <LayoutTextFlip duration={3000} text="Into " words={words} />
-          </div>
-        </h1>
-
-        <p className="mt-8 max-w-2xl text-base leading-relaxed text-muted-foreground font-light sm:text-lg">
-          Paste a docs URL—Mintlify, Docusaurus, GitHub, OpenAPI—and get a
-          hosted, Cursor-ready MCP server in seconds. No setup, no local
-          scripts.
-        </p>
-
-        <motion.form
-          animate={mounted ? { y: 0, opacity: 1 } : false}
-          className="mt-10 flex w-full max-w-[620px] animate-fade-in items-center rounded-full border border-border/80 bg-card/50 p-1.5 transition-all duration-300 focus-within:border-[#4285f4] focus-within:shadow-[0_0_24px_rgba(66,133,244,0.15)] focus-within:ring-2 focus-within:ring-[#4285f4]/20 hover:border-[#4285f4] hover:bg-card/75 dark:focus-within:border-[#8ab4f8] dark:focus-within:shadow-[0_0_24px_rgba(138,180,248,0.12)] dark:hover:border-[#8ab4f8]"
-          data-tour="hero-url"
-          initial={false}
-          onSubmit={handleSubmit}
-          transition={{ delay: 0.3, duration: 0.6 }}
-        >
-          <input
-            className="flex-1 bg-transparent px-5 py-3 font-sans text-sm text-foreground outline-none placeholder:text-muted-foreground/40"
-            onChange={(e) => setUrlInput(e.target.value)}
-            placeholder="Paste documentation URL (e.g. docs.stripe.com)..."
-            type="text"
-            value={urlInput}
-          />
-          <button
-            className="flex shrink-0 items-center gap-1.5 rounded-full bg-[#4285f4] px-6 py-2.5 text-sm font-medium text-white shadow-sm transition-all hover:opacity-90 active:scale-[0.98] dark:bg-[#8ab4f8] dark:text-[#131314]"
-            type="submit"
+      <div className="relative z-10 mx-auto w-full max-w-[1200px] px-[clamp(20px,5vw,40px)]">
+        <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-10 xl:gap-14">
+          <motion.div
+            animate={mounted ? { opacity: 1, y: 0 } : false}
+            className="text-left"
+            initial={reduce ? false : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           >
-            Generate
-            <ArrowRight className="size-3.5" />
-          </button>
-        </motion.form>
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[var(--landing-border)] bg-[var(--landing-bg-glass)] px-3.5 py-1.5 font-mono text-[10px] text-[var(--landing-text-secondary)] uppercase tracking-[0.14em] backdrop-blur-md">
+              Any URL to Model Context Protocol
+            </div>
 
-        <motion.div
-          animate={mounted ? { opacity: 1 } : false}
-          className="mt-5 flex flex-wrap items-center justify-center gap-2 text-xs text-muted-foreground"
-          initial={false}
-          transition={{ delay: 0.45, duration: 0.5 }}
-        >
-          <span>Try an example:</span>
-          {EXAMPLES.map((ex) => (
-            <button
-              className="rounded-full border border-border/50 bg-card/20 px-3 py-1 font-mono text-[11px] text-muted-foreground transition-colors hover:bg-card/50 hover:text-foreground"
-              key={ex}
-              onClick={() => setUrlInput(ex)}
-              type="button"
+            <h1 className="font-display text-[clamp(2.5rem,5.5vw,4.5rem)] leading-[1.05] tracking-[-0.03em]">
+              <span className="block text-[var(--landing-text-primary)]">
+                Turn Any Documentation
+              </span>
+              <div className="relative mt-2 flex flex-col gap-2 sm:flex-row sm:items-center">
+                <LayoutTextFlip duration={3000} text="Into " words={words} />
+              </div>
+            </h1>
+
+            <p className="mt-6 max-w-xl text-base leading-[1.7] text-[var(--landing-text-secondary)] font-light sm:text-lg">
+              Paste a docs URL—Mintlify, Docusaurus, GitHub, OpenAPI—and get a
+              hosted, Cursor-ready MCP server in seconds. No setup, no local
+              scripts.
+            </p>
+
+            <motion.form
+              className="landing-input mt-8 flex w-full max-w-[620px] items-center rounded-xl p-1.5"
+              data-tour="hero-url"
+              onSubmit={handleSubmit}
             >
-              {ex.replace("https://", "")}
-            </button>
-          ))}
-        </motion.div>
+              <input
+                className="flex-1 bg-transparent px-4 py-3 font-mono text-[var(--landing-text-primary)] text-sm outline-none placeholder:text-[var(--landing-text-tertiary)]"
+                onChange={(e) => setUrlInput(e.target.value)}
+                placeholder="Paste documentation URL (e.g. docs.stripe.com)..."
+                type="text"
+                value={urlInput}
+              />
+              <button
+                className="landing-accent-btn flex shrink-0 items-center gap-1.5 rounded-lg px-5 py-2.5 text-sm font-medium"
+                type="submit"
+              >
+                Generate
+                <ArrowRight className="size-3.5" />
+              </button>
+            </motion.form>
 
-        <motion.div
-          animate={mounted ? { opacity: 1, y: 0 } : false}
-          className="mt-14 grid w-full max-w-[760px] grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4"
-          initial={false}
-          transition={{ delay: 0.6, duration: 0.6 }}
-        >
+            <div className="mt-5 flex flex-wrap items-center gap-2 text-[var(--landing-text-secondary)] text-xs">
+              <span>Try an example:</span>
+              {EXAMPLES.map((ex) => (
+                <button
+                  className="landing-chip rounded-full px-3 py-1 font-mono text-[11px] text-[var(--landing-text-secondary)]"
+                  key={ex}
+                  onClick={() => setUrlInput(ex)}
+                  type="button"
+                >
+                  {ex.replace("https://", "")}
+                </button>
+              ))}
+            </div>
+          </motion.div>
+
+          <motion.div
+            animate={showDemo ? { opacity: 1, y: 0 } : false}
+            className="w-full"
+            initial={reduce ? false : { opacity: 0, y: 24 }}
+            transition={{
+              duration: 0.8,
+              delay: 0.15,
+              ease: [0.22, 1, 0.36, 1],
+            }}
+          >
+            {showDemo ? <ProductShowcase /> : null}
+          </motion.div>
+        </div>
+
+        <FadeUp className="mt-14 grid w-full grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
           {STATS.map((stat) => (
             <div
-              className="group relative overflow-hidden rounded-xl border border-border/50 bg-card/30 px-4 py-4 text-left backdrop-blur-md transition-colors hover:border-[#4285f4]/50 dark:hover:border-[#8ab4f8]/50"
+              className="landing-stat-card rounded-xl px-4 py-4 text-left"
               key={stat.tag}
             >
-              <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#4285f4]/50 to-transparent opacity-0 transition-opacity group-hover:opacity-100 dark:via-[#8ab4f8]/50" />
-              <p className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">
-                {stat.value}
+              <p className="font-display text-2xl text-[var(--landing-text-primary)] tracking-tight sm:text-3xl">
+                <CountUp value={stat.value} />
               </p>
-              <p className="mt-1 text-xs text-muted-foreground">{stat.label}</p>
-              <p className="mt-3 font-mono text-[10px] uppercase tracking-wider text-muted-foreground/60">
+              <p className="mt-1 text-[var(--landing-text-secondary)] text-xs">
+                {stat.label}
+              </p>
+              <p className="mt-3 font-mono text-[10px] text-[var(--landing-text-tertiary)] uppercase tracking-wider">
                 {stat.tag}
               </p>
             </div>
           ))}
-        </motion.div>
+        </FadeUp>
       </div>
     </section>
   );

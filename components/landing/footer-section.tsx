@@ -132,7 +132,7 @@ export function FooterSection() {
               >
                 <Heart
                   aria-hidden="true"
-                  className="size-3.5 text-[#4285f4] dark:text-[#8ab4f8] transition-transform group-hover:scale-110"
+                  className="size-3.5 text-[var(--landing-accent)] transition-transform group-hover:scale-110"
                   fill="currentColor"
                 />
                 <span className="font-medium">Sponsor on GitHub</span>
@@ -161,10 +161,15 @@ export function FooterSection() {
           <FooterColumn links={LEGAL_LINKS} title="Legal" />
         </div>
 
-        <div className="mt-16 flex flex-col gap-4 border-border/40 border-t pt-8 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-muted-foreground text-xs">
-            © {currentYear} doc2mcp. All rights reserved.
-          </p>
+        <div className="mt-16 flex flex-col gap-4 border-[var(--landing-border)] border-t pt-8 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+            <p className="text-[var(--landing-text-secondary)] text-xs">
+              © {currentYear} doc2mcp. All rights reserved.
+            </p>
+            <span className="inline-flex w-fit items-center rounded-full border border-[var(--landing-border)] bg-[var(--landing-bg-glass)] px-2.5 py-1 font-mono text-[10px] text-[var(--landing-text-tertiary)]">
+              Powered by Google Gemini
+            </span>
+          </div>
           <p className="font-mono text-[11px] text-muted-foreground/80">
             <a
               className="hover:text-foreground"

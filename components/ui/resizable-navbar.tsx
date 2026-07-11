@@ -88,8 +88,8 @@ export function NavBody({ children, className, visible }: NavBodyProps) {
           : "0 8px 30px -12px rgb(0 0 0 / 0.12)",
       }}
       className={cn(
-        "relative z-[60] mx-auto hidden h-14 w-full max-w-[1200px] flex-row items-center justify-between rounded-full border border-border/60 bg-card/80 px-3 py-2 backdrop-blur-xl lg:flex sm:px-4",
-        visible && "border-border/80 bg-card/92",
+        "relative z-[60] mx-auto hidden h-16 w-full max-w-[1200px] flex-row items-center justify-between rounded-full border border-border/60 bg-card/80 px-3 py-2 backdrop-blur-xl lg:flex sm:px-4",
+        visible && "is-compact h-[3.25rem] border-border/80 bg-card/92",
         className
       )}
       transition={{ type: "spring", stiffness: 260, damping: 32 }}

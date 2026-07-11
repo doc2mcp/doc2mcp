@@ -105,7 +105,7 @@ auth:      bearer token`,
 function getFileIcon(iconType: string, isActive: boolean) {
   const className = cn(
     "size-3.5 shrink-0",
-    isActive ? "text-[#4285f4] dark:text-[#8ab4f8]" : "text-muted-foreground/60"
+    isActive ? "text-[var(--landing-accent)]" : "text-muted-foreground/60"
   );
   switch (iconType) {
     case "url":
@@ -191,7 +191,7 @@ export function HowItWorksSection() {
             </p>
             <div className="mt-4 flex flex-wrap gap-4 text-xs font-mono text-muted-foreground/80">
               <span className="flex items-center gap-1.5">
-                <span className="size-1.5 rounded-full bg-[#4285f4]" />
+                <span className="size-1.5 rounded-full bg-[var(--landing-accent)]" />
                 Zero config
               </span>
               <span className="flex items-center gap-1.5">
@@ -260,7 +260,7 @@ export function HowItWorksSection() {
                       className={cn(
                         "font-mono text-xs shrink-0 flex items-center justify-center size-9 rounded-full font-semibold transition-all duration-300 border",
                         isActive
-                          ? "bg-[#4285f4] dark:bg-[#8ab4f8] border-[#4285f4] dark:border-[#8ab4f8] text-white dark:text-[#131314] shadow-[0_0_12px_rgba(66,133,244,0.3)] dark:shadow-[0_0_12px_rgba(138,180,248,0.25)]"
+                          ? "bg-[var(--landing-accent)] bg-[var(--landing-accent-hover)] border-[var(--landing-accent)] border-[var(--landing-accent-hover)] text-white dark:text-[#131314] shadow-[0_0_12px_rgba(66,133,244,0.3)] dark:shadow-[0_0_12px_rgba(138,180,248,0.25)]"
                           : "bg-background dark:bg-background border-border/60 text-muted-foreground group-hover:border-border group-hover:text-foreground"
                       )}
                     >
@@ -295,7 +295,7 @@ export function HowItWorksSection() {
                       className={cn(
                         "size-4",
                         isActive
-                          ? "text-[#4285f4] dark:text-[#8ab4f8]"
+                          ? "text-[var(--landing-accent)]"
                           : "text-muted-foreground"
                       )}
                     />
@@ -319,7 +319,7 @@ export function HowItWorksSection() {
                   transition={{ duration: 0.25, ease: "easeOut" }}
                 >
                   <div className="inline-flex items-center gap-2">
-                    <span className="font-mono text-[10px] text-[#4285f4] dark:text-[#8ab4f8] uppercase tracking-[0.15em] font-semibold">
+                    <span className="font-mono text-[10px] text-[var(--landing-accent)] uppercase tracking-[0.15em] font-semibold">
                       Step {steps[activeStep].number}
                     </span>
                     <span className="size-1 rounded-full bg-border" />
@@ -422,7 +422,7 @@ export function HowItWorksSection() {
                       className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-card/60 px-3 py-1 font-mono text-[9px] text-muted-foreground uppercase tracking-wider"
                       key={t}
                     >
-                      <span className="size-1.5 rounded-full bg-[#4285f4]" />
+                      <span className="size-1.5 rounded-full bg-[var(--landing-accent)]" />
                       {t}
                     </span>
                   )

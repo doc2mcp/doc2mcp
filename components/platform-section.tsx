@@ -96,7 +96,7 @@ function CrawlingCard() {
       <div className="flex flex-col justify-between gap-3 p-3.5 rounded-xl border border-border/40 bg-card/30">
         <span className="text-[9px] text-muted-foreground uppercase tracking-wider font-semibold border-b border-border/20 pb-1.5 flex items-center justify-between">
           <span>Metadata &amp; Stats</span>
-          <span className="text-[#4285f4] dark:text-[#8ab4f8] font-bold">
+          <span className="text-[var(--landing-accent)] font-bold">
             doc2mcp-crawler/1.0
           </span>
         </span>
@@ -182,9 +182,7 @@ function RetrievalCard() {
   return (
     <div className="flex flex-col gap-2.5 w-full">
       <div className="rounded-lg border border-border/40 bg-card/25 px-3 py-2 flex items-center gap-2 font-mono text-[10.5px]">
-        <span className="text-[#4285f4] dark:text-[#8ab4f8] font-bold">
-          Query:
-        </span>
+        <span className="text-[var(--landing-accent)] font-bold">Query:</span>
         <span className="text-foreground font-medium truncate">
           stripe session return URL parameters
         </span>
@@ -385,8 +383,8 @@ function FeatureCard({ feature }: { feature: Feature }) {
         feature.id === "agents" ? "overflow-visible" : "overflow-hidden",
         feature.span,
         feature.highlight
-          ? "border-[#4285f4]/45 bg-gradient-to-br from-[#4285f4]/12 via-card/50 to-[#8ab4f8]/12"
-          : "border-border/60 bg-card/40 hover:border-[#4285f4]/50 dark:hover:border-[#8ab4f8]/50"
+          ? "border-[var(--landing-accent)]/45 bg-gradient-to-br from-[#4285f4]/12 via-card/50 to-[#8ab4f8]/12"
+          : "border-border/60 bg-card/40 hover:border-[var(--landing-accent)]/50 dark:hover:border-[#8ab4f8]/50"
       )}
       ref={ref}
       variants={cardVariants}
@@ -514,7 +512,7 @@ export function PlatformSection() {
                     className={cn(
                       "mr-[0.25em] inline-block",
                       isAccent
-                        ? "text-[#4285f4] dark:text-[#8ab4f8] font-semibold"
+                        ? "text-[var(--landing-accent)] font-semibold"
                         : "text-foreground"
                     )}
                     initial={{ opacity: 0, y: 14 }}
@@ -532,9 +530,9 @@ export function PlatformSection() {
               From crawl to retrieval to deployment — the full stack between
               your docs and an AI agent.
             </p>
-            <div className="mt-4 flex flex-wrap gap-4 text-xs font-mono text-[#4285f4] dark:text-[#8ab4f8]">
-              <span className="flex items-center gap-1.5 border border-[#4285f4]/30 bg-[#4285f4]/5 px-2.5 py-1 rounded-full">
-                <span className="size-1.5 rounded-full bg-[#4285f4] animate-pulse" />
+            <div className="mt-4 flex flex-wrap gap-4 text-xs font-mono text-[var(--landing-accent)]">
+              <span className="flex items-center gap-1.5 border border-[var(--landing-accent)]/30 bg-[var(--landing-accent)]/5 px-2.5 py-1 rounded-full">
+                <span className="size-1.5 rounded-full bg-[var(--landing-accent)] animate-pulse" />
                 6 Capabilities
               </span>
               <span className="flex items-center gap-1.5 border border-[#8ab4f8]/30 bg-[#8ab4f8]/5 px-2.5 py-1 rounded-full">
