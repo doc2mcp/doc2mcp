@@ -34,6 +34,8 @@ export type CompressedTool = {
   endpoints: string[];
   /** 0..100 confidence assigned by the MCP correctness layer. */
   confidence?: number;
+  /** Whether Gemini or a heuristic produced this tool definition. */
+  generationSource?: "gemini" | "heuristic";
 };
 
 export type McpToolDefinition = {

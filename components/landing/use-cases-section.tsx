@@ -117,7 +117,7 @@ export function UseCasesSection() {
             </span>
             <h2 className="font-display text-3xl tracking-tight sm:text-4xl lg:text-5xl leading-tight text-foreground">
               Infrastructure for every{" "}
-              <span className="text-[#4285f4] dark:text-[#8ab4f8] font-semibold">
+              <span className="text-[var(--landing-accent)] font-semibold">
                 AI-native
               </span>{" "}
               team.
@@ -144,7 +144,7 @@ export function UseCasesSection() {
                   className={cn(
                     "flex flex-col text-left p-5 rounded-2xl border transition-all duration-300 backdrop-blur-md",
                     active
-                      ? "border-[#4285f4] bg-[#4285f4]/5 dark:border-[#8ab4f8] dark:bg-[#8ab4f8]/5 shadow-sm"
+                      ? "border-[var(--landing-accent)] bg-[var(--landing-accent)]/5 border-[var(--landing-accent-hover)] bg-[var(--landing-accent-hover)]/5 shadow-sm"
                       : "border-border/40 bg-card/20 hover:bg-card/45 hover:border-border/80"
                   )}
                   key={uc.id}
@@ -156,7 +156,7 @@ export function UseCasesSection() {
                       className={cn(
                         "flex size-8 items-center justify-center rounded-lg border transition-colors",
                         active
-                          ? "border-[#4285f4]/40 bg-[#4285f4]/10 text-[#4285f4] dark:border-[#8ab4f8]/40 dark:bg-[#8ab4f8]/10 dark:text-[#8ab4f8]"
+                          ? "border-[var(--landing-accent)]/40 bg-[var(--landing-accent)]/10 text-[var(--landing-accent)] border-[var(--landing-accent-hover)]/40 bg-[var(--landing-accent-hover)]/10 text-[var(--landing-accent-hover)]"
                           : "border-border/40 bg-background/50 text-muted-foreground"
                       )}
                     >
@@ -217,7 +217,7 @@ export function UseCasesSection() {
                     <span className="text-zinc-500 font-bold uppercase">
                       claude_desktop_config.json
                     </span>
-                    <span className="text-[#4285f4] dark:text-[#8ab4f8] font-bold">
+                    <span className="text-[var(--landing-accent)] font-bold">
                       ● Connected
                     </span>
                   </div>
@@ -292,7 +292,7 @@ export function UseCasesSection() {
                   >
                     <span
                       aria-hidden="true"
-                      className="mt-1.5 size-1.5 shrink-0 rounded-full bg-[#4285f4] dark:bg-[#8ab4f8]"
+                      className="mt-1.5 size-1.5 shrink-0 rounded-full bg-[var(--landing-accent)] bg-[var(--landing-accent-hover)]"
                     />
                     <span>{b}</span>
                   </li>

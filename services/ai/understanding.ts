@@ -206,6 +206,12 @@ export async function analyzeDocumentation(
 
   const compressedTools = await compressApiToTools(endpoints, projectName);
 
+  const geminiTools = compressedTools.filter(
+    (tool) => tool.generationSource === "gemini"
+  ).length;
+  if (geminiTools > 0) {
+    log(`Generated ${geminiTools} semantic MCP tools via Gemini`, "success");
+  }
   log(`Generated ${compressedTools.length} compressed tools`, "success");
   log("Inferring AI workflow engine patterns...");
 

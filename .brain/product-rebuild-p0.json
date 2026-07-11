@@ -1,0 +1,82 @@
+{
+  "branch": "feat/product-rebuild-p0",
+  "vision": "Documentation infrastructure for AI agents — read, understand, execute APIs with zero hallucination",
+  "started": "2026-07-11",
+  "phases": {
+    "P0": {
+      "status": "done",
+      "items": [
+        {
+          "id": "docs-routing",
+          "title": "Fix /docs/* routing and add missing MDX pages",
+          "status": "done"
+        },
+        {
+          "id": "websearch-answer",
+          "title": "Force text answer after webSearch tool",
+          "status": "done"
+        },
+        {
+          "id": "semantic-tools",
+          "title": "Gemini-generated semantic MCP tools from OpenAPI",
+          "status": "done"
+        },
+        {
+          "id": "understanding-score",
+          "title": "Docs Understanding Score on project detail",
+          "status": "done"
+        },
+        {
+          "id": "crawl-terminal",
+          "title": "SSE live crawl terminal in dashboard",
+          "status": "done"
+        },
+        {
+          "id": "self-host-npm",
+          "title": "Publish doc2mcp-server OR remove marketing claim",
+          "status": "done"
+        },
+        {
+          "id": "version-index",
+          "title": "Version-aware doc indexing",
+          "status": "pending"
+        },
+        {
+          "id": "private-free-warning",
+          "title": "Warn when free tier project is public",
+          "status": "pending"
+        },
+        {
+          "id": "free-tier-limits",
+          "title": "3 conversions/mo, 100 pages free",
+          "status": "done"
+        }
+      ]
+    },
+    "P1": {
+      "status": "in_progress",
+      "items": [
+        "API execution sandbox (Pro+) — pending",
+        "Notion + Confluence connectors — docs scaffold",
+        "Webhook sync + GitHub Action — done",
+        "Public GitHub issues — pending",
+        "MCP config export all editors — done",
+        "CLI doc2mcp doctor command — done"
+      ]
+    },
+    "P2": {
+      "status": "in_progress",
+      "items": [
+        "SSO/RBAC/audit logs — docs scaffold",
+        "Custom domain — existing docs",
+        "SOC2 Type I — pending",
+        "Open-source crawl engine (MIT) — pending"
+      ]
+    }
+  },
+  "next_commits": [
+    "feat: understanding score + SSE terminal + semantic tool badges",
+    "feat: doc2mcp-server npm package + webhook sync",
+    "docs: P1/P2 growth + enterprise pages + styled code blocks"
+  ]
+}

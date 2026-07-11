@@ -100,7 +100,7 @@ const ROW_TWO: Testimonial[] = [
 function TestimonialCard({ item }: { item: Testimonial }) {
   return (
     <figure
-      className={`group relative shrink-0 overflow-hidden rounded-2xl border border-border/80 bg-card/60 px-5 py-4 backdrop-blur-sm transition-all duration-300 hover:border-foreground/25 hover:bg-card/90 sm:px-6 sm:py-5 ${
+      className={`group relative shrink-0 overflow-hidden rounded-2xl border border-[var(--landing-border)] bg-[var(--landing-bg-glass)] px-5 py-4 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-[var(--landing-border-hover)] hover:bg-[var(--landing-bg-secondary)] sm:px-6 sm:py-5 ${
         item.wide
           ? "w-[min(92vw,420px)] sm:w-[440px]"
           : "w-[min(88vw,300px)] sm:w-[320px]"
@@ -169,6 +169,7 @@ export function TestimonialsSection() {
         <div className="relative z-10 flex flex-col gap-5 sm:gap-6">
           <MarqueeRow direction="left" items={ROW_ONE} />
           <MarqueeRow direction="right" items={ROW_TWO} />
+          <MarqueeRow direction="left" items={ROW_ONE.slice(0, 6)} />
         </div>
       </div>
     </section>

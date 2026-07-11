@@ -1,7 +1,8 @@
 import { Analytics } from "@vercel/analytics/next";
 import { GeistMono } from "geist/font/mono";
+import { GeistSans } from "geist/font/sans";
 import type { Metadata } from "next";
-import { Inter, Space_Grotesk } from "next/font/google";
+import { Instrument_Serif } from "next/font/google";
 import { Toaster } from "sonner";
 import { ThemeProvider } from "@/components/theme-provider";
 import { CustomCursor } from "@/components/ui/custom-cursor";
@@ -59,19 +60,15 @@ export const viewport = {
   maximumScale: 1,
 };
 
-const inter = Inter({
+const instrumentSerif = Instrument_Serif({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-inter",
+  weight: ["400"],
+  style: ["normal", "italic"],
+  variable: "--font-instrument-serif",
   display: "swap",
 });
 
-const spaceGrotesk = Space_Grotesk({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-space-grotesk",
-  display: "swap",
-});
+const geistSans = GeistSans;
 
 const geistMono = GeistMono;
 
@@ -82,7 +79,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      className={`${inter.variable} ${spaceGrotesk.variable} ${geistMono.variable}`}
+      className={`${geistSans.variable} ${instrumentSerif.variable} ${geistMono.variable}`}
       data-scroll-behavior="smooth"
       lang="en"
       suppressHydrationWarning
@@ -95,7 +92,7 @@ export default function RootLayout({
           attribute="class"
           defaultTheme="dark"
           disableTransitionOnChange
-          enableSystem={false}
+          enableSystem
         >
           <TooltipProvider>
             <CustomCursor />

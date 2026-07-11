@@ -5,45 +5,55 @@ import {
   renderGroupsForPrompt,
 } from "../extraction/endpoint-grouping";
 
+function tagTools(
+  tools: CompressedTool[],
+  generationSource: CompressedTool["generationSource"]
+): CompressedTool[] {
+  return tools.map((tool) => ({ ...tool, generationSource }));
+}
+
 export async function compressApiToTools(
   endpoints: ApiEndpoint[],
   projectName: string
 ): Promise<CompressedTool[]> {
   if (endpoints.length === 0) {
-    return [
-      {
-        name: "search_documentation",
-        description: `Search the ${projectName} documentation by keywords.`,
-        parameters: {
-          type: "object",
-          properties: { query: { type: "string" } },
-          required: ["query"],
-        },
-        endpoints: [],
-      },
-      {
-        name: "read_documentation_page",
-        description: `Read a specific ${projectName} documentation page (by url or id).`,
-        parameters: {
-          type: "object",
-          properties: {
-            url: { type: "string" },
-            id: { type: "string" },
+    return tagTools(
+      [
+        {
+          name: "search_documentation",
+          description: `Search the ${projectName} documentation by keywords.`,
+          parameters: {
+            type: "object",
+            properties: { query: { type: "string" } },
+            required: ["query"],
           },
+          endpoints: [],
         },
-        endpoints: [],
-      },
-      {
-        name: "ask_documentation",
-        description: `Ask a natural-language question about ${projectName} docs.`,
-        parameters: {
-          type: "object",
-          properties: { question: { type: "string" } },
-          required: ["question"],
+        {
+          name: "read_documentation_page",
+          description: `Read a specific ${projectName} documentation page (by url or id).`,
+          parameters: {
+            type: "object",
+            properties: {
+              url: { type: "string" },
+              id: { type: "string" },
+            },
+          },
+          endpoints: [],
         },
-        endpoints: [],
-      },
-    ];
+        {
+          name: "ask_documentation",
+          description: `Ask a natural-language question about ${projectName} docs.`,
+          parameters: {
+            type: "object",
+            properties: { question: { type: "string" } },
+            required: ["question"],
+          },
+          endpoints: [],
+        },
+      ],
+      "heuristic"
+    );
   }
 
   const groups = groupEndpoints(endpoints);
@@ -74,13 +84,13 @@ Return ONLY a valid JSON array of:
     const jsonMatch = text.match(/\[[\s\S]*\]/);
     const parsed = JSON.parse(jsonMatch?.[0] ?? "[]") as CompressedTool[];
     if (parsed.length > 0) {
-      return parsed;
+      return tagTools(parsed, "gemini");
     }
   } catch {
     // fall through to heuristic compression
   }
 
-  return heuristicCompress(endpoints);
+  return tagTools(heuristicCompress(endpoints), "heuristic");
 }
 
 function heuristicCompress(endpoints: ApiEndpoint[]): CompressedTool[] {
