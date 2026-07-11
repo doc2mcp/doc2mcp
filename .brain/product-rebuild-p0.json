@@ -1,0 +1,83 @@
+{
+  "branch": "feat/product-rebuild-p0",
+  "vision": "Documentation infrastructure for AI agents — read, understand, execute APIs with zero hallucination",
+  "started": "2026-07-11",
+  "phases": {
+    "P0": {
+      "status": "in_progress",
+      "items": [
+        {
+          "id": "docs-routing",
+          "title": "Fix /docs/* routing and add missing MDX pages",
+          "status": "in_progress"
+        },
+        {
+          "id": "websearch-answer",
+          "title": "Force text answer after webSearch tool",
+          "status": "done"
+        },
+        {
+          "id": "semantic-tools",
+          "title": "Gemini-generated semantic MCP tools from OpenAPI",
+          "status": "pending"
+        },
+        {
+          "id": "understanding-score",
+          "title": "Docs Understanding Score on project detail",
+          "status": "pending"
+        },
+        {
+          "id": "crawl-terminal",
+          "title": "SSE live crawl terminal in dashboard",
+          "status": "pending"
+        },
+        {
+          "id": "self-host-npm",
+          "title": "Publish doc2mcp-server OR remove marketing claim",
+          "status": "pending"
+        },
+        {
+          "id": "version-index",
+          "title": "Version-aware doc indexing",
+          "status": "pending"
+        },
+        {
+          "id": "private-free-warning",
+          "title": "Warn when free tier project is public",
+          "status": "pending"
+        },
+        {
+          "id": "free-tier-limits",
+          "title": "3 conversions/mo, 100 pages free",
+          "status": "done"
+        }
+      ]
+    },
+    "P1": {
+      "status": "pending",
+      "items": [
+        "API execution sandbox (Pro+)",
+        "Notion + Confluence connectors",
+        "Webhook sync + GitHub Action",
+        "Public GitHub issues",
+        "MCP config export all editors",
+        "CLI doc2mcp doctor command"
+      ]
+    },
+    "P2": {
+      "status": "pending",
+      "items": [
+        "SSO/RBAC/audit logs",
+        "Custom domain",
+        "SOC2 Type I",
+        "Open-source crawl engine (MIT)"
+      ]
+    }
+  },
+  "next_commits": [
+    "fix: web search tool answer fallback stream",
+    "docs: add Gemini AI pipeline page",
+    "feat: understanding score MVP",
+    "feat: semantic tool generation from crawl"
+  ]
+}

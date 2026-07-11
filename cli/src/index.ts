@@ -5,6 +5,7 @@ import pc from "picocolors";
 import { runWhoami, runLogout } from "./commands/account.js";
 import { runChat } from "./commands/chat.js";
 import { runConvert, runList } from "./commands/convert.js";
+import { runDoctor } from "./commands/doctor.js";
 import { runInstallCommand } from "./commands/install.js";
 import { runLogin } from "./commands/login.js";
 import { runMarketplaceInstall } from "./commands/marketplace.js";
@@ -40,6 +41,13 @@ program
   .description("Show the logged-in user")
   .action(async () => {
     await runWhoami();
+  });
+
+program
+  .command("doctor")
+  .description("Check CLI install, PATH, auth, and API connectivity")
+  .action(async () => {
+    await runDoctor();
   });
 
 program
