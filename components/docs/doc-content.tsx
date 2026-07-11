@@ -4,6 +4,7 @@ import { cjk } from "@streamdown/cjk";
 import { math } from "@streamdown/math";
 import { Streamdown } from "streamdown";
 import { DocPre } from "@/components/docs/doc-code-block";
+import { PipelineDiagram } from "@/components/docs/pipeline-diagram";
 
 const docPlugins = { cjk, math };
 
@@ -21,6 +22,13 @@ const docComponents = {
   img: ({ src, alt }: { src?: unknown; alt?: string }) => {
     if (typeof src !== "string" || src.length === 0) {
       return null;
+    }
+    if (src.endsWith("/diagrams/pipeline.svg")) {
+      return (
+        <span className="my-6 block overflow-x-auto rounded-xl border border-border/60 bg-card/40 p-3">
+          <PipelineDiagram className="mx-auto block max-w-[1024px] rounded-lg" />
+        </span>
+      );
     }
     return (
       <span className="my-6 block overflow-x-auto rounded-xl border border-border/60 bg-card/40 p-3">

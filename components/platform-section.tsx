@@ -135,7 +135,9 @@ function MCPGenCard() {
         <span className="size-1.5 rounded-full bg-emerald-500/80" />
       </div>
       <div className="space-y-1">
-        <p className="text-muted-foreground">{"// stripe/create_payment_intent"}</p>
+        <p className="text-muted-foreground">
+          {"// stripe/create_payment_intent"}
+        </p>
         <p>
           <span className="text-violet-400">type</span>{" "}
           <span className="text-blue-400">Input</span> = {"{"}

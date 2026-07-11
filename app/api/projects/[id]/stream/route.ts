@@ -4,6 +4,7 @@ import { ChatbotError } from "@/lib/errors";
 import type { ProcessingLog } from "@/types/platform";
 
 const TERMINAL_STATUSES = new Set(["ready", "error"]);
+const STREAM_POLL_INTERVAL_MS = 1200;
 
 export async function GET(
   _request: Request,
@@ -36,27 +37,32 @@ export async function GET(
 
       const poll = async () => {
         while (!closed) {
-          const project = await getPlatformProjectById({
-            id,
-            userId: session.user.id,
-          });
+          try {
+            const project = await getPlatformProjectById({
+              id,
+              userId: session.user.id,
+            });
 
-          if (!project) {
-            send({ status: "not_found", logs: [], done: true });
+            if (!project) {
+              send({ status: "not_found", logs: [], done: true });
+              break;
+            }
+
+            const logs = (project.logs as ProcessingLog[] | null) ?? [];
+            const done = TERMINAL_STATUSES.has(project.status);
+            send({ status: project.status, logs, done });
+
+            if (done) {
+              break;
+            }
+
+            await new Promise((resolve) => {
+              setTimeout(resolve, STREAM_POLL_INTERVAL_MS);
+            });
+          } catch {
+            send({ status: "error", logs: [], done: true });
             break;
           }
-
-          const logs = (project.logs as ProcessingLog[] | null) ?? [];
-          const done = TERMINAL_STATUSES.has(project.status);
-          send({ status: project.status, logs, done });
-
-          if (done) {
-            break;
-          }
-
-          await new Promise((resolve) => {
-            setTimeout(resolve, 1200);
-          });
         }
 
         if (!closed) {

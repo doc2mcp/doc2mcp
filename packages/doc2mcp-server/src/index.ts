@@ -48,12 +48,21 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       params: {},
     }),
   });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(
+      `Remote tools/list failed (HTTP ${res.status}): ${body.slice(0, 200)}`
+    );
+  }
   const data = (await res.json()) as {
-    error?: { message?: string };
+    error?: { message?: string; code?: number };
     result?: { tools?: unknown[] };
   };
   if (data.error) {
-    throw new Error(data.error.message ?? "Remote tools/list failed");
+    throw new Error(
+      data.error.message ??
+        `Remote tools/list failed (code ${data.error.code ?? "unknown"})`
+    );
   }
   return { tools: data.result?.tools ?? [] };
 });
@@ -75,12 +84,21 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       },
     }),
   });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(
+      `Remote tool call failed (HTTP ${res.status}): ${body.slice(0, 200)}`
+    );
+  }
   const data = (await res.json()) as {
-    error?: { message?: string };
+    error?: { message?: string; code?: number };
     result?: unknown;
   };
   if (data.error) {
-    throw new Error(data.error.message ?? "Remote tool call failed");
+    throw new Error(
+      data.error.message ??
+        `Remote tool call failed (code ${data.error.code ?? "unknown"})`
+    );
   }
   return data.result as { content: unknown[]; isError?: boolean };
 });

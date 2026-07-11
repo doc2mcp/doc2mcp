@@ -58,8 +58,12 @@ export async function runDoctor(): Promise<void> {
     process.stdout.write(
       `${res.ok ? pc.green("✓") : pc.yellow("!")} API reachable (${res.status})\n`
     );
-  } catch {
-    process.stdout.write(`${pc.red("✗")} Cannot reach API at ${apiUrl}\n`);
+  } catch (error) {
+    const detail =
+      error instanceof Error ? error.message : "Network request failed";
+    process.stdout.write(
+      `${pc.red("✗")} Cannot reach API at ${apiUrl} (${detail})\n`
+    );
   }
 
   process.stdout.write(`\n${pc.dim("Need help? https://doc2mcp.site/docs/cli")}\n`);
