@@ -104,7 +104,12 @@ export function ChatShell() {
           if (!(row && typeof row === "object")) {
             continue;
           }
-          const r = row as { title?: string; url?: string; snippet?: string };
+          const r = row as {
+            title?: string;
+            url?: string;
+            snippet?: string;
+            fullContent?: string;
+          };
           if (typeof r.url !== "string" || seen.has(r.url)) {
             continue;
           }
@@ -112,7 +117,12 @@ export function ChatShell() {
           sources.push({
             title: typeof r.title === "string" ? r.title : r.url,
             url: r.url,
-            snippet: typeof r.snippet === "string" ? r.snippet : undefined,
+            snippet:
+              typeof r.fullContent === "string" && r.fullContent.length > 0
+                ? r.fullContent.slice(0, 400)
+                : typeof r.snippet === "string"
+                  ? r.snippet
+                  : undefined,
           });
         }
       }

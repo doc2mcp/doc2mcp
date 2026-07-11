@@ -21,6 +21,10 @@ import { MessageActions } from "./message-actions";
 import { MessageReasoning } from "./message-reasoning";
 import { MessageWithMedia } from "./message-with-media";
 import { PreviewAttachment } from "./preview-attachment";
+import {
+  type WebSearchResultItem,
+  WebSearchResults,
+} from "./url-preview-reader";
 import { Weather } from "./weather";
 
 function imageFileName(prompt?: string): string {
@@ -311,8 +315,8 @@ const PurePreviewMessage = ({
       const { toolCallId, state } = part;
       return (
         <Tool
-          className="w-[min(100%,520px)]"
-          defaultOpen={false}
+          className="w-[min(100%,720px)]"
+          defaultOpen={true}
           key={toolCallId}
         >
           <ToolHeader state={state} type="tool-webSearch" />
@@ -323,35 +327,26 @@ const PurePreviewMessage = ({
                 errorText={undefined}
                 output={
                   part.output && "results" in part.output ? (
-                    <div className="space-y-2 px-4 py-3 text-sm">
-                      {part.output.results.length === 0 ? (
-                        <p className="text-muted-foreground">
-                          {part.output.note ?? "No results."}
-                        </p>
-                      ) : (
-                        part.output.results.map((r) => (
-                          <a
-                            className="block rounded-md border border-border/40 p-2 transition-colors hover:bg-muted/40"
-                            href={r.url}
-                            key={r.url}
-                            rel="noopener noreferrer"
-                            target="_blank"
-                          >
-                            <p className="truncate font-medium text-foreground">
-                              {r.title}
-                            </p>
-                            <p className="truncate text-muted-foreground text-xs">
-                              {r.url}
-                            </p>
-                            {r.snippet ? (
-                              <p className="mt-1 line-clamp-2 text-muted-foreground/90 text-xs">
-                                {r.snippet}
-                              </p>
-                            ) : null}
-                          </a>
-                        ))
-                      )}
-                    </div>
+                    part.output.results.length === 0 ? (
+                      <p className="px-4 py-3 text-muted-foreground text-sm">
+                        {part.output.note ?? "No results."}
+                      </p>
+                    ) : (
+                      <WebSearchResults
+                        className="px-2 py-2"
+                        results={part.output.results.map((r) => {
+                          const row = r as WebSearchResultItem;
+                          return {
+                            title: row.title,
+                            url: row.url,
+                            snippet: row.snippet,
+                            fullContent: row.fullContent ?? row.snippet,
+                            images: row.images,
+                            source: row.source,
+                          };
+                        })}
+                      />
+                    )
                   ) : (
                     <div className="px-4 py-3 text-muted-foreground text-sm">
                       No search results.

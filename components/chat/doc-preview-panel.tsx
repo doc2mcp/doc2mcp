@@ -6,6 +6,7 @@ import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useChatDocPreview } from "./chat-doc-preview-context";
+import { UrlPreviewReader } from "./url-preview-reader";
 
 function parseUrl(raw: string) {
   try {
@@ -78,12 +79,7 @@ export function DocPreviewPanel({ className }: { className?: string }) {
 
         <div className="flex min-h-0 flex-1 flex-col gap-0 overflow-hidden">
           <div className="relative min-h-[180px] flex-1 bg-muted/30 sm:min-h-[240px]">
-            <iframe
-              className="size-full border-0 bg-background"
-              sandbox="allow-scripts allow-same-origin"
-              src={url}
-              title={`Preview of ${parsed.host}`}
-            />
+            <UrlPreviewReader className="size-full" url={url} />
             {isLoading ? (
               <div className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm">
                 <div className="flex flex-col items-center gap-2">
