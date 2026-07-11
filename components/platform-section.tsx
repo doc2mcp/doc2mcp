@@ -72,7 +72,7 @@ function CrawlingCard() {
   return (
     <div className="flex flex-col gap-4 w-full h-full flex-1">
       {/* File Tree Explorer */}
-      <div className="flex flex-col gap-1.5 p-3.5 rounded-xl border border-border/40 bg-zinc-950/40 font-mono text-[10.5px] text-zinc-300 select-none flex-1">
+      <div className="flex flex-col gap-1.5 p-3.5 rounded-xl border border-border/40 bg-muted/80 font-mono text-[10.5px] text-foreground select-none flex-1 dark:bg-zinc-950/40 dark:text-zinc-300">
         <span className="text-[9px] text-muted-foreground uppercase tracking-wider font-semibold border-b border-border/20 pb-1.5 mb-1.5 flex items-center justify-between">
           <span>Target Tree</span>
           <span className="text-emerald-500 font-bold">● Scan complete</span>
@@ -127,15 +127,15 @@ function CrawlingCard() {
 
 function MCPGenCard() {
   return (
-    <div className="relative flex w-full flex-col overflow-hidden rounded-xl border border-border/40 bg-zinc-950 p-4 font-mono text-[10.5px] text-zinc-300 leading-relaxed shadow-inner">
-      <div className="flex items-center justify-between border-b border-zinc-800 pb-2 mb-2.5">
-        <span className="text-[9px] text-zinc-500 font-semibold tracking-wider uppercase">
+    <div className="relative flex w-full flex-col overflow-hidden rounded-xl border border-border/40 bg-muted/80 p-4 font-mono text-[10.5px] text-foreground leading-relaxed shadow-inner dark:bg-zinc-950 dark:text-zinc-300">
+      <div className="flex items-center justify-between border-b border-border/40 pb-2 mb-2.5">
+        <span className="text-[9px] text-muted-foreground font-semibold tracking-wider uppercase">
           Generated Tool Schema
         </span>
         <span className="size-1.5 rounded-full bg-emerald-500/80" />
       </div>
       <div className="space-y-1">
-        <p className="text-zinc-500">{"// stripe/create_payment_intent"}</p>
+        <p className="text-muted-foreground">{"// stripe/create_payment_intent"}</p>
         <p>
           <span className="text-violet-400">type</span>{" "}
           <span className="text-blue-400">Input</span> = {"{"}
@@ -260,8 +260,8 @@ const multiAgentShowcase = () => <ToolOrbitShowcase />;
 
 function ExportCard() {
   return (
-    <div className="relative w-full overflow-hidden rounded-xl border border-border/40 bg-zinc-950 p-4 font-mono text-[10.5px] text-zinc-300 leading-relaxed shadow-inner">
-      <div className="text-zinc-400 select-all">
+    <div className="relative w-full overflow-hidden rounded-xl border border-border/40 bg-muted/80 p-4 font-mono text-[10.5px] text-foreground leading-relaxed shadow-inner dark:bg-zinc-950 dark:text-zinc-300">
+      <div className="text-muted-foreground select-all dark:text-zinc-400">
         <p>
           <span className="text-violet-400">"stripe-mcp"</span>: {"{"}
         </p>

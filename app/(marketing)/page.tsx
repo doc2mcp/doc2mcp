@@ -8,7 +8,6 @@ import { HeroSection } from "@/components/landing/hero-section";
 import { HowItWorksSectionClient } from "@/components/landing/how-it-works-client";
 import { LandingNavigation } from "@/components/landing/navigation";
 import { LandingNavigationServer } from "@/components/landing/navigation-server";
-import { PipelineDiagramSection } from "@/components/landing/pipeline-diagram-section";
 import { PricingSection } from "@/components/landing/pricing-section";
 import { ProblemSectionClient } from "@/components/landing/problem-section-client";
 import { TestimonialsSection } from "@/components/landing/testimonials-section";
@@ -27,7 +26,6 @@ export default function Page() {
       </Suspense>
       <LandingTour />
       <HeroSection />
-      <PipelineDiagramSection />
       <ToolsStripSection />
       <Suspense
         fallback={
