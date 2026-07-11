@@ -92,7 +92,7 @@ export default function RootLayout({
           attribute="class"
           defaultTheme="dark"
           disableTransitionOnChange
-          enableSystem={false}
+          enableSystem
         >
           <TooltipProvider>
             <CustomCursor />

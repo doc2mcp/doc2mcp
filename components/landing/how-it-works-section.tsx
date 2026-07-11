@@ -195,7 +195,7 @@ export function HowItWorksSection() {
                 Zero config
               </span>
               <span className="flex items-center gap-1.5">
-                <span className="size-1.5 rounded-full bg-[#8ab4f8]" />
+                <span className="size-1.5 rounded-full bg-[var(--landing-accent-hover)]" />
                 Auto-syncing
               </span>
               <span className="flex items-center gap-1.5">
@@ -219,11 +219,11 @@ export function HowItWorksSection() {
                 animate={{
                   height: `${(activeStep / (steps.length - 1)) * 100}%`,
                 }}
-                className="w-full bg-gradient-to-b from-[#4285f4] to-[#8ab4f8] relative"
+                className="w-full bg-gradient-to-b from-[var(--landing-accent)] to-[var(--landing-accent-hover)] relative"
                 transition={{ type: "spring", stiffness: 80, damping: 15 }}
               >
                 {/* Glowing tip */}
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-[#8ab4f8] shadow-[0_0_8px_#8ab4f8] opacity-80" />
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-[var(--landing-accent-hover)] shadow-[0_0_8px_var(--landing-accent-glow)] opacity-80" />
               </motion.div>
             </div>
 
@@ -260,8 +260,8 @@ export function HowItWorksSection() {
                       className={cn(
                         "font-mono text-xs shrink-0 flex items-center justify-center size-9 rounded-full font-semibold transition-all duration-300 border",
                         isActive
-                          ? "bg-[var(--landing-accent)] bg-[var(--landing-accent-hover)] border-[var(--landing-accent)] border-[var(--landing-accent-hover)] text-white dark:text-[#131314] shadow-[0_0_12px_rgba(66,133,244,0.3)] dark:shadow-[0_0_12px_rgba(138,180,248,0.25)]"
-                          : "bg-background dark:bg-background border-border/60 text-muted-foreground group-hover:border-border group-hover:text-foreground"
+                          ? "border-[var(--landing-accent)] bg-[var(--landing-accent)] text-white shadow-[0_0_12px_var(--landing-accent-glow)]"
+                          : "border-border/60 bg-background text-muted-foreground group-hover:border-border group-hover:text-foreground"
                       )}
                     >
                       {step.number}

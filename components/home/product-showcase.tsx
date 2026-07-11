@@ -200,7 +200,7 @@ export function ProductShowcase({ className }: { className?: string }) {
         })}
       </div>
 
-      <div className="relative flex-1 overflow-hidden bg-[#0a0a0c] p-4">
+      <div className="relative flex-1 overflow-hidden bg-[var(--landing-terminal-bg,#0a0a0c)] p-4">
         <AnimatePresence mode="wait">
           <motion.div
             animate={{ opacity: 1, y: 0 }}

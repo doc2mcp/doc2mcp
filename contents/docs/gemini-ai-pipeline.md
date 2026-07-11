@@ -36,38 +36,6 @@ Each tool maps to real HTTP routes — Gemini must not invent endpoints.
 Tools tagged **Gemini** in the dashboard were model-generated; heuristic fallbacks
 apply when parsing fails.
 
-Example proxy message shape for agent frameworks:
-
-```python title=bridge.py
-import json
-from datetime import datetime, timezone
-from uuid import uuid4
-from uagents_core.contrib.protocols.chat import ChatMessage, MetadataContent, TextContent
-
-CARD_PAYLOAD = {
-    "type": "section",
-    "title": "Hotels in London",
-    "children": [],
-}
-
-message = ChatMessage(
-    timestamp=datetime.now(timezone.utc),
-    msg_id=uuid4(),
-    content=[
-        TextContent(type="text", text="Pick a hotel to continue."),
-        MetadataContent(
-            type="metadata",
-            metadata={
-                "card_protocol_version": "1",
-                "requires_card_interaction": "true",
-                "card_kind": "custom",
-                "card_payload": json.dumps(CARD_PAYLOAD),
-            },
-        ),
-    ],
-)
-```
-
 ## Data flow
 
 1. **Crawl** — HTML/markdown is fetched and stored in Supabase (your project only).

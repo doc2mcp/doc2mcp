@@ -521,6 +521,51 @@
 
 /* ─── Landing page (Kombai-style) design system ─── */
 .landing-page {
+  --landing-accent: #7c6aef;
+  --landing-accent-hover: #9585f5;
+  --landing-accent-glow: rgba(124, 106, 239, 0.25);
+  --landing-accent-subtle: rgba(124, 106, 239, 0.08);
+}
+
+html:not(.dark) .landing-page {
+  --landing-bg-primary: #f4f4f2;
+  --landing-bg-secondary: #ffffff;
+  --landing-bg-tertiary: #ececea;
+  --landing-bg-glass: rgba(255, 255, 255, 0.72);
+  --landing-text-primary: #09090b;
+  --landing-text-secondary: #52525b;
+  --landing-text-tertiary: #71717a;
+  --landing-border: rgba(9, 9, 11, 0.08);
+  --landing-border-hover: rgba(9, 9, 11, 0.14);
+  --landing-gradient-hero: radial-gradient(
+    ellipse 80% 60% at 50% -10%,
+    rgba(124, 106, 239, 0.08),
+    transparent
+  );
+  --landing-gradient-card: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.9),
+    rgba(244, 244, 242, 0.6)
+  );
+  --landing-terminal-bg: #18181b;
+
+  --background: var(--landing-bg-primary);
+  --foreground: var(--landing-text-primary);
+  --card: var(--landing-bg-secondary);
+  --card-foreground: var(--landing-text-primary);
+  --muted: var(--landing-bg-tertiary);
+  --muted-foreground: var(--landing-text-secondary);
+  --border: var(--landing-border);
+  --primary: var(--landing-accent);
+  --primary-foreground: #fafafa;
+  --ring: var(--landing-accent);
+  --surface-page: var(--landing-bg-primary);
+  --surface-card: var(--landing-bg-secondary);
+  background-color: var(--landing-bg-primary);
+  color: var(--landing-text-primary);
+}
+
+.dark .landing-page {
   --landing-bg-primary: #0c0c0e;
   --landing-bg-secondary: #141416;
   --landing-bg-tertiary: #1a1a1e;
@@ -528,10 +573,6 @@
   --landing-text-primary: #f5f0eb;
   --landing-text-secondary: #a8a29e;
   --landing-text-tertiary: #78716c;
-  --landing-accent: #7c6aef;
-  --landing-accent-hover: #9585f5;
-  --landing-accent-glow: rgba(124, 106, 239, 0.25);
-  --landing-accent-subtle: rgba(124, 106, 239, 0.08);
   --landing-border: rgba(255, 255, 255, 0.06);
   --landing-border-hover: rgba(255, 255, 255, 0.12);
   --landing-gradient-hero: radial-gradient(
@@ -539,6 +580,12 @@
     rgba(124, 106, 239, 0.15),
     transparent
   );
+  --landing-gradient-card: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.04),
+    rgba(255, 255, 255, 0.01)
+  );
+  --landing-terminal-bg: #0a0a0c;
 
   --background: var(--landing-bg-primary);
   --foreground: var(--landing-text-primary);
@@ -580,11 +627,9 @@
 }
 
 .landing-page .landing-glass {
-  --landing-gradient-card: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.04),
-    rgba(255, 255, 255, 0.01)
-  );
+  background: var(--landing-gradient-card);
+  background-color: var(--landing-bg-glass);
+  border-color: var(--landing-border);
 }
 
 .landing-accent-btn {
@@ -631,7 +676,7 @@
 
 .landing-chip:hover {
   border-color: var(--landing-border-hover);
-  background: rgba(255, 255, 255, 0.05);
+  background: color-mix(in srgb, var(--landing-text-primary) 4%, transparent);
   color: var(--landing-text-primary);
 }
 
