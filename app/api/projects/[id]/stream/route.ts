@@ -3,9 +3,6 @@ import { getPlatformProjectById } from "@/lib/db/queries";
 import { ChatbotError } from "@/lib/errors";
 import type { ProcessingLog } from "@/types/platform";
 
-export const dynamic = "force-dynamic";
-export const runtime = "nodejs";
-
 const TERMINAL_STATUSES = new Set(["ready", "error"]);
 
 export async function GET(
