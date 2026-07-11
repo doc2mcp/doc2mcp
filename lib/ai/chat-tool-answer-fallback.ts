@@ -8,8 +8,10 @@ import {
 
 const TOOL_ANSWER_SYSTEM = `You already executed one or more tools (for example webSearch).
 Write a complete, helpful answer for the user using those tool results.
-- Synthesize the findings in clear markdown.
-- Cite source URLs when web search results were used.
+- Synthesize the findings in clear markdown using fullContent from each result.
+- Include concrete facts, steps, and explanations — not just a list of links.
+- Cite source URLs inline when web search results were used.
+- If results include images, mention what they show when relevant.
 - Do not call any more tools.
 - Do not say you lack internet access if search results were returned.`;
 
