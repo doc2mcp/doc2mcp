@@ -44,6 +44,10 @@ const realtimeAddendum = (canSearch: boolean) => {
   benchmarks, weather forecasts beyond today, sports scores, stock prices, or
   any fact that could have changed after your training cutoff.
 - Use focused queries (4-10 words). Cite urls in your final answer.
+- webSearch returns fullContent for each hit — read it and answer with details,
+  steps, and facts from that text. Do not reply with only a list of links.
+- When fullContent includes images (images[]), describe relevant visuals in
+  your answer when they help the user.
 - If the first search returns nothing useful, retry with a refined query
   before falling back to your own knowledge.
 - Never claim "I don't have access to the internet" — you do, via webSearch.

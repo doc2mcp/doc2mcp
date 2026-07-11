@@ -71,6 +71,7 @@ const tavilyProvider: SearchProvider = {
           query: opts?.site ? `${query} site:${opts.site}` : query,
           max_results: opts?.limit ?? 8,
           include_answer: false,
+          search_depth: "advanced",
         }),
       });
       if (!res.ok) {
@@ -226,7 +227,7 @@ const exaProvider: SearchProvider = {
       return (data.results ?? []).map((r) => ({
         title: r.title ?? r.url ?? "",
         url: r.url ?? "",
-        snippet: r.text?.slice(0, 400) ?? "",
+        snippet: r.text?.slice(0, 8000) ?? "",
         source: "exa",
       }));
     } catch {
