@@ -1,0 +1,19 @@
+# Re-run doc2mcp conversion when docs change (manual trigger).
+# Store DOC2MCP_SYNC_URL and DOC2MCP_TOKEN in repo secrets.
+name: doc2mcp sync (example)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "docs/**"
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger doc2mcp re-sync
+        run: |
+          curl -fsS -X POST "${{ secrets.DOC2MCP_SYNC_URL }}" \
+            -H "Authorization: Bearer ${{ secrets.DOC2MCP_TOKEN }}"

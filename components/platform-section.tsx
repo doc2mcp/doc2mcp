@@ -281,7 +281,13 @@ function ExportCard() {
           <span className="text-emerald-400">"doc2mcp-server@latest"</span>,
         </p>
         <p className="pl-8">
-          <span className="text-emerald-400">"--key=st_3a1"</span>
+          <span className="text-emerald-400">
+            "--url=https://doc2mcp.site/api/mcp/&lt;project&gt;/mcp"
+          </span>
+          ,
+        </p>
+        <p className="pl-8">
+          <span className="text-emerald-400">"--key=d2mcp_…"</span>
         </p>
         <p className="pl-4">]</p>
         <p>{"}"}</p>

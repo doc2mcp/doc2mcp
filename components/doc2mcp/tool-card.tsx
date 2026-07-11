@@ -24,11 +24,16 @@ export function ToolCard({
       <p className="mt-2 text-muted-foreground text-xs leading-relaxed">
         {tool.description}
       </p>
-      {tool.endpoints.length > 0 && (
-        <p className="mt-3 font-mono text-[10px] text-muted-foreground/60">
+      {tool.endpoints.length > 0 ? (
+        <p className="mt-2 font-mono text-[10px] text-muted-foreground">
           {tool.endpoints.join(" · ")}
         </p>
-      )}
+      ) : null}
+      {tool.generationSource === "gemini" ? (
+        <p className="mt-2 font-mono text-[10px] text-violet-500 dark:text-violet-300">
+          Gemini semantic tool
+        </p>
+      ) : null}
     </motion.div>
   );
 }

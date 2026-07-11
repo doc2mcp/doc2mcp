@@ -676,9 +676,19 @@ ${body}
   }
 }
 
+export type CrawlProgressCallback = (message: string) => void | Promise<void>;
+
+async function reportCrawlProgress(
+  onProgress: CrawlProgressCallback | undefined,
+  message: string
+) {
+  await onProgress?.(message);
+}
+
 export async function crawlDocsSource(
   sourceUrl: string,
-  sourceType: SourceType
+  sourceType: SourceType,
+  onProgress?: CrawlProgressCallback
 ): Promise<CrawlResult[]> {
   if (sourceType === "postman") {
     const res = await fetchText(sourceUrl, "application/json,text/plain");
@@ -902,6 +912,11 @@ export async function crawlDocsSource(
         contentHash: contentHash(content),
         crawledAt: new Date().toISOString(),
       });
+
+      await reportCrawlProgress(
+        onProgress,
+        `Crawled: ${title} (${results.length} page${results.length === 1 ? "" : "s"})`
+      );
 
       // Prefer the HTML the markdown fetcher already retrieved; only
       // fall back to a fresh fetchPageHtml when we don't have it (avoids

@@ -1,11 +1,11 @@
 "use client";
 
 import { cjk } from "@streamdown/cjk";
-import { code } from "@streamdown/code";
 import { math } from "@streamdown/math";
 import { Streamdown } from "streamdown";
+import { DocPre } from "@/components/docs/doc-code-block";
 
-const docPlugins = { cjk, code, math };
+const docPlugins = { cjk, math };
 
 /**
  * Render markdown images with a plain, reliable image element.
@@ -17,6 +17,7 @@ const docPlugins = { cjk, code, math };
  * them directly and skip that heuristic entirely.
  */
 const docComponents = {
+  pre: DocPre,
   img: ({ src, alt }: { src?: unknown; alt?: string }) => {
     if (typeof src !== "string" || src.length === 0) {
       return null;

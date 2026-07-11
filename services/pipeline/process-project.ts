@@ -445,13 +445,25 @@ async function runPipeline({
     });
 
     addLog("Starting documentation crawl...", "info", "crawl");
+    await persistLogs(projectId, userId, logs, { status: "crawling" });
+
+    let crawlPersistTick = 0;
+    const onCrawlProgress = async (message: string) => {
+      addLog(message, "info", "crawl");
+      crawlPersistTick += 1;
+      if (crawlPersistTick % 2 === 0) {
+        await persistLogs(projectId, userId, logs, { status: "crawling" });
+      }
+    };
+
     const crawlResults = await withSpan(
       "pipeline.crawl",
       { attributes: { "doc2mcp.source_type": sourceType } },
-      () => crawlDocsSource(sourceUrl, sourceType)
+      () => crawlDocsSource(sourceUrl, sourceType, onCrawlProgress)
     );
     addSpanAttributes({ "doc2mcp.pages_crawled": crawlResults.length });
     addLog(`Crawled ${crawlResults.length} pages`, "success", "crawl");
+    await persistLogs(projectId, userId, logs, { status: "crawling" });
 
     await updatePlatformProject({
       id: projectId,

@@ -8,7 +8,10 @@ import { generateUUID } from "@/lib/utils";
 import { processProjectPipeline } from "@/services/pipeline/process-project";
 import type { SourceType } from "@/types/platform";
 
-export async function restartProjectPipeline(project: PlatformProject) {
+export async function restartProjectPipeline(
+  project: PlatformProject,
+  options?: { reason?: string }
+) {
   if (!project.sourceUrl) {
     throw new Error("Project is missing a source URL.");
   }
@@ -16,6 +19,7 @@ export async function restartProjectPipeline(project: PlatformProject) {
   const sourceUrl = project.sourceUrl;
   const sourceType = project.sourceType as SourceType;
   const projectName = project.name;
+  const reason = options?.reason ?? "Retrying doc2mcp pipeline…";
 
   await updatePlatformProject({
     id: project.id,
@@ -27,7 +31,7 @@ export async function restartProjectPipeline(project: PlatformProject) {
           id: generateUUID(),
           timestamp: new Date().toISOString(),
           level: "info",
-          message: "Retrying doc2mcp pipeline…",
+          message: reason,
           phase: "retry",
         },
       ],

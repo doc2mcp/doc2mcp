@@ -13,6 +13,7 @@ import {
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { UnderstandingScoreCard } from "@/components/dashboard/understanding-score-card";
 import { InstallButtons } from "@/components/doc2mcp/install-buttons";
 import { RegistryStatusCard } from "@/components/doc2mcp/registry-status-card";
 import { Button } from "@/components/ui/button";
@@ -471,6 +472,8 @@ export function ResultDashboard({
           <MetricCell label="MCP score" suffix="%" value={mcpScore} />
         </Framed>
       </section>
+
+      <UnderstandingScoreCard score={artifacts.qualityScore} />
 
       {/* Connect */}
       <section className="scroll-mt-8" id="connect">
