@@ -22,6 +22,7 @@ import {
 import { RetryConversionButton } from "@/components/doc2mcp/retry-conversion-button";
 import { TerminalLog } from "@/components/doc2mcp/terminal-log";
 import { Button } from "@/components/ui/button";
+import { useProjectLogStream } from "@/hooks/use-project-log-stream";
 import type { PlatformProject } from "@/lib/db/schema";
 import type { ProcessingLog, ProjectArtifacts } from "@/types/platform";
 
@@ -68,8 +69,17 @@ export function ConvertExperience({
 }) {
   const [project, setProject] = useState(initialProject);
   const artifacts = project.artifacts as ProjectArtifacts | null;
-  const logs = (project.logs as ProcessingLog[]) ?? [];
+  const baseLogs = (project.logs as ProcessingLog[]) ?? [];
   const isProcessing = !["ready", "error"].includes(project.status);
+  const { logs: streamLogs, connected: streamConnected } = useProjectLogStream(
+    project.id,
+    isProcessing,
+    baseLogs
+  );
+  const logs =
+    isProcessing && streamLogs.length >= baseLogs.length
+      ? streamLogs
+      : baseLogs;
   const isReady = project.status === "ready" && Boolean(artifacts);
   const currentStep = stepFromStatus(project.status);
 
@@ -260,9 +270,16 @@ export function ConvertExperience({
                 </section>
 
                 <section className="rounded-2xl border border-border/60 bg-muted/30 p-5">
-                  <p className="mb-3 font-mono text-muted-foreground text-xs">
-                    terminal
-                  </p>
+                  <div className="mb-3 flex items-center justify-between gap-2">
+                    <p className="font-mono text-muted-foreground text-xs">
+                      terminal · SSE
+                    </p>
+                    {streamConnected ? (
+                      <span className="font-mono text-emerald-500 text-[10px]">
+                        connected
+                      </span>
+                    ) : null}
+                  </div>
                   {logs.length > 0 ? (
                     <TerminalLog
                       lines={logs.map((l) => `[${l.level}] ${l.message}`)}

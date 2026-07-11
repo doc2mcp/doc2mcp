@@ -17,6 +17,7 @@ import Link from "next/link";
 import { useMemo, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { updateProjectOwnership } from "@/app/(dashboard)/dashboard/projects/[id]/ownership-actions";
+import { UnderstandingScoreCard } from "@/components/dashboard/understanding-score-card";
 import { RegistryStatusCard } from "@/components/doc2mcp/registry-status-card";
 import { RetryConversionButton } from "@/components/doc2mcp/retry-conversion-button";
 import { Badge } from "@/components/ui/badge";
@@ -29,6 +30,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useProjectLogStream } from "@/hooks/use-project-log-stream";
 import type { PlatformProject } from "@/lib/db/schema";
 import { cn } from "@/lib/utils";
 import type { McpExportArtifact } from "@/services/mcp/exports";
@@ -94,7 +96,16 @@ export function ProjectDetail({
   const { project, isProcessing } = useRealtimeProject(initialProject);
   const artifacts = project.artifacts as ProjectArtifacts | null;
   const tools = artifacts?.compressedTools ?? [];
-  const logs = (project.logs as ProcessingLog[] | null) ?? [];
+  const baseLogs = (project.logs as ProcessingLog[] | null) ?? [];
+  const { logs: streamLogs, connected: streamConnected } = useProjectLogStream(
+    project.id,
+    isProcessing,
+    baseLogs
+  );
+  const logs =
+    isProcessing && streamLogs.length >= baseLogs.length
+      ? streamLogs
+      : baseLogs;
   const status = STATUS_META[project.status];
   const StatusIcon = status.icon;
   const report = artifacts?.generationReport;
@@ -181,6 +192,8 @@ export function ProjectDetail({
         report={report}
         tools={tools}
       />
+
+      <UnderstandingScoreCard score={artifacts?.qualityScore} />
 
       {project.status === "error" ? (
         <Card className="border-red-500/30 bg-red-500/5">
@@ -306,7 +319,11 @@ export function ProjectDetail({
         </TabsContent>
 
         <TabsContent className="mt-4" value="logs">
-          <LogsPanel isProcessing={isProcessing} logs={logs} />
+          <LogsPanel
+            connected={streamConnected}
+            isProcessing={isProcessing}
+            logs={logs}
+          />
         </TabsContent>
       </Tabs>
     </div>
@@ -411,6 +428,12 @@ function ToolCard({
           {typeof tool.confidence === "number" ? (
             <Badge variant="outline">{tool.confidence}%</Badge>
           ) : null}
+          {tool.generationSource === "gemini" ? (
+            <Badge className="gap-1" variant="secondary">
+              <Sparkles className="size-3" />
+              Gemini
+            </Badge>
+          ) : null}
         </div>
       </CardHeader>
       <CardContent className="space-y-3 pt-0">
@@ -451,9 +474,11 @@ function ToolCard({
 function LogsPanel({
   logs,
   isProcessing,
+  connected,
 }: {
   logs: ProcessingLog[];
   isProcessing: boolean;
+  connected?: boolean;
 }) {
   const display = useMemo(() => logs.slice(-200).reverse(), [logs]);
   return (
@@ -463,14 +488,14 @@ function LogsPanel({
           <CardTitle>Live pipeline logs</CardTitle>
           <CardDescription>
             {isProcessing
-              ? "Streaming via Supabase Realtime + polling fallback."
+              ? "Streaming via Server-Sent Events (SSE) from the crawl terminal."
               : "Final run logs."}
           </CardDescription>
         </div>
         {isProcessing ? (
           <Badge className="gap-1" variant="secondary">
             <Loader2 className="size-3 animate-spin" />
-            live
+            {connected ? "live" : "connecting"}
           </Badge>
         ) : null}
       </CardHeader>

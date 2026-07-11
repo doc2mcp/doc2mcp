@@ -9,9 +9,9 @@ import {
   ShieldCheck,
   Terminal,
 } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { DocCta } from "@/components/docs/doc-cta";
+import { PipelineDiagram } from "@/components/docs/pipeline-diagram";
 
 const CARDS = [
   {
@@ -97,15 +97,8 @@ export function DocsHome() {
         </div>
       </section>
 
-      <div className="mt-10 overflow-hidden rounded-2xl border border-border/60">
-        <Image
-          alt="The doc2mcp pipeline: documentation, crawling, knowledge processing, retrieval, MCP generation, AI agents"
-          className="w-full"
-          height={300}
-          src="/diagrams/pipeline.svg"
-          unoptimized
-          width={1280}
-        />
+      <div className="mt-10 overflow-hidden rounded-2xl border border-border/60 bg-card/40 p-3">
+        <PipelineDiagram className="w-full rounded-lg" />
       </div>
 
       <div className="mt-10 grid gap-4 sm:grid-cols-2">

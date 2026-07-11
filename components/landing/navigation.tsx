@@ -132,7 +132,7 @@ export function LandingNavigation({
 
   return (
     <Navbar>
-      <NavBody>
+      <NavBody className="landing-nav-shell">
         <Link
           aria-label="doc2mcp home"
           className="relative z-20 flex shrink-0 items-center"
@@ -166,7 +166,7 @@ export function LandingNavigation({
         </div>
       </NavBody>
 
-      <MobileNav>
+      <MobileNav className="landing-nav-shell">
         <MobileNavHeader>
           <Link aria-label="doc2mcp home" href="/">
             <Doc2McpLogo size={24} />

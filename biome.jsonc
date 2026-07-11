@@ -13,6 +13,7 @@
     "includes": [
       "**/*",
       "!cli",
+      "!packages/doc2mcp-server",
       "!components/ai-elements",
       "!components/elements",
       "!components/ui",

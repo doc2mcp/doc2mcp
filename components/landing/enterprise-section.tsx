@@ -129,7 +129,7 @@ export function EnterpriseSection() {
             >
               Enterprise-ready
               <br />
-              <span className="text-[#4285f4] dark:text-[#8ab4f8] font-semibold">
+              <span className="text-[var(--landing-accent)] font-semibold">
                 AI infrastructure.
               </span>
             </h2>

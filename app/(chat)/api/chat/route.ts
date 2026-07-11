@@ -9,6 +9,7 @@ import {
 import { checkBotId } from "botid/server";
 import { auth, type UserType } from "@/app/(auth)/auth";
 import { isAdminEmail } from "@/lib/admin/admin-access";
+import { mergeStreamWithToolAnswerFallback } from "@/lib/ai/chat-tool-answer-fallback";
 import { entitlementsByUserType } from "@/lib/ai/entitlements";
 import {
   chatModels,
@@ -340,15 +341,17 @@ export async function POST(request: Request) {
           ...(docTools ?? {}),
         };
 
+        const activeSystemPrompt =
+          hybridSystemPrompt ??
+          systemPrompt({
+            requestHints,
+            supportsTools,
+            webSearchAvailable,
+          });
+
         const result = streamText({
           model: getLanguageModel(chatModel),
-          system:
-            hybridSystemPrompt ??
-            systemPrompt({
-              requestHints,
-              supportsTools,
-              webSearchAvailable,
-            }),
+          system: activeSystemPrompt,
           messages: modelMessages,
           stopWhen: stepCountIs(
             docTools ? MAX_HYBRID_TOOL_STEPS : MAX_STANDARD_TOOL_STEPS
@@ -367,9 +370,14 @@ export async function POST(request: Request) {
           },
         });
 
-        dataStream.merge(
-          result.toUIMessageStream({ sendReasoning: isReasoningModel })
-        );
+        await mergeStreamWithToolAnswerFallback({
+          result,
+          dataStream,
+          model: getLanguageModel(chatModel),
+          baseMessages: modelMessages,
+          baseSystem: activeSystemPrompt,
+          sendReasoning: isReasoningModel,
+        });
 
         if (titlePromise) {
           try {

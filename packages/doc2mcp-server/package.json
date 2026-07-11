@@ -1,0 +1,27 @@
+{
+  "name": "doc2mcp-server",
+  "version": "0.1.0",
+  "description": "Stdio MCP proxy for doc2mcp hosted endpoints — run with npx in Cursor or Claude Desktop.",
+  "type": "module",
+  "bin": {
+    "doc2mcp-server": "./dist/index.js"
+  },
+  "files": ["dist", "README.md"],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsup",
+    "prepublishOnly": "pnpm build"
+  },
+  "keywords": ["mcp", "doc2mcp", "documentation", "stdio"],
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.10",
+    "tsup": "^8.4.0",
+    "typescript": "^5.8.2"
+  }
+}

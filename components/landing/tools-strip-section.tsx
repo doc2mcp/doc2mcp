@@ -1,9 +1,10 @@
+"use client";
+
 import Image from "next/image";
 
 type Tool = {
   name: string;
   icon: string;
-  /** Monochrome marks invert on dark mode; coloured brand marks stay as-is. */
   invertOnDark?: boolean;
 };
 
@@ -27,16 +28,15 @@ const TOOLS: Tool[] = [
   { name: "Zed", icon: "/icons/tools/zedindustries.svg" },
 ];
 
-// Duplicate the list so the translate animation can loop seamlessly
-// (when the first copy fully translates off-screen the second copy is
-// already in the same position).
 const MARQUEE = [...TOOLS, ...TOOLS];
+const ROW_A = MARQUEE;
+const ROW_B = [...TOOLS.slice().reverse(), ...TOOLS.slice().reverse()];
 
 function ToolPill({ tool }: { tool: Tool }) {
   return (
     <div
       aria-hidden="true"
-      className="inline-flex shrink-0 items-center gap-2 border border-border bg-card/40 px-3.5 py-2 text-foreground/80 text-sm transition-colors hover:border-neon-lime/50 hover:text-foreground"
+      className="inline-flex shrink-0 items-center gap-2 rounded-full border border-[var(--landing-border)] bg-[var(--landing-bg-glass)] px-3.5 py-2 text-[var(--landing-text-primary)]/85 text-sm transition-colors hover:border-[var(--landing-border-hover)] hover:text-[var(--landing-text-primary)]"
     >
       <Image
         alt=""
@@ -52,66 +52,81 @@ function ToolPill({ tool }: { tool: Tool }) {
   );
 }
 
+function MarqueeRow({
+  items,
+  reverse = false,
+}: {
+  items: Tool[];
+  reverse?: boolean;
+}) {
+  return (
+    <div
+      aria-hidden="true"
+      className="tools-marquee relative w-full"
+      style={{
+        maskImage:
+          "linear-gradient(to right, transparent, black 8%, black 92%, transparent)",
+        WebkitMaskImage:
+          "linear-gradient(to right, transparent, black 8%, black 92%, transparent)",
+      }}
+    >
+      <div
+        className={`tools-marquee-track flex w-max items-center gap-3 sm:gap-3.5 ${reverse ? "tools-marquee-reverse" : ""}`}
+      >
+        {items.map((tool, i) => (
+          <ToolPill key={`${tool.name}-${String(i)}`} tool={tool} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function ToolsStripSection() {
   return (
-    <section className="relative bg-background py-14 sm:py-20">
-      <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-12">
+    <section className="relative py-14 sm:py-20">
+      <div className="mx-auto max-w-[1280px] px-[clamp(20px,5vw,40px)]">
         <div className="text-center">
-          <span className="inline-flex items-center gap-2 font-mono text-muted-foreground text-[11px] uppercase tracking-[0.18em] sm:text-xs">
-            <span className="h-px w-8 bg-foreground/30" />
+          <span className="inline-flex items-center gap-2 font-mono text-[11px] text-[var(--landing-text-secondary)] uppercase tracking-[0.18em] sm:text-xs">
+            <span className="h-px w-8 bg-[var(--landing-border-hover)]" />
             Ecosystem
-            <span className="h-px w-8 bg-foreground/30" />
+            <span className="h-px w-8 bg-[var(--landing-border-hover)]" />
           </span>
-          <p className="mt-3 font-display font-semibold text-foreground text-xl tracking-tight sm:text-2xl">
+          <p className="mt-3 font-display text-[var(--landing-text-primary)] text-xl tracking-tight sm:text-2xl">
             Built for the modern AI ecosystem
           </p>
-          <p className="mt-2 text-muted-foreground text-sm">
+          <p className="mt-2 text-[var(--landing-text-secondary)] text-sm">
             One MCP server, ready to plug into every major AI editor and agent
             runtime.
           </p>
         </div>
 
-        {/* Accessible flat list for screen readers — visually replaced by
-            the animated marquee below. */}
         <ul className="sr-only">
           {TOOLS.map((tool) => (
             <li key={tool.name}>{tool.name}</li>
           ))}
         </ul>
 
-        <div
-          aria-hidden="true"
-          className="tools-marquee relative mt-8 sm:mt-10"
-          style={{
-            maskImage:
-              "linear-gradient(to right, transparent, black 8%, black 92%, transparent)",
-            WebkitMaskImage:
-              "linear-gradient(to right, transparent, black 8%, black 92%, transparent)",
-          }}
-        >
-          <div className="tools-marquee-track flex w-max items-center gap-3 sm:gap-3.5">
-            {MARQUEE.map((tool, i) => (
-              <ToolPill key={`${tool.name}-${String(i)}`} tool={tool} />
-            ))}
-          </div>
+        <div className="mt-8 flex flex-col gap-4 sm:mt-10">
+          <MarqueeRow items={ROW_A} />
+          <MarqueeRow items={ROW_B} reverse />
         </div>
 
-        <p className="mt-7 text-center text-muted-foreground/80 text-xs sm:mt-8">
+        <p className="mt-7 text-center text-[var(--landing-text-tertiary)] text-xs sm:mt-8">
           Plus any MCP-compatible AI tool via manual configuration.
         </p>
       </div>
 
       <style>{`
-        .tools-marquee {
-          overflow: hidden;
-        }
+        .tools-marquee { overflow: hidden; }
         .tools-marquee-track {
           animation: tools-marquee-scroll 38s linear infinite;
           will-change: transform;
         }
-        .tools-marquee:hover .tools-marquee-track {
-          animation-play-state: paused;
+        .tools-marquee-reverse.tools-marquee-track {
+          animation-direction: reverse;
+          animation-duration: 44s;
         }
+        .tools-marquee:hover .tools-marquee-track { animation-play-state: paused; }
         @keyframes tools-marquee-scroll {
           from { transform: translateX(0); }
           to   { transform: translateX(-50%); }

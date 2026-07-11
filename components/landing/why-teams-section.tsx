@@ -121,7 +121,7 @@ export function WhyTeamsSection() {
             </span>
             <h2 className="font-display text-3xl tracking-tight sm:text-4xl lg:text-5xl leading-tight">
               Why teams use{" "}
-              <span className="text-[#4285f4] dark:text-[#8ab4f8] font-semibold">
+              <span className="text-[var(--landing-accent)] font-semibold">
                 Doc2MCP
               </span>
             </h2>
@@ -142,7 +142,7 @@ export function WhyTeamsSection() {
                 className="group relative overflow-hidden rounded-2xl border border-border/40 bg-card/25 p-5 backdrop-blur-md transition-all duration-300 hover:bg-card/40 hover:border-border/80"
                 key={o.id}
               >
-                <span className="flex size-9 items-center justify-center rounded-xl border border-border/40 bg-background/50 text-[#4285f4] dark:text-[#8ab4f8] group-hover:scale-[1.02] transition-transform duration-300">
+                <span className="flex size-9 items-center justify-center rounded-xl border border-border/40 bg-background/50 text-[var(--landing-accent)] group-hover:scale-[1.02] transition-transform duration-300">
                   <Icon className="size-4.5" />
                 </span>
                 <h3 className="mt-4 font-display font-semibold text-foreground text-base tracking-tight">

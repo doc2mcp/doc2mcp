@@ -31,5 +31,5 @@
     "next.config.js",
     ".next/dev/types/**/*.ts"
   ],
-  "exclude": ["node_modules", "cli"]
+  "exclude": ["node_modules", "cli", "packages/doc2mcp-server"]
 }
