@@ -10,17 +10,28 @@
 
 ---
 
-# Traction snapshot (founder-reported — use exactly)
+# Traction snapshot (Supabase-verified 2026-07-12)
 
-| Metric | Number | Notes for YC |
+| Metric | Number | Source |
 | --- | --- | --- |
-| MCPs created (lifetime) | **12** | Early; emphasize quality of usage over vanity volume |
-| Paying customers | **1** | Self-serve paid |
-| Approx MRR | **~₹999 / ~$12–15** | Assume Pro tier unless you correct; say exact plan name in app |
-| Weekly MCP tool calls | **3,000+** | **Lead with this** — proves agents actually use the servers |
-| Named references | **Ashwin Sharma**, **Ashish Chanchal** | Repo contributors; ask them for permissioned quote before putting on site |
+| Product start | **June 2026** | First user `2026-06-01`; first MCP `2026-06-02` |
+| MCPs created | **12** (all `ready`) | `PlatformProject` |
+| Paying customers | **1** | `Subscription` |
+| Paid plan | **Enterprise · yearly · INR** | Active since `2026-06-14`; amount **₹299** in DB — confirm if special deal |
+| Named references | **Ashwin Sharma**, **Ashish Chanchal** | Permission granted |
+| Logged `McpHit` | **8 total** | Do **not** claim 3,000+/week until this matches |
 
-> Do **not** invent logos or long fake testimonials. For the app: “early users / contributors who will take a call.” For the site: only quotes **after they approve wording**.
+### Permissioned quotes (approved)
+
+**Ashwin Sharma** ([hi-ashwinsharma](https://github.com/hi-ashwinsharma)):
+
+> “I’ve been building on Doc2MCP since the early repo. Paste a docs URL, get a hosted MCP you can wire into Cursor the same day — that’s the loop we ship and dogfood.”
+
+**Ashish Chanchal** ([Ashish-chanchal](https://github.com/Ashish-chanchal)):
+
+> “As a contributor, the value is obvious: less custom MCP glue, more time on the actual product. Happy to hop on a reference call about how we use it.”
+
+Both available for YC partner reference calls.
 
 ---
 
@@ -270,10 +281,8 @@ GTM 90 days: **US/global API DevRel outreach primary**; India community demos se
 
 # Immediate actions for you
 
-1. Confirm exact **MRR plan** (Pro ₹999?).  
-2. Message **Ashwin** + **Ashish** — approve quote + reference-call yes.  
-3. Tell me **exact product start month** for the application.  
-4. Merge/deploy PR #88 (logo + honest claims).  
-5. Start Day 1 of the sprint checklist tomorrow.
-
-When Ashwin/Ashish approve quotes, paste their lines here — I’ll format site-safe proof + final YC PDF-ready answers.
+1. ~~Ashwin + Ashish permission~~ **done** (quotes in pack).  
+2. ~~Start month + plan~~ **done** — June 2026 · **Enterprise yearly**.  
+3. **Reconcile MCP calls** — DB `McpHit` = 8; do not claim 3k+/week in YC until fixed.  
+4. Merge/deploy PR #88 (transparent logo, native cursor, no landing tour).  
+5. Sprint Day 1 outreach — see `.brain/sprint-day1.md` (20 DevRel messages).
