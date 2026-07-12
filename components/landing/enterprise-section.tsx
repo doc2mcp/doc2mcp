@@ -69,7 +69,7 @@ const FEATURES: EnterpriseFeature[] = [
   {
     id: "security",
     title: "Enterprise Security",
-    body: "SOC 2-ready controls, signed MCP token rotation, prompt-injection guards, and per-project secret isolation.",
+    body: "Signed MCP token rotation, prompt-injection guards, and per-project secret isolation — built for production agents today.",
     icon: ShieldCheck,
   },
 ];
@@ -117,7 +117,7 @@ export function EnterpriseSection() {
           <div>
             <span className="inline-flex items-center gap-2 rounded-full border border-violet-500/30 bg-violet-500/10 px-3 py-1 font-mono text-[10px] text-violet-700 uppercase tracking-[0.16em] dark:text-violet-300">
               <ShieldCheck className="size-3" />
-              Enterprise
+              For teams
             </span>
             <h2
               className={cn(
@@ -127,16 +127,16 @@ export function EnterpriseSection() {
                   : "translate-y-4 opacity-0"
               )}
             >
-              Enterprise-ready
+              Built for teams that
               <br />
               <span className="text-[var(--landing-accent)] font-semibold">
-                AI infrastructure.
+                ship official MCP.
               </span>
             </h2>
             <p className="mt-5 max-w-xl text-base text-muted-foreground leading-relaxed sm:text-lg">
-              The same MCP layer your engineers love — hardened with the
-              controls, audit trails, and deployment options enterprise teams
-              require.
+              Hosted MCP, project tokens, and webhook sync work today. SSO,
+              self-host, and advanced audit export are on the roadmap — talk to
+              us if you need them for a pilot.
             </p>
           </div>
 
@@ -192,19 +192,19 @@ export function EnterpriseSection() {
 
         <div className="mt-10 flex flex-col items-center gap-2 text-center sm:flex-row sm:justify-center sm:gap-6">
           <p className="font-mono text-[11px] text-muted-foreground uppercase tracking-[0.18em]">
-            SOC 2 in progress
+            Hosted MCP today
           </p>
           <span aria-hidden="true" className="hidden text-border sm:inline">
             ·
           </span>
           <p className="font-mono text-[11px] text-muted-foreground uppercase tracking-[0.18em]">
-            GDPR-ready data handling
+            Webhook sync
           </p>
           <span aria-hidden="true" className="hidden text-border sm:inline">
             ·
           </span>
           <p className="font-mono text-[11px] text-muted-foreground uppercase tracking-[0.18em]">
-            EU + US regions
+            Roadmap: SSO / self-host
           </p>
         </div>
       </div>

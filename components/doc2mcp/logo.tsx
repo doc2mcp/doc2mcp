@@ -30,7 +30,7 @@ export function Doc2McpWordmark({ className }: { className?: string }) {
       )}
     >
       <span className="text-foreground">doc</span>
-      <span className="text-[#4285f4] dark:text-[#8ab4f8]">2</span>
+      <span className="text-[#a78bfa] dark:text-[#c4b5fd]">2</span>
       <span className="text-foreground">mcp</span>
     </span>
   );
@@ -47,7 +47,7 @@ export function Doc2McpLogo({
 }) {
   return (
     <div className={cn("flex items-center gap-2.5", className)}>
-      <Doc2McpMark className="logo-glow" size={size} />
+      <Doc2McpMark size={size} />
       {showWordmark ? <Doc2McpWordmark /> : null}
     </div>
   );
