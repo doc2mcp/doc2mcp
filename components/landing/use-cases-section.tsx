@@ -74,7 +74,7 @@ const USE_CASES: UseCase[] = [
 ];
 
 const TRUST_ROW = [
-  { icon: Lock, label: "SOC 2 ready architecture" },
+  { icon: Lock, label: "Token-authenticated MCP" },
   { icon: Cpu, label: "AI-native indexing" },
   { icon: Workflow, label: "Agent-shaped toolkits" },
   { icon: Zap, label: "< 60s URL → MCP" },

@@ -30,3 +30,8 @@ tsconfig.tsbuildinfo
 .fetch-coder/checkpoints/
 .env*
 .env
+
+# Private internal docs — never commit (YC, GTM, metrics)
+.brain/*.md
+.brain/yc-*
+.brain/sprint-*
