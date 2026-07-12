@@ -29,9 +29,14 @@
 ## What’s real now
 
 - Product loop works (URL → hosted MCP → Cursor/Claude).  
-- **3,000+ weekly MCP calls** on a small base = real usage density (strong interview line).  
-- 1 paying customer = not zero revenue (say it calmly; don’t oversell).  
-- Founder has shipped MCP tooling before (ASI1-MCP-CLI, MCP client agent, VS Code/Cursor extension) — see [gautammanak.xyz](https://gautammanak.xyz/).  
+- Live since **June 2026**; **12** ready MCPs.  
+- **1** paying customer on **Enterprise (yearly)**.  
+- Ashwin + Ashish: permissioned quotes + reference calls.  
+- Founder has shipped MCP tooling before — see [gautammanak.xyz](https://gautammanak.xyz/).  
+
+## Instrumentation gap (fix before claiming usage)
+
+Founder-reported **3,000+ weekly MCP calls** does **not** match Supabase `McpHit` (**8 total**). Until fixed or explained with a screenshot from another source, YC answers should lead with **12 MCPs + 1 Enterprise customer + named references**, not call volume.
 
 ## Still weak for YC
 
@@ -95,7 +100,7 @@ Not “everyone with a README.”
 | Docs platforms (Mintlify, etc.) | Own the docs host | Partner on top of their URLs; we are the agent publish layer |
 | IDE-native docs features | Possible long-term | Become the **vendor-official** MCP source of truth they pull from |
 
-**Wedge:** Hosted remote MCP as **official agent infrastructure for API docs**, measured by weekly tool calls (already 3k+) not homepage adjectives.
+**Wedge:** Hosted remote MCP as **official agent infrastructure for API docs**—sync, semantic tools, IDE install—not a one-off scraper.
 
 ### 7) Path to a huge company
 
@@ -171,20 +176,19 @@ We turn documentation websites into hosted Model Context Protocol servers. A use
 
 ### Progress
 
-- Solo founder; product live at doc2mcp.site; CLI on npm (`doc2mcp`).  
-- **12** hosted MCPs created.  
-- **3,000+** MCP tool calls per week.  
-- **1** paying customer (~₹999 MRR on Pro — confirm exact).  
-- Early contributors: Ashwin Sharma (`hi-ashwinsharma`), Ashish Chanchal (`Ashish-chanchal`) — building in-repo and using the product; available as references with permission.  
+- Solo founder; product live at doc2mcp.site since **June 2026**; CLI on npm (`doc2mcp`).  
+- **12** hosted MCPs created (all ready).  
+- **1** paying customer on **Enterprise (yearly, INR)**.  
+- Early contributors with permissioned quotes + reference calls: **Ashwin Sharma**, **Ashish Chanchal**.  
 - Recent: live crawl streaming, webhook sync, semantic tool generation, understanding score.
 
 ### How long have you been working on this?
 
-**[FILL exact months]** — say the real start date (repo ~May 2026 era; use your true first commit / launch).
+**Since June 2026** (first user / first project in the first week of June).
 
 ### Revenue / growth
 
-One self-serve paid customer. Near-term growth: design partners at API companies → Company/official MCP plan. Leading indicator today is **weekly tool calls (3k+)**, not only signups.
+One active **Enterprise yearly** subscription (INR). Near-term growth: US/global API company design partners → expand Company/official MCP monetization. Leading public proof today: shipped product + named engineering references + 12 live MCPs.
 
 ### Market / competition
 
@@ -215,7 +219,7 @@ Solo founder — 100%. Early contributors (Ashwin, Ashish) are not co-founders; 
 >  
 > Doc2MCP: paste a docs URL — under a minute you get a hosted MCP. Connect it in Cursor. Agents call real tools from your docs.  
 >  
-> We’re early — twelve MCPs so far — but those servers already see over three thousand tool calls a week. One paying customer; we’re onboarding API companies as design partners for official MCP.  
+> We’re early — twelve hosted MCPs since June, one Enterprise customer, and contributors Ashwin and Ashish who’ll take a reference call. We’re onboarding API companies as design partners for official MCP.  
 >  
 > That’s Doc2MCP. Thanks.
 
@@ -225,10 +229,13 @@ Solo founder — 100%. Early contributors (Ashwin, Ashish) are not co-founders; 
 Use the honest paragraph above — never “none.”
 
 **“Only 12 MCPs?”**  
-“We’re early and focused on usage quality. Those projects do 3k+ tool calls/week. This sprint is expanding design partners at API companies.”
+“We launched in June 2026. Focus was shipping a real hosted loop, not vanity volume. We have an Enterprise customer and design-partner outreach running now.”
 
 **“Only one paid?”**  
-“Yes. Revenue is real but small. Leading indicator is agent calls; monetization expands with Company/official MCP.”
+“Yes — one active Enterprise yearly subscription. Next step is API-company design partners and a clearer Company/official MCP offer.”
+
+**“What about usage / calls?”**  
+“Be precise: only cite call volume you can screenshot from logs. We’re hardening MCP hit instrumentation so usage is auditable.”
 
 **“Solo founder?”**  
 “I ship full-stack and DevRel myself. Ashwin and Ashish already contribute code; next hire is after design-partner load.”
@@ -254,10 +261,10 @@ GTM 90 days: **US/global API DevRel outreach primary**; India community demos se
 | --- | --- | --- |
 | Product | 7 | 8 |
 | Trust / site | 5 (after #88) | 7 |
-| Traction story | 5 (3k calls help) | 7–8 |
+| Traction story | 4 (fix call-log gap) | 7–8 |
 | Narrative / FIT | 7 | 8 |
 | Venture framing | 5 | 7 |
-| **Overall YC readiness** | **5/10** | **7–7.5/10** |
+| **Overall YC readiness** | **4.5/10** | **7–7.5/10** |
 
 ---
 

@@ -14,7 +14,6 @@ import { ToolsStripSection } from "@/components/landing/tools-strip-section";
 import { UseCasesSection } from "@/components/landing/use-cases-section";
 import { WhyNowSection } from "@/components/landing/why-now-section";
 import { WhyTeamsSection } from "@/components/landing/why-teams-section";
-import { LandingTour } from "@/components/onboarding/landing-tour";
 import { PlatformSection } from "@/components/platform-section";
 
 export default function Page() {
@@ -23,7 +22,6 @@ export default function Page() {
       <Suspense fallback={<LandingNavigation session={null} />}>
         <LandingNavigationServer />
       </Suspense>
-      <LandingTour />
       <HeroSection />
       <ToolsStripSection />
       <Suspense

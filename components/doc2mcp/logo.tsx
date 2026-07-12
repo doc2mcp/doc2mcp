@@ -47,7 +47,7 @@ export function Doc2McpLogo({
 }) {
   return (
     <div className={cn("flex items-center gap-2.5", className)}>
-      <Doc2McpMark className="logo-glow" size={size} />
+      <Doc2McpMark size={size} />
       {showWordmark ? <Doc2McpWordmark /> : null}
     </div>
   );
