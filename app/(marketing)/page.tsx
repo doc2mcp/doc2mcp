@@ -10,7 +10,6 @@ import { LandingNavigation } from "@/components/landing/navigation";
 import { LandingNavigationServer } from "@/components/landing/navigation-server";
 import { PricingSection } from "@/components/landing/pricing-section";
 import { ProblemSectionClient } from "@/components/landing/problem-section-client";
-import { TestimonialsSection } from "@/components/landing/testimonials-section";
 import { ToolsStripSection } from "@/components/landing/tools-strip-section";
 import { UseCasesSection } from "@/components/landing/use-cases-section";
 import { WhyNowSection } from "@/components/landing/why-now-section";
@@ -40,7 +39,6 @@ export default function Page() {
         <HowItWorksSectionClient />
       </Suspense>
       <PlatformSection />
-      <TestimonialsSection />
       <WhyTeamsSection />
       <UseCasesSection />
       <ComparisonSection />
