@@ -1,354 +1,272 @@
-# Doc2MCP — YC Pack (working)
+# Doc2MCP — YC Application Pack (filled)
 
-**Date:** 2026-07-12  
-**Site audited:** https://www.doc2mcp.site/  
-**GitHub:** doc2mcp/doc2mcp (2★, 4 forks, ~Jul 2025/2026 vintage)  
-**CLI:** `doc2mcp@0.1.23` on npm  
-
-> Honest coaching doc. Numbers below that are not from founders are marked **[ASK]** or **unknown**.
-
----
-
-# 1) PHASE 0 — Brutal audit memo (1 page)
-
-## A) Real vs aspirational on the live site
-
-| Claim / surface | Verdict |
-| --- | --- |
-| Paste docs URL → hosted MCP in seconds | **Real** — core product works (web + CLI + pipeline) |
-| Cursor / Claude / VS Code connect | **Real** — install configs + `doc2mcp-server` proxy |
-| Free tier + paid Razorpay plans | **Real** — Starter ₹299 / Pro ₹999 / Team ₹2,999 (also USD) |
-| CLI on npm | **Real** — `doc2mcp@0.1.23` |
-| Webhook sync + SSE crawl logs | **Real** (shipped recently) |
-| Understanding score / semantic tools | **Real-ish** — product features exist; quality not yet public-proofed |
-| Testimonial marquee (16 anonymous quotes) | **Aspirational / harmful** — no names, companies, or links → reads as fake |
-| “SOC 2-ready” / “SOC 2 in progress” | **Unproven on site** — docs say scaffold; do not claim progress without auditor |
-| Enterprise: VPC self-host, SAML, SIEM export, BYOK | **Roadmap theater** — docs are scaffolds (“contact for pilots”), not GA |
-| Notion / Confluence connectors | **Scaffold docs**, not shipped product |
-| “Enterprise-ready” section | **Overclaim** for current stage |
-| GitHub social proof | **Weak** — 2 stars (public). Do not imply open-source momentum |
-| Customer logos | **Absent** (good — don’t invent) |
-
-## B) What YC partners will attack in interview
-
-1. **“Isn’t this just a wrapper on crawl + MCP?”** — DIY scripts / open-source docs→MCP exist.  
-2. **“Who pays and why not build in-house?”** — API companies already have docs teams; need budget owner.  
-3. **“Show retention.”** — One-time convert ≠ habit. Weekly reconnect / tool calls matter.  
-4. **“₹999 Pro / $15 feels like indie SaaS.”** — Venture story needs platform / official-MCP pricing.  
-5. **“Fake social proof?”** — Anonymous testimonials destroy trust with sharp partners.  
-6. **“Why you?”** — Need founder-market fit, not MCP buzzwords.  
-7. **“India GTM vs US ICP.”** — Who are the first 20 design partners? US API cos vs India startups?  
-8. **“What’s the moat in 18 months?”** — Hosted alone is not enough; sync + quality + distribution.
-
-## C) Top 10 fixes by YC selection impact
-
-1. **Kill anonymous testimonials** until you have named, permissioned quotes.  
-2. **Replace enterprise/SOC2 theater** with “what works today + what’s coming.”  
-3. **Pick ONE beachhead ICP** (recommendation: **API companies publishing official MCP**).  
-4. **14-day proof sprint** — 20 manual design partners, not homepage polish.  
-5. **Instrument funnel** — visit → MCP created → Cursor connected → D7 return → paid.  
-6. **Pricing narrative** — Free/dev + **Company / Official MCP** plan (usage or seats for external agents), not only hobby caps.  
-7. **Honest homepage** — outcome for API companies; proof only if real.  
-8. **Founder story + why now** — crisp for app + video.  
-9. **Competitive wedge on paper** — hosted remote + live sync + semantic tools + IDE distribution vs DIY.  
-10. **Public proof ledger** — MCPs created, weekly active projects, npm installs (only true numbers).
-
-## D) What NOT to change
-
-- Core loop: URL → hosted MCP → IDE config (this is the wedge).  
-- CLI + PAT device flow (developer credibility).  
-- Shipping speed / product depth already in repo (don’t rewrite to “simpler chatbot”).  
-- Dual INR/USD checkout for India founders — keep free + paid; **add** company tier rather than deleting INR.  
-- Honest “contact for enterprise” is fine; fake GA enterprise is not.
-
-**YC readiness now: 3/10** — real product, weak evidence, trust leaks on marketing, lifestyle pricing optics.
+**Updated:** 2026-07-12  
+**Founder:** Gautam Kumar (Gautam Manak) — solo founder, 100%  
+**Site:** https://www.doc2mcp.site/  
+**GitHub:** [doc2mcp/doc2mcp](https://github.com/doc2mcp/doc2mcp)  
+**Founder site:** [gautammanak.xyz](https://gautammanak.xyz/)  
+**CLI:** `doc2mcp@0.1.23`  
+**Target:** YC **2026** batch  
 
 ---
 
-# 2) PHASE 1 — YC narrative pack (copy-paste ready)
+# Traction snapshot (founder-reported — use exactly)
+
+| Metric | Number | Notes for YC |
+| --- | --- | --- |
+| MCPs created (lifetime) | **12** | Early; emphasize quality of usage over vanity volume |
+| Paying customers | **1** | Self-serve paid |
+| Approx MRR | **~₹999 / ~$12–15** | Assume Pro tier unless you correct; say exact plan name in app |
+| Weekly MCP tool calls | **3,000+** | **Lead with this** — proves agents actually use the servers |
+| Named references | **Ashwin Sharma**, **Ashish Chanchal** | Repo contributors; ask them for permissioned quote before putting on site |
+
+> Do **not** invent logos or long fake testimonials. For the app: “early users / contributors who will take a call.” For the site: only quotes **after they approve wording**.
+
+---
+
+# 1) PHASE 0 — Audit (updated with your numbers)
+
+## What’s real now
+
+- Product loop works (URL → hosted MCP → Cursor/Claude).  
+- **3,000+ weekly MCP calls** on a small base = real usage density (strong interview line).  
+- 1 paying customer = not zero revenue (say it calmly; don’t oversell).  
+- Founder has shipped MCP tooling before (ASI1-MCP-CLI, MCP client agent, VS Code/Cursor extension) — see [gautammanak.xyz](https://gautammanak.xyz/).  
+
+## Still weak for YC
+
+- 12 MCPs total — partners will ask “why so few conversions?” → answer with intentional quality + design-partner focus, then sprint.  
+- Solo founder — normal; address “who else ships?” with Ashwin/Ashish as early eng contributors + hiring plan.  
+- Site previously overclaimed enterprise/SOC2/fake quotes — PR #88 started honesty pass.  
+- Pricing optics still look lifestyle unless you add **Company / Official MCP** narrative.
+
+## Competitor honesty (critical)
+
+Saying **“there is no competitor”** will hurt you in a YC interview.
+
+**Better true sentence:**
+
+> There is no dominant **hosted commercial** product that turns arbitrary docs URLs into paid, syncable remote MCP for API companies the way we do. But we still compete with **DIY open-source scrapers**, **in-house platform teams**, **docs platforms adding agent features**, and eventually **IDE-native docs tools**. Our wedge is hosted remote MCP + sync + semantic tools + one-click IDE install + distribution.
+
+---
+
+# 2) PHASE 1 — Narrative (final copy)
 
 ### 1) One-liner (≤50 chars)
 
-**Docs URL → hosted MCP for agents**  
-(38 chars)
-
-Alt: **Turn API docs into agent tools** (32)
+**Docs URL → hosted MCP for agents**
 
 ### 2) What are you making? (≤50 words)
 
-Doc2MCP turns any documentation site into a hosted Model Context Protocol server. Paste a docs URL; we crawl, structure, and expose semantic tools so Cursor, Claude, and other agents can answer and act from your real docs in under a minute—no local scrapers, no glue code.
-
-(49 words)
+Doc2MCP turns any documentation URL into a hosted Model Context Protocol server. Paste docs; we crawl, structure, and expose semantic tools so Cursor, Claude, and other agents use your real APIs and docs in under a minute—hosted, tokenized, syncable, no local scrapers.
 
 ### 3) Why now
 
-MCP became the default way coding agents attach tools (Cursor, Claude Desktop, OpenAI Agents). API companies already maintain docs, but agents still hallucinate endpoints. The gap is not “more RAG demos”—it’s **official, hosted, syncable agent interfaces** for docs the same way companies publish OpenAPI. Timing: agent adoption in IDEs is ahead of vendors’ official MCP publishing.
+Coding agents (Cursor, Claude Desktop, OpenAI Agents) standardized on MCP for tools. API companies already invest in docs, but agents still invent endpoints. The missing layer is **official, hosted, syncable agent infrastructure for docs**—the OpenAPI moment for agents. Gautam saw this repeatedly while shipping MCP CLIs and agent tooling in the Fetch.ai / ASI ecosystem and answering thousands of developer questions.
 
-### 4) Beachhead customer (ONE)
+### 4) Beachhead (ONE)
 
-**API / platform companies that sell developer APIs** (Stripe-like, infra SDKs, B2B APIs)—docs team or DevRel owns the surface; buyers care that **customers’ agents** call the right tools.
+**API / developer-platform companies** that want an **official MCP** for their public docs so *their customers’* agents integrate correctly.
 
-Why not “all eng teams”: too broad; retention weaker. Why not only “AI startups”: they DIY. API companies have distribution (their docs) and budget to make agents stop opening support tickets.
+Next 90 days GTM (decision):
 
-### 5) Unfair advantage / founder-market fit
+1. **Primary:** US / global API companies (DevRel, DX, docs leads) — YC narrative + willingness to pay for “official.”  
+2. **Secondary:** India design partners via MeerutCodeHub / Fetch / ASI communities — fast feedback, demos, density.  
 
-**[ASK — fill after founder Qs]** Draft structure:
+Not “everyone with a README.”
 
-- What you’ve shipped before (scale, systems).  
-- Why docs→agents (personal pain).  
-- Execution edge (how fast you ship vs OSS wrappers).  
-- Access (API companies, DevRel, India+US network).
+### 5) Unfair advantage / founder–market fit
 
-### 6) Competitors + honest wedge
+**Gautam Kumar — solo founder**
 
-| Competitor type | They do | We win (12 mo) if… |
+- Developer Advocate at **Fetch.ai** (Aug 2024–present): 100+ hackathons/workshops across India; onboarded thousands of developers to agent tooling; 1000+ Discord support threads; owned Innovation Lab site, SDK docs, campaigns ([bio](https://gautammanak.xyz/)).  
+- Shipped **MCP-native tools before Doc2MCP**: ASI1-MCP-CLI, Software Developer MCP Client Agent, Fetch Coder (VS Code/Cursor extension), plus npm/PyPI packages (`uagent-client`, `uAgent-A2A-Adapter`).  
+- Founded **MeerutCodeHub** (4000+ members); Fetch.ai Delhi NCR community (6000+); ASI1 India city network.  
+- Full-stack production shipping (Next.js/Node, prior KloudiDev products).  
+
+**Edge:** He lives in the agent+MCP developer loop daily—not learning MCP for a pitch. Distribution starts from communities he already leads; product taste comes from building MCP clients/CLIs himself.
+
+### 6) Competitors + wedge
+
+| Alternative | Reality | Our 12-month win condition |
 | --- | --- | --- |
-| DIY / open-source crawl→MCP | Free, flexible | Hosted remote MCP + auth + sync + IDE one-click; quality of tools |
-| Generic RAG chatbots | Q&A on docs | **Tools/actions** via MCP, not only chat |
-| Docs platforms (Mintlify etc.) | Host docs | We sit **on top** of their URLs as agent layer; partner not replace |
-| In-house platform eng | Custom MCP | Time-to-first-MCP &lt;1 min; maintenance via webhook sync |
+| DIY / OSS docs→MCP scripts | Free, fragile | Hosted remote + auth + webhook sync + IDE install |
+| In-house platform eng | Custom MCP per company | Time-to-official-MCP &lt; 60s; maintenance via sync |
+| Docs platforms (Mintlify, etc.) | Own the docs host | Partner on top of their URLs; we are the agent publish layer |
+| IDE-native docs features | Possible long-term | Become the **vendor-official** MCP source of truth they pull from |
 
-**Wedge sentence:** “We’re the hosted distribution layer that turns an API company’s docs into official agent infrastructure—not a one-off scraper script.”
+**Wedge:** Hosted remote MCP as **official agent infrastructure for API docs**, measured by weekly tool calls (already 3k+) not homepage adjectives.
 
 ### 7) Path to a huge company
 
-Today: convert any docs URL → hosted MCP.  
-Next: **official MCP for API vendors** (versioned, synced, analytics on agent tool use).  
-Then: **marketplace / registry** of trusted API MCPs + usage billing when agents of *their customers* call tools.  
-Endgame: **default agent integration surface** for software companies (docs + APIs), analogous to “how humans find APIs via docs sites.”
+Convert any docs URL → hosted MCP (today) → **official MCP for API vendors** (versioned, synced, analytics) → **usage-based billing when customer agents call tools** → default distribution layer for how agents integrate with software companies (docs + APIs).
 
-Not: ₹999/mo indie tool forever.
+### 8) Risks
 
-### 8) Risks that could kill us
+1. Docs platforms or IDEs ship “good enough” native MCP.  
+2. Stay stuck at curiosity converts (12 MCPs) without more design partners.  
+3. Tool quality fails → calls drop despite hosting.  
+4. Solo-founder bandwidth — must keep Ashwin/Ashish engaged or hire.  
+5. Underpricing forever as ₹999 indie SaaS.
 
-1. MCP standard fragments or IDEs bake in first-party docs tools.  
-2. Docs platforms ship native MCP and own distribution.  
-3. We never get past one-shot curiosity → no retention.  
-4. Tool quality too weak → agents ignore MCP.  
-5. We stay lifestyle SaaS and never land paying API companies.
+### Why Doc2MCP (origin story — use this)
+
+While shipping MCP CLIs and agent clients and teaching developers across India, the same failure mode kept showing up: teams pasted docs into prompts or wrote one-off scrapers, and agents still hallucinated APIs. There was no fast path from **“our docs are public”** to **“here is our official hosted MCP.”** Doc2MCP is that path—paste a URL, get a Cursor-ready remote MCP in under a minute—so API companies publish agent infrastructure the way they already publish docs.
 
 ---
 
-# 3) PHASE 2 — 14-day traction sprint
+# 3) PHASE 2 — 14-day sprint (tuned to your numbers)
 
-## Metrics to start measuring **today**
+**Goal:** Turn 3k weekly calls + 12 MCPs into **clear YC proof**: more official API cos, retention, 1–2 named quotes, Company-plan conversations.
 
-| Metric | Definition | How |
-| --- | --- | --- |
-| Visits | Landing uniques | Vercel Analytics / Plausible |
-| MCP created | Projects reaching `ready` | DB count / admin |
-| Cursor connected | First successful MCP tool list/call | MCP hit logs |
-| D1 / D7 return | Same user returns to project or MCP call | Auth userId + hits |
-| WAUs | Users with ≥1 MCP call in 7d | Hits |
-| Paid conversion | Checkout success | Razorpay |
-| MRR | Recurring | Razorpay + plan table |
-
-**[ASK]** Paste current: signups, MCPs created (all-time / 7d), paid users, MRR, MCP call volume.
-
-## Realistic strong-app targets (pre-seed / YC stage)
-
-Not “unicorn metrics”—**evidence of pull**:
-
-- 20 design-partner conversations booked  
-- ≥10 API/docs teams that create MCP and connect Cursor  
-- ≥5 still calling MCP in week 2  
-- ≥1–3 paying or LOI / design-partner letters  
-- Public proof: named quote **or** clear product usage chart (no fake logos)
-
-## ICP list (beachhead)
-
-Target titles: Head of DevRel, Docs lead, DX eng, Platform eng at **API companies** (auth, payments, infra, AI APIs, data APIs).  
-Sources: MCP Discord, Cursor forum, Twitter/X “MCP”, HN “Show HN”, LinkedIn DevRel.
-
-## Outreach scripts (short)
-
-**LinkedIn / email**
-
-> Subject: Official MCP for {Company} docs?  
->  
-> Hi {Name} — we built Doc2MCP: paste your docs URL → hosted MCP Cursor/Claude can use in &lt;60s. Curious if {Company} wants agents hitting **your** docs accurately without a custom server. Happy to stand up a private pilot this week and share tool-call logs. — {You}
-
-**Twitter/X**
-
-> If your API docs are public but agents still invent endpoints, try Doc2MCP: URL → hosted MCP. Looking for 10 API companies as design partners this week.
-
-**HN Show HN** (when product honest): lead with demo GIF + “what’s not ready” — YC partners read HN.
-
-## Offer that gets YES
-
-- **Design partner (14 days):** Free Pro/Team, white-glove convert + Cursor install, weekly call, written feedback.  
-- Ask for: permissioned quote OR logo later; not payment first.  
-- Success = weekly MCP tool calls from their eng team.
-
-## Daily checklist (14 days)
-
-| Day | Focus |
+| Day | Checklist |
 | --- | --- |
-| 1 | Instrument metrics; remove fake testimonials from site |
-| 2 | List 100 ICP contacts; ship honest homepage strip |
-| 3–4 | 30 outreaches/day; book calls |
-| 5–6 | Manual onboard 5 users (screenshare) |
-| 7 | Mid-week metrics review; iterate tool quality on their docs |
-| 8–10 | 30 outreaches/day; onboard to 15 total |
-| 11–12 | Collect 3 written notes / 1 quote; fix top bugs |
-| 13 | Record 60s YC video with real demo |
-| 14 | Freeze numbers for application; write progress section |
+| 1 | Confirm MRR plan name; screenshot MCP call graph; merge honest-site PR #88 |
+| 2 | Ask **Ashwin** + **Ashish** for 2-sentence quote + “will take YC reference call” |
+| 3–4 | 30 outreaches/day to US/global API DevRel (LinkedIn/email) |
+| 5–6 | Manually onboard 5 new docs→MCP→Cursor users on screenshare |
+| 7 | Metrics review: calls, D7 return, new MCPs |
+| 8–10 | Another 60 outreaches; target **20 design-partner conversations** total |
+| 11–12 | Land 1 more paid or LOI; write case study from highest-call MCP |
+| 13 | Record 60s YC video (demo + 3k calls line) |
+| 14 | Freeze numbers for application |
+
+**Strong-for-stage targets after sprint**
+
+- 25–40 MCPs created  
+- ≥5 projects with weekly calls  
+- 2–3 permissioned quotes (Ashwin/Ashish + 1 API cos)  
+- 2+ paying or written design-partner commitments  
+- Keep weekly calls ≥3k (growth preferred)
 
 ---
 
-# 4) PHASE 3 — Site / pricing recommendations
+# 4) PHASE 3 — Site / pricing (exact)
 
-## Trust fixes (do immediately)
+**Proof line (homepage — only if true):**  
+`12 hosted MCPs · 3,000+ agent tool calls / week · npm: doc2mcp`
 
-1. **Remove** anonymous testimonial marquee **or** relabel as “Example outcomes” with disclaimer — better: **delete** until named.  
-2. Enterprise section: retitle to **“Coming for teams”** / only claim shipped: hosted MCP, tokens, webhook sync, private projects (Pro+).  
-3. Replace “SOC 2-ready / in progress” with “Security practices we use today” (token hashing, isolation) **or** silence until auditor engaged.  
-4. Proof section: only GitHub stars / npm version / “N MCPs generated” if true.
+**Do not** put Ashwin/Ashish quotes live until they approve text.
 
-## Pricing (venture narrative, keep free)
+**Pricing narrative**
 
-| Tier | Role | Direction |
-| --- | --- | --- |
-| Free / Starter | Devs try | Keep low conversion caps |
-| Pro | Indie / small team | Keep, don’t lead homepage with ₹999 |
-| Team | Internal squads | OK |
-| **Company / Official MCP** (new) | API vendors | $$–$$$ : external agent traffic, SLA sync, analytics, custom domain, “official” badge — **sales-assisted** |
-| Enterprise | VPC/SSO | “Talk to us” only until real |
-
-Default currency optics for **YC app**: lead with **USD Company plan** story; INR can remain for India self-serve.
-
-## Homepage copy direction (exact)
-
-**Hero eyebrow:** DOCS → HOSTED MCP  
-
-**Headline:** Turn your API docs into agent infrastructure  
-
-**Sub:** Paste a docs URL. Get a Cursor- and Claude-ready MCP server in under a minute—hosted, syncable, no local scrapers.  
-
-**CTA:** Generate MCP | View docs  
-
-**Not in hero:** enterprise pills, fake quotes, feature grids.
-
-**Differentiation line (below fold):** Hosted remote MCP + webhook sync + semantic tools + one-click IDE install — vs DIY open-source scrapers.
+- Keep Free + Pro for builders.  
+- Add **Company / Official MCP** (sales-assisted): sync SLA, analytics, custom domain, external agent traffic — lead YC story with this, not ₹999.
 
 ---
 
-# 5) PHASE 4 — YC application draft
+# 5) PHASE 4 — YC application answers (copy-paste)
 
-### Company description
+### Company name
 
-Doc2MCP helps API companies turn documentation into hosted MCP servers so coding agents can use their products accurately.
+Doc2MCP
 
-### Product
+### Describe what your company does in 50 characters or less
 
-Users paste a documentation URL. We crawl and structure the docs, generate semantic MCP tools, and host a remote MCP endpoint with tokens and IDE install configs. CLI and webhook sync keep servers fresh when docs change.
+Docs URL → hosted MCP for agents
 
-### Progress / traction **[FILL]**
+### What is your company going to make? (~50–100 words OK if needed)
 
-- Launched: **[ASK]**  
-- Users / signups: **[ASK]**  
-- MCPs created: **[ASK]**  
-- Weekly active (MCP calls): **[ASK]**  
-- Revenue / MRR: **[ASK]**  
-- Notable: npm CLI `doc2mcp`, open GitHub repo, recent sync/SSE features  
+We turn documentation websites into hosted Model Context Protocol servers. A user pastes a docs URL; Doc2MCP crawls and structures the docs, generates semantic tools, and hosts a remote MCP endpoint with tokens and one-click Cursor/Claude install. API companies can publish official agent access to their docs without writing scrapers or maintaining custom MCP servers. We already see 3,000+ MCP tool calls per week on early projects.
 
-### Revenue / growth **[FILL]**
+### Progress
 
-Self-serve INR/USD via Razorpay. Growth plan: design partners → Company plan.
+- Solo founder; product live at doc2mcp.site; CLI on npm (`doc2mcp`).  
+- **12** hosted MCPs created.  
+- **3,000+** MCP tool calls per week.  
+- **1** paying customer (~₹999 MRR on Pro — confirm exact).  
+- Early contributors: Ashwin Sharma (`hi-ashwinsharma`), Ashish Chanchal (`Ashish-chanchal`) — building in-repo and using the product; available as references with permission.  
+- Recent: live crawl streaming, webhook sync, semantic tool generation, understanding score.
+
+### How long have you been working on this?
+
+**[FILL exact months]** — say the real start date (repo ~May 2026 era; use your true first commit / launch).
+
+### Revenue / growth
+
+One self-serve paid customer. Near-term growth: design partners at API companies → Company/official MCP plan. Leading indicator today is **weekly tool calls (3k+)**, not only signups.
 
 ### Market / competition
 
-Agents need tool interfaces; MCP is emerging standard. Competitors: DIY scripts, RAG chat, docs platforms. We focus on hosted official MCP for API docs with sync and IDE distribution.
+Agents need reliable tools; MCP is becoming the IDE standard. Alternatives: DIY OSS, in-house MCP, docs platforms, future IDE features. No dominant hosted “docs URL → official commercial MCP” winner yet—we are racing to become that default for API companies.
 
 ### Unique insight
 
-Docs sites are already the source of truth for APIs; agents still don’t get an official machine interface. The winners won’t be chat wrappers—they’ll be the **publish layer** for agent-native APIs (like OpenAPI was for humans/SDKs).
+Docs are already the human interface to APIs. Agents still lack an official machine interface. The company that becomes the **publish + sync layer for agent-native docs** owns distribution the way docs sites owned human integration discovery.
 
-### Founders **[ASK — paste bios]**
+### Founders
 
-Template: Name · role · what you built (users/scale) · why this · % equity · how long together.
+**Gautam Kumar (Gautam Manak)** — Founder & CEO, 100% equity.  
+Developer Advocate at Fetch.ai; previously built and published MCP CLIs, agent clients, and a VS Code/Cursor coding assistant; founded MeerutCodeHub and leads large India developer communities (Fetch.ai / ASI1). Full-stack engineer who ships Next.js/Node production systems. Portfolio: https://gautammanak.xyz/
 
-### Why this team **[ASK]**
+### Why this team / why you
 
-### 60s video script (unscripted tone)
+I’ve spent the last years onboarding developers to agents and MCP in production ecosystems, shipping the client-side tools myself, and answering the same support pain: “how do we give agents our docs without hallucinations?” Doc2MCP is the server-side answer. I can build the product, demo to developers, and distribute through communities I already run.
 
-> “Hey — I’m {Name}. We built Doc2MCP.  
-> Problem: coding agents still invent API endpoints even when your docs are perfect.  
-> Demo: I paste {docs URL}… under a minute we get a hosted MCP… I connect it in Cursor… it calls the real tools from the docs.  
-> We’re onboarding API companies as design partners so their customers’ agents use official docs infrastructure—not scrapers.  
-> Here’s our usage so far: {real number}. Here’s what we’re measuring next week: reconnects and weekly tool calls.  
-> That’s Doc2MCP.”
+### Equity
 
-### Interview: 20 questions + honest answer frames
+Solo founder — 100%. Early contributors (Ashwin, Ashish) are not co-founders; open to future equity grants for critical hires.
 
-1. What do you do? → One-liner + 15s demo mental picture.  
-2. Who pays? → API company DevRel/docs; start design partners.  
-3. Why now? → MCP in IDEs + agent hallucination on APIs.  
-4. Why not OSS? → Hosted, sync, auth, quality, distribution.  
-5. Moat? → Data on tool quality + official vendor relationships + switch cost of published MCP.  
-6. Retention? → Admit one-shot risk; show D7 MCP calls plan.  
-7. Competition Mintlify? → They host docs; we agent-ify any URL; partner.  
-8. Why you? → **[founder]**  
-9. How much revenue? → Exact number; if ~0, say so + sprint.  
-10. What’s broken? → Tool quality / enterprise claims we removed.  
-11. Biggest risk? → Platform ships native MCP.  
-12. India? → Build from India, sell global API cos.  
-13. Pricing? → Free trial → Company plan for official MCP.  
-14. How did last users find you? → Truth only.  
-15. What did you learn this week? → Always have one.  
-16. TAM? → API companies publishing docs; bottom-up agents.  
-17. Hiring? → Only if asked; focus execution.  
-18. Legal/compliance? → Don’t claim SOC2 if not started.  
-19. Open source? → Repo exists; stars low—don’t oversell.  
-20. Ask? → Design partner intros at API cos.
+### 60-second video script
 
-### Red-flag audit of *this* draft
+> Hey — I’m Gautam. I work on AI agents and MCP every day — I’ve shipped MCP CLIs, agent clients, and run developer communities across India.  
+>  
+> The problem: even when API docs are great, Cursor and Claude still invent endpoints. Teams either paste docs into prompts or write scrapers.  
+>  
+> Doc2MCP: paste a docs URL — under a minute you get a hosted MCP. Connect it in Cursor. Agents call real tools from your docs.  
+>  
+> We’re early — twelve MCPs so far — but those servers already see over three thousand tool calls a week. One paying customer; we’re onboarding API companies as design partners for official MCP.  
+>  
+> That’s Doc2MCP. Thanks.
 
-- Still need real traction numbers.  
-- Beachhead must stay singular in interviews.  
-- Do not say “SOC2” or “enterprise-ready” until true.  
-- Avoid “AI infrastructure” fluff without demo.
+### Interview answers (high-risk ones)
+
+**“Any competitors?”**  
+Use the honest paragraph above — never “none.”
+
+**“Only 12 MCPs?”**  
+“We’re early and focused on usage quality. Those projects do 3k+ tool calls/week. This sprint is expanding design partners at API companies.”
+
+**“Only one paid?”**  
+“Yes. Revenue is real but small. Leading indicator is agent calls; monetization expands with Company/official MCP.”
+
+**“Solo founder?”**  
+“I ship full-stack and DevRel myself. Ashwin and Ashish already contribute code; next hire is after design-partner load.”
+
+**“Why not Fetch.ai own this?”**  
+“Fetch is agents/ecosystem. Doc2MCP is horizontal infra for any company’s docs → MCP. Different buyer and product.”
 
 ---
 
-# 6) PHASE 5 — Positioning upgrade
+# 6) PHASE 5 — Thesis
 
-**Thesis:** Every API company’s documentation becomes agent-native infrastructure—the distribution layer for how AI agents integrate with software.
+**Every API company’s documentation becomes agent-native infrastructure — the distribution layer for how AI agents integrate with software.**
 
-**Roadmap reverse-engineered:**
+Roadmap: tool quality → official publish → sync/analytics → usage billing → SDK in docs repos (Issue #87).
 
-1. Best URL→MCP quality (semantic tools, scores).  
-2. Official publish: custom domain, version pins, public registry.  
-3. Sync + analytics (what agents call).  
-4. Company billing on external agent usage.  
-5. Ecosystem (SDK in docs repos — Issue #87).
-
-**GTM:** Design partners (API DevRel) → case study → Company plan → marketplace.
+GTM 90 days: **US/global API DevRel outreach primary**; India community demos secondary for speed.
 
 ---
 
-# 7) Scores
+# 7) Scores (updated)
 
-| | Now | After honest 14-day sprint (if executed) |
+| Dimension | Now | After 14-day sprint (if executed) |
 | --- | --- | --- |
-| Product reality | 7 | 7–8 |
-| Trust / site honesty | 3 | 7 |
-| Traction evidence | 2 | 6–7 |
-| Narrative clarity | 4 | 8 |
-| Venture-scale story | 4 | 7 |
-| **Overall YC readiness** | **3/10** | **6.5–7.5/10** |
-
-YC is still founder + evidence. Sprint matters more than new logo—but logo consistency helps professionalism.
+| Product | 7 | 8 |
+| Trust / site | 5 (after #88) | 7 |
+| Traction story | 5 (3k calls help) | 7–8 |
+| Narrative / FIT | 7 | 8 |
+| Venture framing | 5 | 7 |
+| **Overall YC readiness** | **5/10** | **7–7.5/10** |
 
 ---
 
-# Critical questions (answer these next)
+# Immediate actions for you
 
-1. Who are the founders (names, % equity, how long working together)?  
-2. What’s your background—what have you shipped with real users before?  
-3. Why did you start Doc2MCP (specific story)?  
-4. Current numbers: signups, MCPs created (lifetime + 7d), paying customers, MRR, weekly MCP tool calls?  
-5. Any **named** users/companies who would take a call or give a quote?  
-6. Are you applying to a specific YC batch? Deadline?  
-7. Which competitor do you fear most (OSS, Mintlify, Cursor-native, other)?  
-8. Will you sell primarily to US API companies, India, or both in the next 90 days?
+1. Confirm exact **MRR plan** (Pro ₹999?).  
+2. Message **Ashwin** + **Ashish** — approve quote + reference-call yes.  
+3. Tell me **exact product start month** for the application.  
+4. Merge/deploy PR #88 (logo + honest claims).  
+5. Start Day 1 of the sprint checklist tomorrow.
+
+When Ashwin/Ashish approve quotes, paste their lines here — I’ll format site-safe proof + final YC PDF-ready answers.
