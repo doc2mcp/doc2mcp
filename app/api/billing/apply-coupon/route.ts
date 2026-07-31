@@ -8,6 +8,9 @@ import {
   getCouponRedemption,
 } from "@/lib/db/queries";
 import { ChatbotError } from "@/lib/errors";
+import { createLogger } from "@/lib/observability/logger";
+
+const log = createLogger("billing.apply-coupon");
 
 const bodySchema = z.object({
   code: z.string().min(3).max(64),
@@ -104,7 +107,7 @@ export async function POST(request: Request) {
       description: coupon.description,
     });
   } catch (error) {
-    console.error("apply-coupon failed:", error);
+    log.error("apply_failed", error, { userId: session.user.id });
     return Response.json(
       { error: "Could not apply coupon. Try again or contact support." },
       { status: 500 }

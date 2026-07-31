@@ -1339,36 +1339,38 @@ export async function applyCouponSubscription({
   const orderId = `coupon:${code}:${userId}:${Date.now()}`;
   const paymentId = `coupon_pay:${code}:${userId}:${Date.now()}`;
 
-  const [created] = await db
-    .insert(subscription)
-    .values({
-      userId,
-      plan,
-      billingCycle,
-      status: "active",
-      razorpayOrderId: orderId,
-      razorpayPaymentId: paymentId,
-      razorpayCustomerId: null,
-      amount: 0,
-      currency: "INR",
-      currentPeriodStart,
-      currentPeriodEnd,
-      cancelAtPeriodEnd: true,
-    })
-    .returning();
+  return await db.transaction(async (tx) => {
+    const [created] = await tx
+      .insert(subscription)
+      .values({
+        userId,
+        plan,
+        billingCycle,
+        status: "active",
+        razorpayOrderId: orderId,
+        razorpayPaymentId: paymentId,
+        razorpayCustomerId: null,
+        amount: 0,
+        currency: "INR",
+        currentPeriodStart,
+        currentPeriodEnd,
+        cancelAtPeriodEnd: true,
+      })
+      .returning();
 
-  const [redemption] = await db
-    .insert(couponRedemption)
-    .values({
-      userId,
-      code,
-      plan,
-      billingCycle,
-      subscriptionId: created.id,
-    })
-    .returning();
+    const [redemption] = await tx
+      .insert(couponRedemption)
+      .values({
+        userId,
+        code,
+        plan,
+        billingCycle,
+        subscriptionId: created.id,
+      })
+      .returning();
 
-  return { subscription: created, redemption };
+    return { subscription: created, redemption };
+  });
 }
 
 /**

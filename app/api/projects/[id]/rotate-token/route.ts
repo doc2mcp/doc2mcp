@@ -5,11 +5,69 @@ import {
 } from "@/lib/db/queries";
 import { createMcpProjectToken, hashMcpToken } from "@/lib/doc2mcp/mcp-access";
 import { ChatbotError } from "@/lib/errors";
-import type { ProjectArtifacts } from "@/types/platform";
+import type { McpServerConfig, ProjectArtifacts } from "@/types/platform";
+
+/**
+ * Patch Bearer token inside stored MCP export configs so Exports/CLI install
+ * JSON does not keep serving a revoked secret. Does not add a top-level
+ * `mcpAccessToken` plaintext field — that is returned once in the API body.
+ */
+function withRotatedBearer(
+  config: McpServerConfig | null | undefined,
+  plaintext: string
+): McpServerConfig | null {
+  if (!config) {
+    return null;
+  }
+
+  const authHeader = `Bearer ${plaintext}`;
+  const patchServers = (
+    servers: Record<string, { url?: string; headers?: Record<string, string> }>
+  ) => {
+    const next: typeof servers = {};
+    for (const [name, entry] of Object.entries(servers)) {
+      next[name] = {
+        ...entry,
+        headers: {
+          ...(entry.headers ?? {}),
+          Authorization: authHeader,
+        },
+      };
+    }
+    return next;
+  };
+
+  return {
+    ...config,
+    cursorConfig: config.cursorConfig
+      ? {
+          ...config.cursorConfig,
+          mcpServers: patchServers(
+            (config.cursorConfig.mcpServers ?? {}) as Record<
+              string,
+              { url?: string; headers?: Record<string, string> }
+            >
+          ),
+        }
+      : config.cursorConfig,
+    claudeConfig: config.claudeConfig
+      ? {
+          ...config.claudeConfig,
+          mcpServers: patchServers(
+            (config.claudeConfig.mcpServers ?? {}) as Record<
+              string,
+              { url?: string; headers?: Record<string, string> }
+            >
+          ),
+        }
+      : config.claudeConfig,
+  };
+}
 
 /**
  * Rotate the project MCP Bearer token. Invalidates the previous token
- * immediately (hash replaced). Returns the new plaintext once.
+ * immediately (hash replaced). Returns the new plaintext once — it is not
+ * persisted as `artifacts.mcpAccessToken`.
  */
 export async function POST(
   _request: Request,
@@ -35,8 +93,10 @@ export async function POST(
   const previous = (project.artifacts ?? {}) as ProjectArtifacts;
   const artifacts: ProjectArtifacts = {
     ...previous,
-    mcpAccessToken: plaintext,
+    // Never persist plaintext here — returned once in the response body.
+    mcpAccessToken: undefined,
     mcpTokenHash,
+    mcpConfig: withRotatedBearer(previous.mcpConfig, plaintext),
   };
 
   const updated = await updatePlatformProject({
