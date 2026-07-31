@@ -1,7 +1,9 @@
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { auth } from "@/app/(auth)/auth";
+import { CouponCodeForm } from "@/components/billing/coupon-code-form";
 import { CustomDomainCard } from "@/components/dashboard/custom-domain-card";
+import { McpAccessTokensCard } from "@/components/dashboard/mcp-access-tokens-card";
 import {
   ManageBillingButton,
   SignOutButton,
@@ -118,30 +120,21 @@ export default async function DashboardSettingsPage({
               Plans are one-time Razorpay orders that unlock access for the
               billing window. To renew or change plan, open{" "}
               <span className="font-medium">Pricing</span> and check out again.
+              Contributors can also redeem a coupon below — no payment required.
             </p>
           </CardContent>
         </Card>
       </section>
 
+      {hasSubscription ? null : (
+        <section>
+          <CouponCodeForm redirectOnSuccess="/dashboard/settings" />
+        </section>
+      )}
+
       <section className="grid gap-4 lg:grid-cols-2">
         <TeamInviteForm />
-
-        <Card>
-          <CardHeader>
-            <CardTitle>API access</CardTitle>
-            <CardDescription>
-              Each MCP server already has a scoped access token. Project-level
-              API keys with full CRUD are coming soon.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <p className="rounded-lg border border-border/40 bg-muted/20 p-3 text-muted-foreground text-xs">
-              Tip: open any project in <strong>Dashboard → Projects</strong> and
-              copy the MCP Bearer token from the Exports tab to integrate with
-              Cursor, Claude Desktop, or your own client.
-            </p>
-          </CardContent>
-        </Card>
+        <McpAccessTokensCard />
       </section>
 
       <section>

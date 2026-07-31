@@ -22,6 +22,7 @@ const FEATURES_LINKS = [
 const RESOURCES_LINKS = [
   { label: "Docs", href: "/docs" },
   { label: "Blog", href: "/blog" },
+  { label: "Open Source", href: "/open-source" },
   { label: "Quick start", href: "/docs/quickstart" },
   { label: "Architecture", href: "/docs/workflow" },
   { label: "Security", href: "/docs/security" },
@@ -31,13 +32,14 @@ const LEGAL_LINKS = [
   { label: "Terms & Conditions", href: "/terms-and-conditions" },
   { label: "Privacy Policy", href: "/privacy-policy" },
   { label: "Refund & Cancellation", href: "/refund-policy" },
+  { label: "Contribute", href: "/open-source" },
   { label: "Contact us", href: "/contact" },
 ];
 
 const SOCIAL_LINKS = [
   {
     label: "GitHub",
-    href: "https://github.com/doc2mcp",
+    href: "https://github.com/doc2mcp/doc2mcp",
     icon: Github,
   },
   {

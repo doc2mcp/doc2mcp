@@ -1,5 +1,5 @@
 ---
-description: doc2mcp branch protection, proprietary license, and PR-only workflow
+description: doc2mcp branch protection, MIT license, and PR-only workflow
 alwaysApply: true
 ---
 
@@ -18,7 +18,7 @@ and releases (maintainer bypass). Other collaborators must use PRs.
 
 ## License
 
-Code is **proprietary** (`LICENSE`). Do not relicense to Apache/MIT without approval.
+Code is **MIT** (`LICENSE`). Contributions are welcome under the same license.
 
 ## Secrets
 

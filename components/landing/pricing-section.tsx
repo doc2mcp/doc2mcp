@@ -2,6 +2,7 @@
 
 import { Check } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { CouponCodeForm } from "@/components/billing/coupon-code-form";
 import { RazorpayCheckoutButton } from "@/components/billing/razorpay-checkout-button";
 import {
   type BillingCurrency,
@@ -439,6 +440,10 @@ export function PricingSection({
           Unlimited MCP reads included · Conversions run once per docs portal ·
           Cancel anytime.
         </p>
+
+        <div className="mx-auto mt-10 max-w-xl">
+          <CouponCodeForm />
+        </div>
 
         {detailed ? (
           <>
