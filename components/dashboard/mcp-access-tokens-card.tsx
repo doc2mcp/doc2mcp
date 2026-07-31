@@ -3,6 +3,7 @@
 import { Check, Copy, KeyRound, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -58,26 +59,46 @@ export function McpAccessTokensCard() {
         body: JSON.stringify({ name }),
       });
       if (!res.ok) {
+        toast.error("Failed to create token");
         return;
       }
       const data = (await res.json()) as { token: CreatedToken };
       setFreshToken(data.token);
+      toast.success("Token created — copy it now");
       await loadTokens();
+    } catch {
+      toast.error("Network error — try again");
     } finally {
       setCreating(false);
     }
   };
 
   const handleRevoke = async (id: string) => {
-    await fetch(`/api/user/mcp-tokens/${id}`, { method: "DELETE" });
-    setFreshToken(null);
-    await loadTokens();
+    try {
+      const res = await fetch(`/api/user/mcp-tokens/${id}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) {
+        toast.error("Failed to revoke token");
+        return;
+      }
+      setFreshToken(null);
+      toast.success("Token revoked");
+      await loadTokens();
+    } catch {
+      toast.error("Network error — try again");
+    }
   };
 
   const handleCopy = async (value: string) => {
-    await navigator.clipboard.writeText(value);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopied(true);
+      toast.success("Copied");
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error("Could not copy to clipboard");
+    }
   };
 
   return (
@@ -85,11 +106,12 @@ export function McpAccessTokensCard() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
           <KeyRound className="size-4 text-violet-700 dark:text-violet-300" />
-          MCP access tokens
+          API &amp; MCP tokens
         </CardTitle>
         <CardDescription>
-          Create one token on your profile, then use it in any marketplace MCP
-          config. Marketplace listings never expose the creator&apos;s token.
+          Create and revoke personal access tokens for marketplace MCP configs.
+          Project Bearer tokens can be rotated from each project&apos;s Exports
+          tab.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -159,12 +181,14 @@ export function McpAccessTokensCard() {
                 </div>
                 {token.active ? (
                   <Button
+                    aria-label={`Revoke token ${token.name}`}
                     onClick={() => handleRevoke(token.id)}
                     size="sm"
                     type="button"
                     variant="ghost"
                   >
                     <Trash2 className="size-4" />
+                    <span className="sr-only">Revoke</span>
                   </Button>
                 ) : null}
               </div>

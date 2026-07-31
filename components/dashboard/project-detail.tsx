@@ -17,6 +17,7 @@ import Link from "next/link";
 import { useMemo, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { updateProjectOwnership } from "@/app/(dashboard)/dashboard/projects/[id]/ownership-actions";
+import { RotateProjectTokenButton } from "@/components/dashboard/rotate-project-token-button";
 import { UnderstandingScoreCard } from "@/components/dashboard/understanding-score-card";
 import { RegistryStatusCard } from "@/components/doc2mcp/registry-status-card";
 import { RetryConversionButton } from "@/components/doc2mcp/retry-conversion-button";
@@ -254,6 +255,9 @@ export function ProjectDetail({
         </TabsContent>
 
         <TabsContent className="mt-4 space-y-4" value="exports">
+          {artifacts?.mcpAccessToken || project.status === "ready" ? (
+            <RotateProjectTokenButton projectId={project.id} />
+          ) : null}
           {exportBundle ? (
             <div className="grid gap-4 lg:grid-cols-2">
               {exportBundle.artifacts.map((artifact) => (

@@ -4,7 +4,7 @@ import { Star } from "lucide-react";
 import useSWR from "swr";
 import { cn } from "@/lib/utils";
 
-const REPO = "doc2mcp/doc2mcp-registry";
+const REPO = "doc2mcp/doc2mcp";
 const REPO_URL = `https://github.com/${REPO}`;
 
 function fetcher(url: string): Promise<{ stargazers_count?: number }> {

@@ -28,7 +28,19 @@ export function buildCliInstallBundle(
     return null;
   }
 
-  const mcpToken = artifacts?.mcpAccessToken;
+  const fromArtifacts = artifacts?.mcpAccessToken;
+  const fromConfigHeader = (() => {
+    const name = mcpConfig.name;
+    const servers = mcpConfig.cursorConfig?.mcpServers as
+      | Record<string, { headers?: Record<string, string> }>
+      | undefined;
+    const auth = servers?.[name]?.headers?.Authorization;
+    if (!auth?.startsWith("Bearer ")) {
+      return;
+    }
+    return auth.slice(7).trim();
+  })();
+  const mcpToken = fromArtifacts ?? fromConfigHeader;
   if (!mcpToken) {
     return null;
   }

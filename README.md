@@ -6,36 +6,62 @@
 
 **Paste any docs URL → get a hosted, Cursor-ready MCP server in under 60 seconds.**
 
-[**Live**](https://doc2mcp.site) · [Docs](https://doc2mcp.site/docs) · [Marketplace](https://doc2mcp.site/marketplace) · [Pricing](https://doc2mcp.site/pricing)
+[**Live**](https://doc2mcp.site) · [Docs](https://doc2mcp.site/docs) · [Marketplace](https://doc2mcp.site/marketplace) · [Open Source](https://doc2mcp.site/open-source) · [Pricing](https://doc2mcp.site/pricing)
 
 [![MCP Registry](https://img.shields.io/badge/MCP_Registry-io.github.doc2mcp-2563eb)](https://registry.modelcontextprotocol.io/?search=doc2mcp)
 [![npm](https://img.shields.io/npm/v/doc2mcp?color=8b5cf6&logo=npm)](https://www.npmjs.com/package/doc2mcp)
-[![GitHub stars](https://img.shields.io/github/stars/doc2mcp/doc2mcp-registry?style=social)](https://github.com/doc2mcp/doc2mcp-registry/stargazers)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/doc2mcp/doc2mcp?style=social)](https://github.com/doc2mcp/doc2mcp/stargazers)
 
-⭐ Star the public repo: [github.com/doc2mcp/doc2mcp-registry](https://github.com/doc2mcp/doc2mcp-registry)
+⭐ **Star this repo** — it helps developers discover doc2mcp on GitHub and the MCP Registry.
+
+[![doc2mcp on Product Hunt](https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1171095&theme=light)](https://www.producthunt.com/products/doc2mcp)
 
 </div>
 
 ---
 
-> **Private codebase.** This repository contains proprietary product code.
-> It is not open source. For public docs, badges, and MCP Registry publishing,
-> see **[doc2mcp/doc2mcp-registry](https://github.com/doc2mcp/doc2mcp-registry)**.
+## What is doc2mcp?
 
-## Product
+Turn any documentation URL (Stripe, LangChain, Mintlify, OpenAPI, GitHub…)
+into a live **Model Context Protocol** server that Cursor, Claude, and VS Code
+can query — no install, no shared API keys.
 
-- **Site:** [doc2mcp.site](https://doc2mcp.site)
-- **CLI:** `npm install -g doc2mcp`
-- **Registry:** every converted MCP auto-publishes to `io.github.doc2mcp/<slug>` on the [official MCP Registry](https://registry.modelcontextprotocol.io/?search=doc2mcp) when `MCP_REGISTRY_GITHUB_TOKEN` is configured in production.
+| Surface | Purpose |
+|---------|---------|
+| **[doc2mcp/doc2mcp](https://github.com/doc2mcp/doc2mcp)** (this repo) | Open-source product: Next.js app, CLI, pipeline, MCP runtime |
+| **[doc2mcp/doc2mcp-registry](https://github.com/doc2mcp/doc2mcp-registry)** | Public MCP Registry gateway manifest (`server.json`) + OIDC publish |
+
+Live product: **[doc2mcp.site](https://doc2mcp.site)**
 
 ## How it works
 
-1. Paste a docs URL with the doc2mcp toggle on.
-2. Pipeline crawls, chunks, and generates MCP tools.
-3. You get a remote URL + Bearer token for Cursor / Claude / VS Code.
-4. Listing appears on the MCP Registry and [marketplace](https://doc2mcp.site/marketplace).
+1. Sign in at [doc2mcp.site/login](https://doc2mcp.site/login)
+2. Paste a docs URL
+3. Get a hosted MCP URL + Bearer token
+4. Paste into Cursor / Claude / VS Code `mcp.json`
+5. Converted MCPs auto-list on the [MCP Registry](https://registry.modelcontextprotocol.io/?search=doc2mcp) as `io.github.doc2mcp/<slug>`
 
-## MCP tools
+```json
+{
+  "mcpServers": {
+    "my-docs": {
+      "url": "https://doc2mcp.site/api/mcp/{project_id}/mcp",
+      "headers": { "Authorization": "Bearer <your-token>" }
+    }
+  }
+}
+```
+
+## CLI
+
+```bash
+npm install -g doc2mcp
+doc2mcp login
+doc2mcp https://docs.example.com
+```
+
+## MCP tools generated per project
 
 | Tool | What it does |
 |------|--------------|
@@ -46,31 +72,53 @@
 | `read_full_documentation` | All pages combined |
 | `ask_documentation` | Q&A with citations |
 
-## Stack
+## Contribute
 
-Next.js 16 · Google Gemini · Supabase · Upstash Redis + QStash · Streamable HTTP MCP
+We welcome PRs. Look for `good first issue` and `help wanted` on GitHub.
 
-## Internal development
+1. Read [CONTRIBUTING.md](./CONTRIBUTING.md) and [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md)
+2. Branch from `staging` → open PR → `staging`
+3. Redeem contributor coupon **`opensourcedoc2mcp`** on [Pricing](https://doc2mcp.site/pricing) or Dashboard → Settings — unlocks **Starter free for 12 months** (no Razorpay)
 
-For team members with repo access:
+More: [doc2mcp.site/open-source](https://doc2mcp.site/open-source)
+
+## Local development
 
 ```bash
 pnpm install
 cp .env.example .env.local
-pnpm db:migrate   # or apply migrations via Supabase
+# apply SQL in lib/db/migrations/ via Supabase (or your Postgres)
 pnpm dev
 ```
 
-See [`.env.example`](./.env.example) and [`mcp-registry/README.md`](./mcp-registry/README.md) for production env vars (Supabase, Gemini, QStash, `MCP_REGISTRY_GITHUB_TOKEN`, Razorpay **live** keys).
+Requirements: Node 20, pnpm 10, Supabase/Postgres. See [`.env.example`](./.env.example).
+
+```bash
+pnpm check
+pnpm exec tsc --noEmit --skipLibCheck
+```
+
+## Stack
+
+Next.js 16 · Google Gemini · Supabase · Upstash Redis + QStash · Streamable HTTP MCP · Razorpay
 
 ## CI / CD
 
-`staging` → `main` → `v*` tag deploys production on Vercel.
+Feature branch → `staging` (preview) → `main` → `v*` tag deploys production on Vercel.
+
+## MCP Registry
+
+| Entry | Namespace |
+|-------|-----------|
+| Platform gateway | `io.github.doc2mcp/doc2mcp` |
+| Your converted docs | `io.github.doc2mcp/<slug>` |
+
+Gateway publish workflow lives in the [registry repo](https://github.com/doc2mcp/doc2mcp-registry).
 
 ## Security
 
-Report issues to doc2mcp@gmail.com or a private security advisory (org members only).
+Report vulnerabilities to [doc2mcp@gmail.com](mailto:doc2mcp@gmail.com) or a [private advisory](https://github.com/doc2mcp/doc2mcp/security/advisories/new). See [SECURITY.md](./SECURITY.md).
 
 ## License
 
-**Proprietary** — all rights reserved. See [LICENSE](./LICENSE).
+[MIT](./LICENSE) — contributions welcome.

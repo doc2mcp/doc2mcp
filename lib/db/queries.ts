@@ -29,6 +29,7 @@ import {
   chat,
   cliAuthRequest,
   cliToken,
+  couponRedemption,
   type DBMessage,
   document,
   mcpAccessToken,
@@ -1297,6 +1298,79 @@ export async function setUserRazorpayCustomerId(
     .update(user)
     .set({ razorpayCustomerId, updatedAt: new Date() })
     .where(eq(user.id, userId));
+}
+
+export async function getCouponRedemption({
+  userId,
+  code,
+}: {
+  userId: string;
+  code: string;
+}) {
+  const [row] = await db
+    .select()
+    .from(couponRedemption)
+    .where(
+      and(eq(couponRedemption.userId, userId), eq(couponRedemption.code, code))
+    )
+    .limit(1);
+  return row ?? null;
+}
+
+/**
+ * Grant a plan from a promo coupon without Razorpay.
+ * Uses synthetic order/payment ids so the existing Subscription row shape works.
+ */
+export async function applyCouponSubscription({
+  userId,
+  code,
+  plan,
+  billingCycle,
+  currentPeriodStart,
+  currentPeriodEnd,
+}: {
+  userId: string;
+  code: string;
+  plan: PlanId;
+  billingCycle: BillingCycle;
+  currentPeriodStart: Date;
+  currentPeriodEnd: Date;
+}) {
+  const orderId = `coupon:${code}:${userId}:${Date.now()}`;
+  const paymentId = `coupon_pay:${code}:${userId}:${Date.now()}`;
+
+  return await db.transaction(async (tx) => {
+    const [created] = await tx
+      .insert(subscription)
+      .values({
+        userId,
+        plan,
+        billingCycle,
+        status: "active",
+        razorpayOrderId: orderId,
+        razorpayPaymentId: paymentId,
+        razorpayCustomerId: null,
+        amount: 0,
+        currency: "INR",
+        currentPeriodStart,
+        currentPeriodEnd,
+        cancelAtPeriodEnd: true,
+      })
+      .returning();
+
+    const [redemption] = await tx
+      .insert(couponRedemption)
+      .values({
+        userId,
+        code,
+        plan,
+        billingCycle,
+        subscriptionId: created.id,
+      })
+      .returning();
+
+    return { subscription: created, redemption };
+  });
 }
 
 /**
