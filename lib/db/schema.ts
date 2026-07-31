@@ -339,6 +339,29 @@ export const subscription = pgTable("Subscription", {
 
 export type Subscription = InferSelectModel<typeof subscription>;
 
+/** One-time promo / contributor coupon redemption (no Razorpay). */
+export const couponRedemption = pgTable(
+  "CouponRedemption",
+  {
+    id: uuid("id").primaryKey().notNull().defaultRandom(),
+    userId: uuid("userId")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    code: varchar("code", { length: 64 }).notNull(),
+    plan: varchar("plan", { length: 32 }).notNull(),
+    billingCycle: varchar("billingCycle", { length: 32 }).notNull(),
+    subscriptionId: uuid("subscriptionId").references(() => subscription.id, {
+      onDelete: "set null",
+    }),
+    createdAt: timestamp("createdAt").notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("CouponRedemption_user_code_uidx").on(table.userId, table.code),
+  ]
+);
+
+export type CouponRedemption = InferSelectModel<typeof couponRedemption>;
+
 /**
  * JobMetric — observability table for pipeline runs.
  *

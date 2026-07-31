@@ -109,10 +109,14 @@ this for routine work.
 
 ## License and source use
 
-The repository is **public for transparency**, but the code is **proprietary**
-(see [LICENSE](./LICENSE)). Do not copy, fork for redistribution, or reuse
-substantial portions without written permission. Hosted functionality depends on
-server-side secrets (Vercel env) that are not in the repo.
+doc2mcp is **open source** under the [MIT License](./LICENSE). Fork, modify, and
+contribute freely. Hosted production secrets (Vercel / Supabase) are not in the
+repo — see [`.env.example`](./.env.example) for local setup.
+
+Contributor coupon: redeem **`opensourcedoc2mcp`** on
+[Pricing](https://doc2mcp.site/pricing) or Dashboard → Settings to activate
+Starter free for 12 months (no Razorpay). Details:
+[doc2mcp.site/open-source](https://doc2mcp.site/open-source).
 
 ## Automated AI code review
 

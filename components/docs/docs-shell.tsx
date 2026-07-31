@@ -91,7 +91,7 @@ export function DocsShell({ children }: { children: React.ReactNode }) {
             <Link
               aria-label="GitHub repository"
               className="hidden size-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent/60 hover:text-foreground sm:inline-flex"
-              href="https://github.com/doc2mcp/doc2mcp-registry"
+              href="https://github.com/doc2mcp/doc2mcp"
               rel="noopener noreferrer"
               target="_blank"
             >
