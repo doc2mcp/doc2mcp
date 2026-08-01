@@ -85,7 +85,7 @@ npm i doc2mcp-sdk
 import { Doc2MCP } from "doc2mcp-sdk";
 
 // User PAT from doc2mcp.site / `npx doc2mcp login` — SDK has no auth of its own
-const client = new Doc2MCP({ token: process.env.DOC2MCP_PAT! });
+const client = new Doc2MCP({ token: process.env.DOC2MCP_API_TOKEN! }); // Settings → d2mcp_usr_…
 
 const ready = await client.convertAndWait({
   sourceUrl: "https://js.langchain.com/docs",

@@ -49,15 +49,28 @@ export function verifyPat(
   return timingSafeEqual(a, b);
 }
 
-export function readCliAuthToken(request: Request): string | null {
+const API_TOKEN_PREFIX = "d2mcp_usr_";
+
+/**
+ * Bearer token for CLI/SDK owner APIs.
+ * - `d2mcp_pat_…` — CLI device-login PAT
+ * - `d2mcp_usr_…` — Settings → API & MCP tokens
+ */
+export function readApiAuthToken(request: Request): string | null {
   const header = request.headers.get("authorization");
-  if (header?.startsWith("Bearer ")) {
-    const token = header.slice(7).trim();
-    if (token.startsWith(PAT_PREFIX)) {
-      return token;
-    }
+  if (!header?.startsWith("Bearer ")) {
+    return null;
+  }
+  const token = header.slice(7).trim();
+  if (token.startsWith(PAT_PREFIX) || token.startsWith(API_TOKEN_PREFIX)) {
+    return token;
   }
   return null;
+}
+
+/** @deprecated Use {@link readApiAuthToken}. */
+export function readCliAuthToken(request: Request): string | null {
+  return readApiAuthToken(request);
 }
 
 export const CLI_AUTH_POLL_INTERVAL_SECONDS = 2;
