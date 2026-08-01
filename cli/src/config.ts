@@ -1,7 +1,8 @@
 import { homedir } from "node:os";
 import { join } from "node:path";
 
-export const DEFAULT_API_URL = "https://doc2mcp.site";
+/** Canonical www host — apex redirects here; keeps OAuth PKCE on one origin. */
+export const DEFAULT_API_URL = "https://www.doc2mcp.site";
 
 export type CliConfig = {
   apiUrl: string;
