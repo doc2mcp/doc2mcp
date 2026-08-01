@@ -29,7 +29,7 @@ content instead of guessing.
 
 Documentation → Crawling → Knowledge processing → Retrieval → MCP generation → AI agents.
 
-![The doc2mcp pipeline](/diagrams/pipeline.svg)
+![The doc2mcp pipeline](/diagrams/pipeline.png)
 
 ## Popular paths
 

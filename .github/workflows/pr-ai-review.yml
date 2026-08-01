@@ -2,6 +2,10 @@ name: PR AI code review
 
 # Gemini review for PRs into staging only (feature → staging). Skips staging → main
 # release PRs. Requires GEMINI_API_KEY in repo secrets.
+#
+# Merge blocking: when the model reports any high-confidence must_fix (or the
+# local secret scan hits), scripts/pr-ai-review.mjs exits 1 so this check fails.
+# Mark "Gemini PR review" as a required status check on staging for hard blocks.
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]

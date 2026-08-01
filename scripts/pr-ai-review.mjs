@@ -1180,11 +1180,16 @@ try {
 
   await upsertReviewComment(body);
 
+  // Fail the check so branch protection / required checks can block merge.
+  // REQUEST_CHANGES alone is not enough when reviews come from GITHUB_TOKEN.
   if (verdict === "request_changes" || secretHits.length > 0) {
-    console.log("Review completed with must-fix / blocking findings.");
-  } else {
-    console.log("Review completed.");
+    console.error(
+      "AI review found must-fix / blocking findings — failing job to block merge."
+    );
+    process.exit(1);
   }
+
+  console.log("Review completed.");
 } catch (error) {
   const message = error instanceof Error ? error.message : String(error);
   await upsertReviewComment(`⚠️ AI review failed: ${message}`);

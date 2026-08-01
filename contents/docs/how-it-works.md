@@ -10,7 +10,7 @@ order: 4
 When you paste a documentation URL, doc2mcp runs a multi-stage pipeline
 server-side. Nothing runs on your machine.
 
-![The doc2mcp pipeline](/diagrams/pipeline.svg)
+![The doc2mcp pipeline](/diagrams/pipeline.png)
 
 ## Why it matters
 
