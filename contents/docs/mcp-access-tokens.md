@@ -13,8 +13,8 @@ doc2mcp uses **two kinds of tokens**. They look similar but do different jobs.
 | Token | Prefix | Who gets it | Used for |
 |-------|--------|-------------|----------|
 | **Project token** | `d2mcp_…` | MCP creator | Your own MCP only — shown once after conversion |
-| **MCP access token** | `d2mcp_usr_…` | Any signed-in user | Any **marketplace** MCP you want to install |
-| **CLI PAT** | `d2mcp_pat_…` | CLI users | `doc2mcp` terminal commands only |
+| **API / MCP access token** | `d2mcp_usr_…` | Any signed-in user | **SDK** (`convert`, list projects), marketplace MCP install |
+| **CLI PAT** | `d2mcp_pat_…` | CLI users | `doc2mcp` terminal commands (also accepted by SDK) |
 
 ## If you created the MCP
 

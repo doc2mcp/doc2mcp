@@ -10,7 +10,7 @@ order: 8
 
 **[`doc2mcp-sdk`](https://www.npmjs.com/package/doc2mcp-sdk)** is the programmatic client for doc2mcp. Use it from scripts, GitHub Actions, LangChain / LangGraph agents, and LangSmith-traced tools — without opening the dashboard.
 
-> The SDK has **no separate signup or auth system**. You create a **User PAT** and **project tokens** on [doc2mcp.site](https://doc2mcp.site) (or via the [CLI](/docs/cli)), then pass them into the SDK. Generation stays on doc2mcp.site — the SDK is the remote control.
+> The SDK has **no separate signup or auth system**. Create an **API token** in Dashboard → Settings (or a CLI PAT via `doc2mcp login`), plus **project tokens** from a ready conversion, then pass them into the SDK. Generation stays on doc2mcp.site — the SDK is the remote control.
 
 Full handbook + diagrams + framework examples: [github.com/doc2mcp/doc2mcp-sdk/tree/main/docs](https://github.com/doc2mcp/doc2mcp-sdk/tree/main/docs)
 
@@ -18,8 +18,15 @@ Full handbook + diagrams + framework examples: [github.com/doc2mcp/doc2mcp-sdk/t
 
 | Key | Where to create | Prefix | SDK use |
 |-----|-----------------|--------|---------|
-| User PAT | `npx doc2mcp login` or [Settings](https://doc2mcp.site) → CLI tokens | `d2mcp_pat_…` | `convert`, `listProjects`, `getProject`, `waitUntilReady` |
+| **API token (recommended)** | Dashboard → [Settings](https://doc2mcp.site/dashboard/settings) → **API & MCP tokens** → Create token | `d2mcp_usr_…` | `convert`, `listProjects`, `getProject`, `waitUntilReady` |
+| User PAT (CLI login) | `npx doc2mcp login` | `d2mcp_pat_…` | Same as API token (optional) |
 | Project token | Returned when a project becomes `ready` (or rotate in project Exports) | `d2mcp_…` | `sync`, `listTools`, `callTool`, MCP runtime |
+
+```ts
+const client = new Doc2MCP({
+  token: process.env.DOC2MCP_API_TOKEN!, // d2mcp_usr_… from Settings
+});
+```
 
 Never commit tokens. Store them in env / GitHub Actions secrets.
 
@@ -31,14 +38,14 @@ npm i doc2mcp-sdk
 
 ## Convert docs → MCP
 
-Uses a **User PAT** (`DOC2MCP_PAT`).
+Uses a **Settings API token** (`DOC2MCP_API_TOKEN` / `d2mcp_usr_…`).
 
 ```ts
 import { Doc2MCP } from "doc2mcp-sdk";
 
 const client = new Doc2MCP({
-  // User PAT from doc2mcp.site / `npx doc2mcp login` — not a project token
-  token: process.env.DOC2MCP_PAT!,
+  // Settings → API & MCP tokens (d2mcp_usr_…) — not a project token
+  token: process.env.DOC2MCP_API_TOKEN!,
 });
 
 const ready = await client.convertAndWait({
@@ -57,7 +64,7 @@ Uses the **project** MCP URL + project token from a ready conversion:
 ```ts
 const text = await client.callToolText({
   mcpUrl: ready.mcp.url,
-  mcpToken: projectToken, // project token d2mcp_… (not DOC2MCP_PAT)
+  mcpToken: projectToken, // project token d2mcp_… (not the Settings API token)
   name: "search_documentation",
   arguments: { query: "how do runnables work?" },
 });
@@ -65,7 +72,7 @@ const text = await client.callToolText({
 
 ## LangChain.js
 
-Constructor `token` can be any non-empty string when you only call MCP helpers — pass the **project token** here. `convert()` still needs a User PAT.
+Constructor `token` can be any non-empty string when you only call MCP helpers — pass the **project token** here. `convert()` still needs a Settings API token.
 
 ```ts
 import { DynamicStructuredTool } from "@langchain/core/tools";
@@ -121,9 +128,10 @@ Secrets: `DOC2MCP_PROJECT_ID`, `DOC2MCP_PROJECT_TOKEN` (project token `d2mcp_…
 
 | Env var | Token type | Prefix | Methods |
 |---------|------------|--------|---------|
-| `DOC2MCP_PAT` | User PAT | `d2mcp_pat_…` | convert / list / get / wait |
+| `DOC2MCP_API_TOKEN` | Settings API token | `d2mcp_usr_…` | convert / list / get / wait |
+| `DOC2MCP_PAT` | CLI User PAT (optional) | `d2mcp_pat_…` | same as API token |
 | `DOC2MCP_PROJECT_TOKEN` | Project token | `d2mcp_…` | sync / tools/list / tools/call |
-| `DOC2MCP_MCP_URL` | Hosted MCP URL | `https://doc2mcp.site/api/mcp/…` | tools |
+| `DOC2MCP_MCP_URL` | Hosted MCP URL | `https://www.doc2mcp.site/api/mcp/…` | tools |
 
 ## Related
 

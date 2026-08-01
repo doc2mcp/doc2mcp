@@ -16,16 +16,17 @@ order: 9
 
 | Env var | Token | Prefix | Create |
 |---------|-------|--------|--------|
-| `DOC2MCP_PAT` | User PAT | `d2mcp_pat_…` | `npx doc2mcp login` or Settings → CLI tokens |
+| `DOC2MCP_API_TOKEN` | **Settings API token (recommended for SDK)** | `d2mcp_usr_…` | Dashboard → Settings → API & MCP tokens → Create |
+| `DOC2MCP_PAT` | CLI User PAT (optional) | `d2mcp_pat_…` | `npx doc2mcp login` |
 | `DOC2MCP_PROJECT_TOKEN` | Project token | `d2mcp_…` | Ready project (`mcp.token`) or rotate on Exports |
-| `DOC2MCP_MCP_URL` | Hosted MCP URL | `https://doc2mcp.site/api/mcp/…` | Ready project |
+| `DOC2MCP_MCP_URL` | Hosted MCP URL | `https://www.doc2mcp.site/api/mcp/…` | Ready project |
 | `DOC2MCP_PROJECT_ID` | Project id | uuid | Dashboard / convert response |
 
 ## Which methods need which key
 
 | Method | Auth |
 |--------|------|
-| `convert` / `convertAndWait` / `getProject` / `listProjects` / `waitUntilReady` | User PAT |
+| `convert` / `convertAndWait` / `getProject` / `listProjects` / `waitUntilReady` | Settings API token (`d2mcp_usr_…`) or CLI PAT |
 | `sync` | Project token |
 | `listTools` / `callTool` / `callToolText` | Project token + MCP URL |
 

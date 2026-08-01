@@ -14,8 +14,8 @@ doc2mcp is hosted. You do not paste Stripe, OpenAI, or other vendor API keys int
 | Token | Prefix | When you need it |
 |-------|--------|------------------|
 | **Project token** | `d2mcp_…` | You created the MCP — copy from the result page once |
-| **MCP access token** | `d2mcp_usr_…` | You install someone else's MCP from the [marketplace](/docs/marketplace) |
-| **CLI PAT** | `d2mcp_pat_…` | Terminal only (`doc2mcp login`) — not for Cursor |
+| **API / MCP access token** | `d2mcp_usr_…` | SDK convert + marketplace MCP install — Settings → Create token |
+| **CLI PAT** | `d2mcp_pat_…` | Terminal (`doc2mcp login`); also works with SDK |
 
 Full guide: [MCP access tokens](/docs/mcp-access-tokens).
 
