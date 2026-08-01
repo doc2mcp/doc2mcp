@@ -8,11 +8,20 @@ order: 8
 
 ## Overview
 
-**`doc2mcp-sdk`** is the programmatic client for doc2mcp. Use it from scripts, GitHub Actions, LangChain / LangGraph agents, and LangSmith-traced tools — without opening the dashboard.
+**[`doc2mcp-sdk`](https://www.npmjs.com/package/doc2mcp-sdk)** is the programmatic client for doc2mcp. Use it from scripts, GitHub Actions, LangChain / LangGraph agents, and LangSmith-traced tools — without opening the dashboard.
 
-> Generation stays on [doc2mcp.site](https://doc2mcp.site). The SDK is the remote control (same pipeline as the [CLI](/docs/cli)).
+> The SDK has **no separate signup or auth system**. You create a **User PAT** and **project tokens** on [doc2mcp.site](https://doc2mcp.site) (or via the [CLI](/docs/cli)), then pass them into the SDK. Generation stays on doc2mcp.site — the SDK is the remote control.
 
-Full docs + diagrams + 12 examples: [github.com/doc2mcp/doc2mcp-sdk](https://github.com/doc2mcp/doc2mcp-sdk)
+Full handbook + diagrams + framework examples: [github.com/doc2mcp/doc2mcp-sdk/tree/main/docs](https://github.com/doc2mcp/doc2mcp-sdk/tree/main/docs)
+
+## Get API keys (on doc2mcp — not in the SDK)
+
+| Key | Where to create | Prefix | SDK use |
+|-----|-----------------|--------|---------|
+| User PAT | `npx doc2mcp login` or [Settings](https://doc2mcp.site) → CLI tokens | `d2mcp_pat_…` | `convert`, `listProjects`, `getProject`, `waitUntilReady` |
+| Project token | Returned when a project becomes `ready` (or rotate in project Exports) | `d2mcp_…` | `sync`, `listTools`, `callTool`, MCP runtime |
+
+Never commit tokens. Store them in env / GitHub Actions secrets.
 
 ## Install
 
@@ -22,11 +31,14 @@ npm i doc2mcp-sdk
 
 ## Convert docs → MCP
 
+Uses a **User PAT** (`DOC2MCP_PAT`).
+
 ```ts
 import { Doc2MCP } from "doc2mcp-sdk";
 
 const client = new Doc2MCP({
-  token: process.env.DOC2MCP_PAT!, // d2mcp_pat_… from `npx doc2mcp login`
+  // User PAT from doc2mcp.site / `npx doc2mcp login` — not a project token
+  token: process.env.DOC2MCP_PAT!,
 });
 
 const ready = await client.convertAndWait({
@@ -34,15 +46,18 @@ const ready = await client.convertAndWait({
 });
 
 console.log(ready.mcp.url);
-console.log(ready.mcp.token);
+// Prefer env/secrets for the project token in real apps — do not log tokens in production
+const projectToken = ready.mcp.token;
 ```
 
 ## Call hosted tools
 
+Uses the **project** MCP URL + project token from a ready conversion:
+
 ```ts
 const text = await client.callToolText({
   mcpUrl: ready.mcp.url,
-  mcpToken: ready.mcp.token,
+  mcpToken: projectToken, // project token d2mcp_… (not DOC2MCP_PAT)
   name: "search_documentation",
   arguments: { query: "how do runnables work?" },
 });
@@ -50,12 +65,18 @@ const text = await client.callToolText({
 
 ## LangChain.js
 
+Constructor `token` can be any non-empty string when you only call MCP helpers — pass the **project token** here. `convert()` still needs a User PAT.
+
 ```ts
 import { DynamicStructuredTool } from "@langchain/core/tools";
 import { z } from "zod";
 import { Doc2MCP } from "doc2mcp-sdk";
 
-const client = new Doc2MCP({ token: process.env.DOC2MCP_TOKEN! });
+// Project token (d2mcp_…) from a ready project — for sync / tools only
+const projectToken = process.env.DOC2MCP_PROJECT_TOKEN!;
+const mcpUrl = process.env.DOC2MCP_MCP_URL!;
+
+const client = new Doc2MCP({ token: projectToken });
 
 const docsSearch = new DynamicStructuredTool({
   name: "search_docs",
@@ -63,17 +84,19 @@ const docsSearch = new DynamicStructuredTool({
   schema: z.object({ query: z.string() }),
   func: async ({ query }) =>
     client.callToolText({
-      mcpUrl: process.env.DOC2MCP_MCP_URL!,
-      mcpToken: process.env.DOC2MCP_TOKEN!,
+      mcpUrl,
+      mcpToken: projectToken,
       name: "search_documentation",
       arguments: { query },
     }),
 });
 ```
 
-More: [LangGraph.js](https://github.com/doc2mcp/doc2mcp-sdk/blob/main/examples/07-langgraph-js.ts), [LangSmith](https://github.com/doc2mcp/doc2mcp-sdk/blob/main/examples/08-langsmith-tracing.ts), [LangChain Python](https://github.com/doc2mcp/doc2mcp-sdk/blob/main/examples/09-langchain-python.py), [LangGraph Python](https://github.com/doc2mcp/doc2mcp-sdk/blob/main/examples/10-langgraph-python.py).
+More frameworks: [LangGraph.js](https://github.com/doc2mcp/doc2mcp-sdk/blob/main/docs/13-langgraph-js.md), [LangSmith](https://github.com/doc2mcp/doc2mcp-sdk/blob/main/docs/15-langsmith.md), [LangChain Python](https://github.com/doc2mcp/doc2mcp-sdk/blob/main/docs/12-langchain-python.md), [OpenAI Agents](https://github.com/doc2mcp/doc2mcp-sdk/blob/main/docs/16-openai-agents.md), [Vercel AI SDK](https://github.com/doc2mcp/doc2mcp-sdk/blob/main/docs/17-vercel-ai-sdk.md).
 
 ## CI re-sync
+
+Uses **project id + project token** (no User PAT required for sync):
 
 ```yaml
 # on docs push
@@ -81,22 +104,29 @@ More: [LangGraph.js](https://github.com/doc2mcp/doc2mcp-sdk/blob/main/examples/0
     npm i doc2mcp-sdk
     node --input-type=module <<'EOF'
     import { Doc2MCP } from "doc2mcp-sdk";
-    const c = new Doc2MCP({ token: process.env.DOC2MCP_TOKEN });
-    console.log(await c.sync(process.env.DOC2MCP_PROJECT_ID, process.env.DOC2MCP_TOKEN));
+    // Project token — sync does not need a User PAT
+    const projectToken = process.env.DOC2MCP_PROJECT_TOKEN;
+    const c = new Doc2MCP({ token: projectToken });
+    const result = await c.sync(
+      process.env.DOC2MCP_PROJECT_ID,
+      projectToken
+    );
+    console.log(result.status);
     EOF
 ```
 
-Secrets: `DOC2MCP_PROJECT_ID`, `DOC2MCP_TOKEN` (project token `d2mcp_…`).
+Secrets: `DOC2MCP_PROJECT_ID`, `DOC2MCP_PROJECT_TOKEN` (project token `d2mcp_…`).
 
-## Auth
+## Auth quick reference
 
-| Token | Prefix | Use |
-|-------|--------|-----|
-| User PAT | `d2mcp_pat_…` | convert / list / getProject |
-| Project token | `d2mcp_…` | sync + MCP tools/list / tools/call |
+| Env var | Token type | Prefix | Methods |
+|---------|------------|--------|---------|
+| `DOC2MCP_PAT` | User PAT | `d2mcp_pat_…` | convert / list / get / wait |
+| `DOC2MCP_PROJECT_TOKEN` | Project token | `d2mcp_…` | sync / tools/list / tools/call |
+| `DOC2MCP_MCP_URL` | Hosted MCP URL | `https://doc2mcp.site/api/mcp/…` | tools |
 
 ## Related
 
 - Repo: [doc2mcp/doc2mcp-sdk](https://github.com/doc2mcp/doc2mcp-sdk)
 - Design issue: [#87](https://github.com/doc2mcp/doc2mcp/issues/87)
-- [CLI](/docs/cli) · [doc2mcp-server](/docs/doc2mcp-server) · [Webhook sync](/docs/webhook-sync)
+- [CLI](/docs/cli) · [doc2mcp-server](/docs/doc2mcp-server) · [Webhook sync](/docs/webhook-sync) · [API keys](/docs/api-keys)
