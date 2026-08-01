@@ -109,9 +109,12 @@ export function McpAccessTokensCard() {
           API &amp; MCP tokens
         </CardTitle>
         <CardDescription>
-          Create and revoke personal access tokens for marketplace MCP configs.
-          Project Bearer tokens can be rotated from each project&apos;s Exports
-          tab.
+          Personal API tokens (<code className="text-xs">d2mcp_usr_…</code>) for
+          the SDK, CI, and marketplace MCP configs. Use as{" "}
+          <code className="text-xs">Bearer</code> with{" "}
+          <code className="text-xs">doc2mcp-sdk</code>. Project tokens (
+          <code className="text-xs">d2mcp_…</code>) stay on each project&apos;s
+          Exports tab.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
