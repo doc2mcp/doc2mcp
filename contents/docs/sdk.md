@@ -1,5 +1,5 @@
 ---
-title: "@doc2mcp/sdk"
+title: "doc2mcp-sdk"
 nav_title: SDK
 description: Programmatic JS/TS SDK to convert docs URLs into hosted MCP servers from code, CI, LangChain, and LangGraph.
 category: Getting Started
@@ -8,7 +8,7 @@ order: 8
 
 ## Overview
 
-**`@doc2mcp/sdk`** is the programmatic client for doc2mcp. Use it from scripts, GitHub Actions, LangChain / LangGraph agents, and LangSmith-traced tools — without opening the dashboard.
+**`doc2mcp-sdk`** is the programmatic client for doc2mcp. Use it from scripts, GitHub Actions, LangChain / LangGraph agents, and LangSmith-traced tools — without opening the dashboard.
 
 > Generation stays on [doc2mcp.site](https://doc2mcp.site). The SDK is the remote control (same pipeline as the [CLI](/docs/cli)).
 
@@ -17,13 +17,13 @@ Full docs + diagrams + 12 examples: [github.com/doc2mcp/doc2mcp-sdk](https://git
 ## Install
 
 ```bash
-npm i @doc2mcp/sdk
+npm i doc2mcp-sdk
 ```
 
 ## Convert docs → MCP
 
 ```ts
-import { Doc2MCP } from "@doc2mcp/sdk";
+import { Doc2MCP } from "doc2mcp-sdk";
 
 const client = new Doc2MCP({
   token: process.env.DOC2MCP_PAT!, // d2mcp_pat_… from `npx doc2mcp login`
@@ -53,7 +53,7 @@ const text = await client.callToolText({
 ```ts
 import { DynamicStructuredTool } from "@langchain/core/tools";
 import { z } from "zod";
-import { Doc2MCP } from "@doc2mcp/sdk";
+import { Doc2MCP } from "doc2mcp-sdk";
 
 const client = new Doc2MCP({ token: process.env.DOC2MCP_TOKEN! });
 
@@ -78,9 +78,9 @@ More: [LangGraph.js](https://github.com/doc2mcp/doc2mcp-sdk/blob/main/examples/0
 ```yaml
 # on docs push
 - run: |
-    npm i @doc2mcp/sdk
+    npm i doc2mcp-sdk
     node --input-type=module <<'EOF'
-    import { Doc2MCP } from "@doc2mcp/sdk";
+    import { Doc2MCP } from "doc2mcp-sdk";
     const c = new Doc2MCP({ token: process.env.DOC2MCP_TOKEN });
     console.log(await c.sync(process.env.DOC2MCP_PROJECT_ID, process.env.DOC2MCP_TOKEN));
     EOF
