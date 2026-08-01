@@ -16,7 +16,7 @@ indexes it, then hosts a remote MCP endpoint your tools can query.
 Manual MCP builds break when docs move, versions multiply, or new pages ship. doc2mcp
 automates discovery, chunking, tool generation, and hosting so you stay on product work.
 
-![The doc2mcp pipeline](/diagrams/pipeline.svg)
+![The doc2mcp pipeline](/diagrams/pipeline.png)
 
 ## Step-by-step
 

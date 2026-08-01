@@ -23,7 +23,10 @@ const docComponents = {
     if (typeof src !== "string" || src.length === 0) {
       return null;
     }
-    if (src.endsWith("/diagrams/pipeline.svg")) {
+    if (
+      src.endsWith("/diagrams/pipeline.svg") ||
+      src.endsWith("/diagrams/pipeline.png")
+    ) {
       return (
         <span className="my-6 block overflow-x-auto rounded-xl border border-border/60 bg-card/40 p-3">
           <PipelineDiagram className="mx-auto block max-w-[1024px] rounded-lg" />

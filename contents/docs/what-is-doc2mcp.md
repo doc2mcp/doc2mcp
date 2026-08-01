@@ -15,7 +15,7 @@ them, and answer questions with citations.
 It is not just an "MCP generator". Generating a config file is the last step of a
 full pipeline: crawling, knowledge processing, retrieval, and serving.
 
-![The doc2mcp pipeline](/diagrams/pipeline.svg)
+![The doc2mcp pipeline](/diagrams/pipeline.png)
 
 ## Why it matters
 
