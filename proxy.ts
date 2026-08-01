@@ -6,6 +6,7 @@ const PUBLIC_PATHS = [
   "/login",
   "/register",
   "/auth",
+  "/cli",
   "/post-login",
   "/pricing",
   "/demo",
@@ -15,11 +16,17 @@ const PUBLIC_PATHS = [
   "/refund-policy",
   "/terms-and-conditions",
   "/api/auth",
+  "/api/cli",
   "/api/contact",
   "/ping",
   "/docs",
   "/api/mcp",
 ];
+
+/** CLI device-flow user codes are short (8 chars). Supabase PKCE codes are long. */
+function looksLikeSupabaseAuthCode(code: string): boolean {
+  return code.length >= 20;
+}
 
 const AUTH_PAGES = ["/login", "/register"];
 
@@ -168,11 +175,18 @@ export async function proxy(request: NextRequest) {
   // Supabase PKCE sometimes redirects to Site URL (/) with ?code= when the
   // exact redirectTo path is not allow-listed. Forward to /auth/oauth so the
   // server can exchange the code and mint the app session.
+  //
+  // Do NOT hijack `/cli/authorize?code=XXXX` — that `code` is the CLI device
+  // flow user code (8 chars), not a Supabase PKCE auth code. Hijacking it
+  // caused exchange_failed / "PKCE code verifier not found" on CLI login.
   const oauthCode = request.nextUrl.searchParams.get("code");
   if (
     oauthCode &&
+    looksLikeSupabaseAuthCode(oauthCode) &&
     !pathname.startsWith("/auth/oauth") &&
-    !pathname.startsWith("/auth/confirm")
+    !pathname.startsWith("/auth/confirm") &&
+    !pathname.startsWith("/cli/") &&
+    !pathname.startsWith("/api/cli/")
   ) {
     const oauthUrl = new URL(`${base}/auth/oauth`, request.url);
     oauthUrl.searchParams.set("code", oauthCode);
