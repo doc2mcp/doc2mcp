@@ -218,6 +218,19 @@ export async function proxy(request: NextRequest) {
     return response;
   }
 
+  // OAuth PKCE callback: never run updateSession/getSafeUser here.
+  // Stale refresh tokens trigger signOut({ scope: "local" }) which clears
+  // `sb-*-auth-token-code-verifier` from the request before /auth/oauth can
+  // exchange the code → "PKCE code verifier not found in storage".
+  if (
+    pathname.startsWith("/auth/oauth") ||
+    pathname.startsWith("/auth/confirm")
+  ) {
+    const response = NextResponse.next({ request });
+    applySecurityHeaders(response);
+    return response;
+  }
+
   const { supabaseResponse, user } = await updateSession(request);
 
   setCurrencyHintIfMissing(request, supabaseResponse);
