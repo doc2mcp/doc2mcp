@@ -134,6 +134,11 @@ export function clearSupabaseAuthCookiesOnResponse(
   response: NextResponse
 ) {
   for (const name of supabaseAuthCookieNames(request)) {
+    // Never clear the PKCE code-verifier — wiping it mid-login breaks
+    // exchangeCodeForSession on /auth/oauth.
+    if (name.includes("code-verifier")) {
+      continue;
+    }
     response.cookies.set(name, "", {
       path: "/",
       maxAge: 0,

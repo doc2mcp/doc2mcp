@@ -1,6 +1,7 @@
 import { type CookieOptions, createServerClient } from "@supabase/ssr";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+import { getDoc2McpBaseUrl } from "@/lib/doc2mcp/app-url";
 import {
   getSupabasePublicEnv,
   isSupabasePublicConfigured,
@@ -14,6 +15,14 @@ function safeRedirectUrl(raw: string | null): string | null {
   return raw;
 }
 
+/** Always use the canonical public origin for OAuth redirect_to (www). */
+function oauthOrigin(request: NextRequest): string {
+  if (process.env.VERCEL_ENV === "production") {
+    return getDoc2McpBaseUrl();
+  }
+  return new URL(request.url).origin;
+}
+
 /**
  * Start Google OAuth. PKCE code-verifier cookies must be attached to the
  * redirect Response that leaves this route — using cookies().set() alone can
@@ -21,7 +30,8 @@ function safeRedirectUrl(raw: string | null): string | null {
  * "PKCE code verifier not found in storage" on /auth/oauth.
  */
 export async function GET(request: NextRequest) {
-  const { searchParams, origin } = new URL(request.url);
+  const { searchParams } = new URL(request.url);
+  const origin = oauthOrigin(request);
   const redirectUrl = safeRedirectUrl(searchParams.get("redirectUrl"));
 
   if (!isSupabasePublicConfigured()) {
