@@ -27,10 +27,25 @@ export type ApiEndpoint = {
   tags?: string[];
 };
 
+export type JsonSchemaProperty = {
+  type?: string | string[];
+  description?: string;
+  default?: unknown;
+  properties?: Record<string, JsonSchemaProperty>;
+  items?: JsonSchemaProperty | JsonSchemaProperty[];
+  enum?: unknown[];
+  [key: string]: unknown;
+};
+
+export type JsonSchemaObject = JsonSchemaProperty & {
+  properties?: Record<string, JsonSchemaProperty>;
+  required?: string[];
+};
+
 export type CompressedTool = {
   name: string;
   description: string;
-  parameters: Record<string, unknown>;
+  parameters: JsonSchemaObject;
   endpoints: string[];
   /** 0..100 confidence assigned by the MCP correctness layer. */
   confidence?: number;
@@ -41,7 +56,7 @@ export type CompressedTool = {
 export type McpToolDefinition = {
   name: string;
   description: string;
-  inputSchema: Record<string, unknown>;
+  inputSchema: JsonSchemaObject;
 };
 
 export type McpServerConfig = {
