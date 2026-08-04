@@ -34,6 +34,12 @@ export function AutoSyncSection() {
   const [activeStep, setActiveStep] = useState(0);
 
   useEffect(() => {
+    if (
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      return;
+    }
     const id = setInterval(() => {
       setActiveStep((s) => (s + 1) % TIMELINE.length);
     }, 1800);

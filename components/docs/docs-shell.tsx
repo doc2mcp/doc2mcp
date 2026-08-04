@@ -33,15 +33,15 @@ function SidebarFallback() {
 
 function MobileNavFallback() {
   return (
-    <Button
-      aria-label="Open documentation menu"
-      className="lg:hidden"
-      disabled
-      size="icon-sm"
-      variant="ghost"
+    <div
+      aria-busy="true"
+      aria-label="Loading documentation menu"
+      className="flex size-8 items-center justify-center lg:hidden"
+      role="status"
     >
-      <Menu className="size-4" />
-    </Button>
+      <span className="size-4 animate-pulse rounded bg-muted" />
+      <span className="sr-only">Loading menu…</span>
+    </div>
   );
 }
 
