@@ -1,4 +1,4 @@
-import { Github, Menu } from "lucide-react";
+import { Github } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
 import { Doc2McpLogo } from "@/components/doc2mcp/logo";
@@ -6,7 +6,6 @@ import { ThemeToggle } from "@/components/doc2mcp/theme-toggle";
 import { DocsMobileNavLoader } from "@/components/docs/docs-mobile-nav-loader";
 import { DocsSearchLoader } from "@/components/docs/docs-search-loader";
 import { DocsSidebarLoader } from "@/components/docs/docs-sidebar-loader";
-import { Button } from "@/components/ui/button";
 
 const NAV_LINKS = [
   { href: "/docs", label: "Docs" },
