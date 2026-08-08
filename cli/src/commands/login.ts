@@ -1,7 +1,7 @@
 import open from "open";
 import ora from "ora";
 import pc from "picocolors";
-import { apiFetch, printError } from "../api.js";
+import { ApiError, apiFetch, printError } from "../api.js";
 import { getApiUrl } from "../config.js";
 import { loadConfig, saveConfig } from "../store.js";
 
@@ -23,6 +23,17 @@ type AuthPollResponse =
       token: string;
       user: { id: string; email: string; name: string | null };
     };
+
+export function recoverAlreadyDeliveredPoll(error: unknown): AuthPollResponse {
+  const body =
+    error instanceof ApiError && error.status === 409
+      ? (error.body as { status?: unknown } | null)
+      : null;
+  if (body?.status === "already_delivered") {
+    return body as AuthPollResponse;
+  }
+  throw error;
+}
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => {
@@ -64,11 +75,16 @@ export async function runLogin(): Promise<void> {
     while (Date.now() < deadline) {
       await sleep(intervalMs);
 
-      const poll = await apiFetch<AuthPollResponse>("/api/cli/auth/poll", {
-        method: "POST",
-        auth: false,
-        body: JSON.stringify({ deviceCode: start.deviceCode }),
-      });
+      let poll: AuthPollResponse;
+      try {
+        poll = await apiFetch<AuthPollResponse>("/api/cli/auth/poll", {
+          method: "POST",
+          auth: false,
+          body: JSON.stringify({ deviceCode: start.deviceCode }),
+        });
+      } catch (error) {
+        poll = recoverAlreadyDeliveredPoll(error);
+      }
 
       if (poll.status === "pending") {
         continue;
@@ -89,6 +105,14 @@ export async function runLogin(): Promise<void> {
 
       if (poll.status === "denied") {
         pollSpinner.fail("Authorization denied");
+        process.exitCode = 1;
+        return;
+      }
+
+      if (poll.status === "already_delivered") {
+        pollSpinner.fail(
+          "Authorization already completed. Check ~/.doc2mcp/config.json or run `doc2mcp login` again."
+        );
         process.exitCode = 1;
         return;
       }
