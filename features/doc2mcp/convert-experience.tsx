@@ -144,8 +144,12 @@ export function ConvertExperience({
   }, [isProcessing, project.id]);
 
   const share = async () => {
-    await navigator.clipboard.writeText(window.location.href);
-    toast.success("Project link copied");
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      toast.success("Project link copied");
+    } catch {
+      toast.error("Could not copy — select the link manually");
+    }
   };
 
   return (
