@@ -1,4 +1,4 @@
-import { Github, Menu } from "lucide-react";
+import { Github } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
 import { Doc2McpLogo } from "@/components/doc2mcp/logo";
@@ -6,7 +6,6 @@ import { ThemeToggle } from "@/components/doc2mcp/theme-toggle";
 import { DocsMobileNavLoader } from "@/components/docs/docs-mobile-nav-loader";
 import { DocsSearchLoader } from "@/components/docs/docs-search-loader";
 import { DocsSidebarLoader } from "@/components/docs/docs-sidebar-loader";
-import { Button } from "@/components/ui/button";
 
 const NAV_LINKS = [
   { href: "/docs", label: "Docs" },
@@ -33,15 +32,15 @@ function SidebarFallback() {
 
 function MobileNavFallback() {
   return (
-    <Button
-      aria-label="Open documentation menu"
-      className="lg:hidden"
-      disabled
-      size="icon-sm"
-      variant="ghost"
+    <div
+      aria-busy="true"
+      aria-label="Loading documentation menu"
+      className="flex size-8 items-center justify-center lg:hidden"
+      role="status"
     >
-      <Menu className="size-4" />
-    </Button>
+      <span className="size-4 animate-pulse rounded bg-muted" />
+      <span className="sr-only">Loading menu…</span>
+    </div>
   );
 }
 
